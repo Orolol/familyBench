@@ -1,10 +1,10 @@
-# TreeEval 🌳
+# FamilyBench 🌳
 
-TreeEval is an evaluation tool for testing the relational reasoning capabilities of Large Language Models (LLMs). It generates random family trees, converts them to textual descriptions, and creates question-answer pairs to evaluate understanding of complex family relationships.
+FamilyBench is an evaluation tool for testing the relational reasoning capabilities of Large Language Models (LLMs). It generates random family trees, converts them to textual descriptions, and creates question-answer pairs to evaluate understanding of complex family relationships.
 
 ## 🎯 Objective
 
-TreeEval enables systematic and reproducible evaluation of LLMs' ability to:
+FamilyBench enables systematic and reproducible evaluation of LLMs' ability to:
 - Understand direct family relationships (parents, children)
 - Infer complex relationships (grandparents, cousins, uncles/aunts)
 - Reason across multiple generations
@@ -29,8 +29,8 @@ TreeEval enables systematic and reproducible evaluation of LLMs' ability to:
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/treeeval.git
-cd treeeval
+git clone https://github.com/yourusername/familybench.git
+cd familybench
 ```
 
 2. Install dependencies:
@@ -135,7 +135,7 @@ python analyze_results.py evaluation_results/results_*.csv --report report.html
 
 ## 🧠 Question Types
 
-TreeEval generates 9 types of questions:
+FamilyBench generates 9 types of questions:
 
 1. **Direct relations**: "Who are Marie's children?"
 2. **Inverse relations**: "Whose child is Jean?"
@@ -180,7 +180,7 @@ TreeEval generates 9 types of questions:
 
 ## 🌍 Multi-language Support
 
-TreeEval currently supports:
+FamilyBench currently supports:
 - 🇫🇷 French (fr)
 - 🇬🇧 English (en)
 
@@ -193,7 +193,7 @@ Translations include:
 ## 🔧 Architecture
 
 ```
-treeeval/
+familybench/
 ├── tree_evaluator/
 │   ├── __init__.py
 │   ├── models.py           # Data models (Person)
@@ -218,7 +218,7 @@ Typical generation times:
 
 ## 🏆 Benchmark Results
 
-Here are the evaluation results of several state-of-the-art models on TreeEval:
+Here are the evaluation results of several state-of-the-art models on FamilyBench:
 
 ### Evaluation Configuration
 - **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
