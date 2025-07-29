@@ -228,38 +228,46 @@ Here are the evaluation results of several state-of-the-art models on TreeEval:
 
 ### Results Summary
 
-| Model | Accuracy | Exact Match | Avg Response Time | Total Tokens | Reasoning Tokens | Error Rate |
-|-------|----------|-------------|-------------------|--------------|------------------|------------|
-| **GLM 4.5** | **64.02%** | 61.90% | 81.98s | 216,281 | 292,394 | 0% |
-| **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 0% |
+| Model | Accuracy | Exact Match | Avg Response Time | Total Tokens | Reasoning Tokens | No Response Rate |
+|-------|----------|-------------|-------------------|--------------|------------------|------------------|
+| **Gemini 2.5 Pro** | **81.48%** | 77.25% | 22.54s | 271,500 | 95,260 | 0% |
+| **GLM 4.5** | 64.02% | 61.90% | 81.98s | 216,281 | 292,394 | 2.12% |
+| **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 26.46% |
 | **Qwen 3.2 Thinking** | 50.26% | 50.26% | 326.30s | 743,131 | 1,077,814 | 20.63% |
 | **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
-| **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0% |
+| **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0.53% |
 | **Mistral Small 3.2** | 22.22% | 22.22% | 13.03s | 5,353 | 0 | 0% |
-| **Magistral Medium** | 0.53% | 0.53% | 68.73s | 22,830 | 35,796 | 97.35% |
 
 ### Detailed Performance Analysis
 
 #### Top Performers
 
-**GLM 4.5** (Best Overall)
+**Gemini 2.5 Pro** (Best Overall)
+- **Accuracy**: 81.48% (154/189 correct)
+- **Enigma Performance**: 22.22% (2/9 correct)
+- **Normal Questions**: 84.44% (152/180 correct)
+- **Efficiency**: Best accuracy with moderate token usage and fast responses
+- **Reliability**: Perfect 0% no-response rate
+- **Reasoning**: Efficient reasoning with only 504 tokens average
+
+**GLM 4.5**
 - **Accuracy**: 64.02% (121/189 correct)
 - **Enigma Performance**: 22.22% (2/9 correct)
 - **Normal Questions**: 66.11% (119/180 correct)
-- **Efficiency**: Best balance of accuracy, speed, and token usage
-- **Reliability**: Only 2.12% no-response rate
+- **Balance**: Good accuracy with reasonable resource usage
+- **Reliability**: Low 2.12% no-response rate
 
 **GLM 4.5 Air**
 - **Accuracy**: 57.14% (108/189 correct)
-- **Enigma Performance**: 33.33% (3/9 correct, best among all models)
+- **Enigma Performance**: 33.33% (3/9 correct, best enigma performance)
 - **Token Usage**: 4.2x more tokens than standard GLM 4.5
-- **Weakness**: High no-response rate (26.46%)
+- **Weakness**: Very high no-response rate (26.46%)
 
 **Qwen 3.2 Thinking**
 - **Accuracy**: 50.26% (95/189 correct)
-- **Enigma Performance**: 37.5% (3/8 correct)
+- **Enigma Performance**: 37.5% (3/8 correct, second best)
 - **Reasoning**: Extensive reasoning (7,185 avg tokens)
-- **Weakness**: 20.63% error rate limits reliability
+- **Weakness**: 20.63% no-response rate limits reliability
 
 #### Mid-Tier Models
 
@@ -281,19 +289,8 @@ Here are the evaluation results of several state-of-the-art models on TreeEval:
 - **Accuracy**: 22.22% (42/189 correct)
 - **Enigma Performance**: 11.11% (1/9 correct)
 - **Speed**: Moderate (13.03s average)
+- **Reliability**: Perfect 0% no-response rate
 
-**Magistral Medium**
-- **Accuracy**: 0.53% (1/189 correct)
-- **Error Rate**: 97.35% (184/189 errors)
-- **Status**: Essentially non-functional on this task
-
-### Key Insights
-
-1. **Reasoning vs Performance**: Models with reasoning capabilities (GLM 4.5, Qwen Thinking) significantly outperform base models
-2. **Enigma Challenge**: All models struggle with enigma questions, with most achieving 0-40% accuracy
-3. **Speed-Accuracy Trade-off**: Faster models (Qwen 3.2, Mistral Small) sacrifice accuracy for speed
-4. **Token Efficiency**: GLM 4.5 achieves the best accuracy with moderate token usage
-5. **Reliability Issues**: Some models (Qwen Thinking, Magistral Medium) have high error rates affecting practical usability
 
 ### Benchmark Difficulty
 

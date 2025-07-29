@@ -38,14 +38,14 @@ models:
   #   max_tokens: 256
 
 
-  - name: "magistral-small-2506-thinking"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "mistralai/magistral-small-2506"
-    temperature: 0.3
-    max_tokens: 16000
-    reasoning:
-      max_tokens: 8000
+  # - name: "magistral-small-2506-thinking"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "mistralai/magistral-small-2506"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
 
   - name: "gemini-2.5-pro"
     api_base: "https://openrouter.ai/api/v1"

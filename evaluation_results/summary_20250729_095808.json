@@ -1,0 +1,56 @@
+{
+  "timestamp": "20250729_095808",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "gemini-2.5-pro"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "gemini-2.5-pro": {
+      "total_questions": 189,
+      "correct_answers": 154,
+      "accuracy": 0.8148148148148148,
+      "exact_matches": 146,
+      "exact_match_rate": 0.7724867724867724,
+      "avg_partial_score": 0.8472903877198905,
+      "avg_response_time": 22.53999635403749,
+      "total_tokens": 271500,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 95260,
+      "questions_with_reasoning": 189,
+      "avg_reasoning_tokens": 504.021164021164,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 152,
+        "accuracy": 0.8444444444444444
+      }
+    }
+  }
+}
