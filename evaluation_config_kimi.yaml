@@ -47,14 +47,14 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  - name: "gemini-2.5-pro"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "google/gemini-2.5-pro"
-    temperature: 0.3 
-    max_tokens: 16000
-    reasoning:
-      max_tokens: 8000 
+  # - name: "gemini-2.5-pro"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "google/gemini-2.5-pro"
+  #   temperature: 0.3 
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000 
 
 
   # - name: "glm-4.5"
@@ -83,6 +83,43 @@ models:
   #   max_tokens: 16000
   #   reasoning:
   #     max_tokens: 8000
+
+  - name: "gemma-3-27b-it"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemma-3-27b-it"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
+
+  - name: "deepseek-r1-0528"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "deepseek/deepseek-r1-0528"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
+
+  - name: "hunyuan-a13b-instruct"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "tencent/hunyuan-a13b-instruct"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
+
+  - name: "claude-sonnet-4"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "anthropic/claude-sonnet-4"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
+
 
 
 

@@ -1,0 +1,191 @@
+{
+  "timestamp": "20250729_154949",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "gemma-3-27b-it",
+    "deepseek-r1-0528",
+    "hunyuan-a13b-instruct",
+    "claude-sonnet-4"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "gemma-3-27b-it": {
+      "total_questions": 189,
+      "correct_answers": 34,
+      "accuracy": 0.17989417989417988,
+      "exact_matches": 34,
+      "exact_match_rate": 0.17989417989417988,
+      "avg_partial_score": 0.22868020433671843,
+      "avg_response_time": 4.972780501400983,
+      "total_tokens": 2888,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 1,
+      "no_response_rate": 0.005291005291005291,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 34,
+        "accuracy": 0.18888888888888888
+      }
+    },
+    "deepseek-r1-0528": {
+      "total_questions": 189,
+      "correct_answers": 143,
+      "accuracy": 0.7566137566137566,
+      "exact_matches": 140,
+      "exact_match_rate": 0.7407407407407407,
+      "avg_partial_score": 0.7804293450896753,
+      "avg_response_time": 97.82714401855671,
+      "total_tokens": 430628,
+      "errors": 2,
+      "error_rate": 0.010582010582010581,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 575624,
+      "questions_with_reasoning": 187,
+      "avg_reasoning_tokens": 3078.2032085561495,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 141,
+        "accuracy": 0.7833333333333333
+      }
+    },
+    "hunyuan-a13b-instruct": {
+      "total_questions": 189,
+      "correct_answers": 57,
+      "accuracy": 0.30158730158730157,
+      "exact_matches": 57,
+      "exact_match_rate": 0.30158730158730157,
+      "avg_partial_score": 0.3393462511619862,
+      "avg_response_time": 91.52137084486623,
+      "total_tokens": 131672,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 4,
+      "no_response_rate": 0.021164021164021163,
+      "total_reasoning_tokens": 121150,
+      "questions_with_reasoning": 189,
+      "avg_reasoning_tokens": 641.005291005291,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 1,
+        "accuracy": 0.1111111111111111,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 1,
+            "accuracy": 0.2
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 56,
+        "accuracy": 0.3111111111111111
+      }
+    },
+    "claude-sonnet-4": {
+      "total_questions": 189,
+      "correct_answers": 127,
+      "accuracy": 0.671957671957672,
+      "exact_matches": 123,
+      "exact_match_rate": 0.6507936507936508,
+      "avg_partial_score": 0.7173514474385658,
+      "avg_response_time": 32.93330070959828,
+      "total_tokens": 258883,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 2,
+      "no_response_rate": 0.010582010582010581,
+      "total_reasoning_tokens": 150642,
+      "questions_with_reasoning": 189,
+      "avg_reasoning_tokens": 797.047619047619,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 125,
+        "accuracy": 0.6944444444444444
+      }
+    }
+  }
+}
