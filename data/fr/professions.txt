@@ -1,0 +1,118 @@
+médecin
+ingénieur
+professeur
+artiste
+boulanger
+charpentier
+dentiste
+électricien
+fermier
+graphiste
+historien
+jardinier
+libraire
+musicien
+navigateur
+opticien
+photographe
+scientifique
+traducteur
+urbaniste
+vétérinaire
+web-designer
+xylophoniste
+youtubeur
+zoologiste
+acteur
+agent immobilier
+agriculteur
+analyste financier
+architecte
+archiviste
+assistant social
+assureur
+astronaute
+avocat
+bibliothécaire
+bijoutier
+boucher
+cameraman
+chef cuisinier
+chimiste
+chirurgien
+climatologue
+coach sportif
+coiffeur
+comédien
+comptable
+concepteur de jeux vidéo
+consultant
+contrôleur aérien
+cordiste
+couturier
+décorateur d'intérieur
+développeur web
+diététicien
+directeur artistique
+directeur des ressources humaines
+économiste
+écrivain
+éditeur
+éducateur spécialisé
+égoutier
+entraîneur
+ergonome
+expert-comptable
+fleuriste
+formateur
+géographe
+géologue
+gestionnaire de paie
+gestionnaire de patrimoine
+guide touristique
+horloger
+huissier de justice
+illustrateur
+infirmier
+informaticien
+inspecteur du travail
+journaliste
+juge
+kinésithérapeute
+logisticien
+maçon
+magistrat
+maître-nageur
+météorologue
+montageur vidéo
+notaire
+nutritionniste
+œnologue
+orthophoniste
+paysagiste
+pédiatre
+pharmacien
+philosophe
+pilote de ligne
+plombier
+poissonnier
+policier
+pompier
+producteur de cinéma
+psychologue
+réalisateur
+réceptionniste
+restaurateur d'œuvres d'art
+sapeur-pompier
+scénariste
+sociologue
+soldat
+soudeur
+statisticien
+styliste
+tatoueur
+taxidermiste
+technicien de laboratoire
+traducteur littéraire
+vendeur
+vigneron

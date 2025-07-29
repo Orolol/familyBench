@@ -1,0 +1,107 @@
+# Configuration pour l'évaluation automatique des modèles
+
+# Modèles à évaluer
+models:
+  - name: "glm-4.1v-9b-thinking"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "thudm/glm-4.1v-9b-thinking"
+    temperature: 0.3
+  - name: "o4-mini-high"
+
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "openai/o4-mini-high"
+    temperature: 0.3
+  - name: "deepseek-r1-0528"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "deepseek/deepseek-r1-0528"
+    temperature: 0.3
+
+  - name: "qwen-3.2-2507"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "qwen/qwen3-235b-a22b-thinking-2507"
+    temperature: 0.3
+
+  - name: "claude-opus-4"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "anthropic/claude-opus-4"
+    temperature: 0.3
+
+  - name: "gemini-2.5-pro"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-2.5-pro"
+    temperature: 0.3  
+
+  - name: "kimi-k2"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "moonshotai/kimi-k2"
+    temperature: 0.3
+
+  - name: "mistral-small-3.2-24b-instruct"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "mistralai/mistral-small-3.2-24b-instruct"
+    temperature: 0.3
+
+  - name: "magistral-medium-2506"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "mistralai/magistral-medium-2506"
+    temperature: 0.3
+
+
+# Configurations de benchmarks à exécuter
+benchmarks:
+
+
+
+  - name: "large_tree_en"
+    people: 100
+    depth: 4
+    questions: 100
+    root_couples: 3
+    seed: 1
+    language: "en"
+
+  - name: "huge_tree_en"
+    people: 200
+    depth: 8
+    questions: 100
+    root_couples: 8
+    seed: 2
+    language: "en"
+
+
+# Paramètres d'évaluation
+evaluation:
+  # Nombre de tentatives par modèle/benchmark
+  runs_per_benchmark: 3
+  
+  # Timeout pour chaque requête API (en secondes)
+  timeout: 60
+  
+  # Taille du batch pour grouper les questions (1 = pas de batching)
+  # Augmenter cette valeur peut améliorer les performances pour certains modèles
+  batch_size: 1
+  
+  # Dossier de sortie pour les résultats
+  output_dir: "evaluation_results"
+  
+  # Format de sortie
+  output_formats:
+    - csv
+    - json
+  
+  # Métriques à calculer
+  metrics:
+    - accuracy  # Nombre de bonnes réponses / total
+    - exact_match  # Match exact de la réponse
+    - partial_match  # Match partiel (pour les listes)
+    - response_time  # Temps de réponse
+    - token_count  # Nombre de tokens utilisés

@@ -1,0 +1,7 @@
+blond
+brun
+roux
+noir
+gris
+châtain
+blanc

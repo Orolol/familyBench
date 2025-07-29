@@ -1,0 +1,117 @@
+# Configuration pour l'évaluation automatique des modèles
+
+# Modèles à évaluer
+models:
+
+  # - name: "qwen-3.2-2507"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "qwen/qwen3-235b-a22b-2507"
+  #   temperature: 0.3
+  #   max_tokens: 256
+
+  # - name: "qwen-3.2-2507-thinking"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "qwen/qwen3-235b-a22b-thinking-2507"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "kimi-k2"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "moonshotai/kimi-k2"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+
+  # - name: "mistral-small-3.2-24b-instruct"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "mistralai/mistral-small-3.2-24b-instruct"
+  #   temperature: 0.3
+  #   max_tokens: 256
+
+
+  # - name: "magistral-medium-2506"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "mistralai/magistral-medium-2506"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "glm-4.5"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "z-ai/glm-4.5"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  - name: "glm-4.5-air"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "z-ai/glm-4.5-air"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      effort: "low"
+
+  # - name: "claude-sonnet-4"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "anthropic/claude-sonnet-4"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+
+
+
+# Configurations de benchmarks à exécuter
+benchmarks:
+
+
+  - name: "huge_tree_en"
+    people: 400
+    depth: 10
+    questions: 200
+    root_couples: 10
+    seed: 43
+    language: "en"
+
+
+
+# Paramètres d'évaluation
+evaluation:
+  # Nombre de tentatives par modèle/benchmark
+  runs_per_benchmark: 1
+  
+  # Timeout pour chaque requête API (en secondes)
+  timeout: 600
+  
+  # Dossier de sortie pour les résultats
+  output_dir: "evaluation_results"
+
+  batch_size: 1
+  
+  # Format de sortie
+  output_formats:
+    - csv
+    - json
+  
+  # Métriques à calculer
+  metrics:
+    - accuracy  # Nombre de bonnes réponses / total
+    - exact_match  # Match exact de la réponse
+    - partial_match  # Match partiel (pour les listes)
+    - response_time  # Temps de réponse
+    - token_count  # Nombre de tokens utilisés

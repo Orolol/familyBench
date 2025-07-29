@@ -1,0 +1,39 @@
+doctor
+teacher
+engineer
+nurse
+lawyer
+chef
+firefighter
+scientist
+artist
+writer
+musician
+actor
+photographer
+journalist
+architect
+dentist
+veterinarian
+pilot
+farmer
+electrician
+plumber
+carpenter
+mechanic
+pharmacist
+accountant
+banker
+salesperson
+manager
+secretary
+programmer
+web designer
+graphic designer
+translator
+librarian
+psychologist
+therapist
+social worker
+waiter
+cashier

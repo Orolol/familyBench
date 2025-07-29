@@ -1,0 +1,6 @@
+bleu
+vert
+marron
+gris
+noir
+noisette

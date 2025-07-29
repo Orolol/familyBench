@@ -1,0 +1,20 @@
+# Dépendances pour TreeEval
+
+# Pour l'évaluation automatique des modèles
+aiohttp>=3.9.0     # Client HTTP asynchrone pour les API
+pyyaml>=6.0        # Lecture des fichiers de configuration YAML
+python-dotenv>=1.0.0  # Gestion des variables d'environnement
+
+# Pour l'analyse des résultats (optionnel)
+pandas>=2.0.0      # Analyse des données CSV
+matplotlib>=3.7.0  # Génération de graphiques
+seaborn>=0.12.0    # Graphiques statistiques avancés
+
+# Pour les tests (optionnel)
+pytest>=7.0.0      # Framework de tests
+pytest-asyncio>=0.21.0  # Support des tests asynchrones
+
+# Dépendances de développement (optionnel)
+black>=23.0.0      # Formatage du code
+flake8>=6.0.0      # Linting
+mypy>=1.0.0        # Vérification des types

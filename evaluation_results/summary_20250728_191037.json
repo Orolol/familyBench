@@ -1,0 +1,101 @@
+{
+  "timestamp": "20250728_191037",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "qwen-3.2-2507",
+    "qwen-3.2-2507-thinking"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "qwen-3.2-2507": {
+      "total_questions": 99,
+      "correct_answers": 26,
+      "accuracy": 0.26262626262626265,
+      "exact_matches": 26,
+      "exact_match_rate": 0.26262626262626265,
+      "avg_partial_score": 0.33445143508032077,
+      "avg_response_time": 4.695499453881775,
+      "total_tokens": 962,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 90,
+        "correct": 26,
+        "accuracy": 0.28888888888888886
+      }
+    },
+    "qwen-3.2-2507-thinking": {
+      "total_questions": 99,
+      "correct_answers": 42,
+      "accuracy": 0.42424242424242425,
+      "exact_matches": 41,
+      "exact_match_rate": 0.41414141414141414,
+      "avg_partial_score": 0.4341814097911659,
+      "avg_response_time": 319.3403243874059,
+      "total_tokens": 152516,
+      "errors": 42,
+      "error_rate": 0.42424242424242425,
+      "no_responses": 3,
+      "no_response_rate": 0.030303030303030304,
+      "total_reasoning_tokens": 213750,
+      "questions_with_reasoning": 57,
+      "avg_reasoning_tokens": 3750.0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 1,
+        "accuracy": 0.1111111111111111,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 90,
+        "correct": 41,
+        "accuracy": 0.45555555555555555
+      }
+    }
+  }
+}

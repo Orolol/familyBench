@@ -1,0 +1,56 @@
+{
+  "timestamp": "20250728_211020",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "glm-4.5"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "glm-4.5": {
+      "total_questions": 189,
+      "correct_answers": 121,
+      "accuracy": 0.6402116402116402,
+      "exact_matches": 117,
+      "exact_match_rate": 0.6190476190476191,
+      "avg_partial_score": 0.6963276388143026,
+      "avg_response_time": 81.978038753782,
+      "total_tokens": 216281,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 4,
+      "no_response_rate": 0.021164021164021163,
+      "total_reasoning_tokens": 292394,
+      "questions_with_reasoning": 154,
+      "avg_reasoning_tokens": 1898.6623376623377,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 119,
+        "accuracy": 0.6611111111111111
+      }
+    }
+  }
+}

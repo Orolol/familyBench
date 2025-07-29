@@ -1,0 +1,12 @@
+blue
+brown
+green
+hazel
+gray
+amber
+black
+dark brown
+light brown
+blue-gray
+green-brown
+violet
