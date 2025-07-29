@@ -1,3 +1,4 @@
+
 # Configuration pour l'évaluation automatique des modèles
 
 # Modèles à évaluer
@@ -37,14 +38,24 @@ models:
   #   max_tokens: 256
 
 
-  # - name: "magistral-medium-2506"
-  #   api_base: "https://openrouter.ai/api/v1"
-  #   api_key: "${OPENROUTER_API_KEY}"
-  #   model: "mistralai/magistral-medium-2506"
-  #   temperature: 0.3
-  #   max_tokens: 16000
-  #   reasoning:
-  #     max_tokens: 8000
+  - name: "magistral-medium-2506-thinking"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "mistralai/magistral-medium-2506:thinking"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
+
+  - name: "gemini-2.5-pro"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-2.5-pro"
+    temperature: 0.3 
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000 
+
 
   # - name: "glm-4.5"
   #   api_base: "https://openrouter.ai/api/v1"
@@ -55,14 +66,14 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  - name: "glm-4.5-air"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "z-ai/glm-4.5-air"
-    temperature: 0.3
-    max_tokens: 16000
-    reasoning:
-      effort: "low"
+  # - name: "glm-4.5-air"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "z-ai/glm-4.5-air"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     effort: "low"
 
   # - name: "claude-sonnet-4"
   #   api_base: "https://openrouter.ai/api/v1"

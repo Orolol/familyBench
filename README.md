@@ -221,39 +221,88 @@ Typical generation times:
 Here are the evaluation results of several state-of-the-art models on TreeEval:
 
 ### Evaluation Configuration
-- **Benchmarks**: 
-  - `large_tree_en`: 100 people, depth 4, 100 questions
-  - `huge_tree_en`: 200 people, depth 8, 100 questions
-- **Runs**: 3 runs per benchmark (600 questions total per model)
+- **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
 - **Temperature**: 0.3 for all models
+- **Evaluation Date**: July 28, 2025
+- **Total Questions**: 189 per model (after filtering)
 
-### Results by Model
+### Results Summary
 
-| Model | Global Accuracy | Large Tree | Huge Tree | Avg Time | Tokens Used |
-|-------|-----------------|------------|-----------|----------|-------------|
-| **Gemini 2.5 Pro** | **70.17%** | 78.33% | 62.00% | 9.22s | 1,238,391 |
-| **Kimi K2** | 45.00% | 52.67% | 37.33% | 5.08s | 3,907 |
-| **o4-mini-high** | 42.83% | 53.67% | 32.00% | 29.81s | 645,714 |
-| **Mistral Small 3.2** | 41.67% | 45.67% | 37.67% | 5.73s | 13,314 |
-| **Claude Opus 4** | 30.33% | 34.33% | 26.33% | 9.62s | 2,691 |
-| **DeepSeek R1** | 27.67% | 32.00% | 23.33% | 41.47s | 329,004 |
-| **Qwen 3.2** | 22.33% | 25.33% | 19.33% | 43.58s | 200,866 |
-| **GLM 4.1v** | 7.33% | 11.00% | 3.67% | 35.14s | 293,232 |
-| **Magistral Medium** | 0.00% | 0.00% | 0.00% | 3.92s | 0 |
+| Model | Accuracy | Exact Match | Avg Response Time | Total Tokens | Reasoning Tokens | Error Rate |
+|-------|----------|-------------|-------------------|--------------|------------------|------------|
+| **GLM 4.5** | **64.02%** | 61.90% | 81.98s | 216,281 | 292,394 | 0% |
+| **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 0% |
+| **Qwen 3.2 Thinking** | 50.26% | 50.26% | 326.30s | 743,131 | 1,077,814 | 20.63% |
+| **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
+| **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0% |
+| **Mistral Small 3.2** | 22.22% | 22.22% | 13.03s | 5,353 | 0 | 0% |
+| **Magistral Medium** | 0.53% | 0.53% | 68.73s | 22,830 | 35,796 | 97.35% |
 
-### Results Analysis
+### Detailed Performance Analysis
 
-- **Best model**: Gemini 2.5 Pro dominates with 70% accuracy, particularly strong on medium-sized trees
-- **Efficiency**: Kimi K2 offers the best speed/performance tradeoff (45% accuracy in 5s)
-- **Scalability**: All models see performance drop on very deep trees (huge_tree)
-- **Variability**: Some models show high variability between runs (e.g., Claude Opus 4)
+#### Top Performers
 
-### Observed Challenges
+**GLM 4.5** (Best Overall)
+- **Accuracy**: 64.02% (121/189 correct)
+- **Enigma Performance**: 22.22% (2/9 correct)
+- **Normal Questions**: 66.11% (119/180 correct)
+- **Efficiency**: Best balance of accuracy, speed, and token usage
+- **Reliability**: Only 2.12% no-response rate
 
-Models particularly struggle with:
-- Complex relationships (cousins, uncles/aunts) in large trees
-- Cross-sectional questions requiring traversal of multiple generations
-- Maintaining consistency over very long descriptions (200+ people)
+**GLM 4.5 Air**
+- **Accuracy**: 57.14% (108/189 correct)
+- **Enigma Performance**: 33.33% (3/9 correct, best among all models)
+- **Token Usage**: 4.2x more tokens than standard GLM 4.5
+- **Weakness**: High no-response rate (26.46%)
+
+**Qwen 3.2 Thinking**
+- **Accuracy**: 50.26% (95/189 correct)
+- **Enigma Performance**: 37.5% (3/8 correct)
+- **Reasoning**: Extensive reasoning (7,185 avg tokens)
+- **Weakness**: 20.63% error rate limits reliability
+
+#### Mid-Tier Models
+
+**Kimi K2**
+- **Accuracy**: 34.92% (66/189 correct)
+- **Speed**: Fast responses (16.04s average)
+- **Enigma Performance**: 0% (failed all enigma questions)
+- **Reliability**: 100% response rate
+
+**Qwen 3.2** (Base Model)
+- **Accuracy**: 28.04% (53/189 correct)
+- **Speed**: Fastest model (5.06s average)
+- **Token Efficiency**: Minimal token usage (3,098 total)
+- **Enigma Performance**: 0% (failed all enigma questions)
+
+#### Lower Performers
+
+**Mistral Small 3.2**
+- **Accuracy**: 22.22% (42/189 correct)
+- **Enigma Performance**: 11.11% (1/9 correct)
+- **Speed**: Moderate (13.03s average)
+
+**Magistral Medium**
+- **Accuracy**: 0.53% (1/189 correct)
+- **Error Rate**: 97.35% (184/189 errors)
+- **Status**: Essentially non-functional on this task
+
+### Key Insights
+
+1. **Reasoning vs Performance**: Models with reasoning capabilities (GLM 4.5, Qwen Thinking) significantly outperform base models
+2. **Enigma Challenge**: All models struggle with enigma questions, with most achieving 0-40% accuracy
+3. **Speed-Accuracy Trade-off**: Faster models (Qwen 3.2, Mistral Small) sacrifice accuracy for speed
+4. **Token Efficiency**: GLM 4.5 achieves the best accuracy with moderate token usage
+5. **Reliability Issues**: Some models (Qwen Thinking, Magistral Medium) have high error rates affecting practical usability
+
+### Benchmark Difficulty
+
+The `huge_tree_en` benchmark represents an extreme challenge:
+- **400 people** across 10 generations
+- **10 root couples** creating multiple interconnected family trees
+- **200 questions** testing various relationship types
+- Models must maintain consistency across extremely long contexts
+- **Enigma questions** require complex multi-step reasoning
 
 ## 🤝 Contributing
 
