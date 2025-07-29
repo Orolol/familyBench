@@ -38,10 +38,10 @@ models:
   #   max_tokens: 256
 
 
-  - name: "magistral-medium-2506-thinking"
+  - name: "magistral-small-2506-thinking"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "mistralai/magistral-medium-2506:thinking"
+    model: "mistralai/magistral-small-2506"
     temperature: 0.3
     max_tokens: 16000
     reasoning:
