@@ -1,0 +1,191 @@
+{
+  "timestamp": "20250731_105059",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "horizon-alpha",
+    "qwen-3-30b-a3b-instruct-2507",
+    "qwen3-coder",
+    "google/gemini-2.5-flash"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "horizon-alpha": {
+      "total_questions": 189,
+      "correct_answers": 63,
+      "accuracy": 0.3333333333333333,
+      "exact_matches": 63,
+      "exact_match_rate": 0.3333333333333333,
+      "avg_partial_score": 0.43119395051801923,
+      "avg_response_time": 5.336630431432573,
+      "total_tokens": 17512,
+      "errors": 1,
+      "error_rate": 0.005291005291005291,
+      "no_responses": 1,
+      "no_response_rate": 0.005291005291005291,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 3,
+        "accuracy": 0.3333333333333333,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 60,
+        "accuracy": 0.3333333333333333
+      }
+    },
+    "qwen-3-30b-a3b-instruct-2507": {
+      "total_questions": 189,
+      "correct_answers": 15,
+      "accuracy": 0.07936507936507936,
+      "exact_matches": 15,
+      "exact_match_rate": 0.07936507936507936,
+      "avg_partial_score": 0.11645894023128084,
+      "avg_response_time": 6.740056500863776,
+      "total_tokens": 7096,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 1,
+      "no_response_rate": 0.005291005291005291,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 15,
+        "accuracy": 0.08333333333333333
+      }
+    },
+    "qwen3-coder": {
+      "total_questions": 189,
+      "correct_answers": 40,
+      "accuracy": 0.21164021164021163,
+      "exact_matches": 40,
+      "exact_match_rate": 0.21164021164021163,
+      "avg_partial_score": 0.2586960222060751,
+      "avg_response_time": 18.0117233140128,
+      "total_tokens": 40031,
+      "errors": 1,
+      "error_rate": 0.005291005291005291,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 1,
+        "accuracy": 0.1111111111111111,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 39,
+        "accuracy": 0.21666666666666667
+      }
+    },
+    "google/gemini-2.5-flash": {
+      "total_questions": 189,
+      "correct_answers": 139,
+      "accuracy": 0.7354497354497355,
+      "exact_matches": 135,
+      "exact_match_rate": 0.7142857142857143,
+      "avg_partial_score": 0.7787703737528616,
+      "avg_response_time": 17.854596845687382,
+      "total_tokens": 258214,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 5,
+      "no_response_rate": 0.026455026455026454,
+      "total_reasoning_tokens": 83022,
+      "questions_with_reasoning": 189,
+      "avg_reasoning_tokens": 439.26984126984127,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 137,
+        "accuracy": 0.7611111111111111
+      }
+    }
+  }
+}

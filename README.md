@@ -232,15 +232,19 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 |-------|----------|-------------|-------------------|--------------|------------------|------------------|
 | **Gemini 2.5 Pro** | **81.48%** | 77.25% | 22.54s | 271,500 | 95,260 | 0% |
 | **DeepSeek R1** | 75.66% | 74.07% | 97.83s | 430,628 | 575,624 | 0% |
+| **Gemini 2.5 Flash** | 73.54% | 71.43% | 17.85s | 258,214 | 83,022 | 2.65% |
 | **Claude Sonnet 4** | 67.20% | 65.08% | 32.93s | 258,883 | 150,642 | 1.06% |
 | **GLM 4.5** | 64.02% | 61.90% | 81.98s | 216,281 | 292,394 | 2.12% |
 | **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 26.46% |
 | **Qwen 3.2 Thinking** | 50.26% | 50.26% | 326.30s | 743,131 | 1,077,814 | 20.63% |
 | **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
+| **Horizon Alpha** | 33.33% | 33.33% | 5.34s | 17,512 | 0 | 0.53% |
 | **Hunyuan A13B** | 30.16% | 30.16% | 91.52s | 131,672 | 121,150 | 2.12% |
 | **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0.53% |
 | **Mistral Small 3.2** | 22.22% | 22.22% | 13.03s | 5,353 | 0 | 0% |
+| **Qwen 3 Coder** | 21.16% | 21.16% | 18.01s | 40,031 | 0 | 0% |
 | **Gemma 3 27B** | 17.99% | 17.99% | 4.97s | 2,888 | 0 | 0.53% |
+| **Qwen 3 30B A3B** | 7.94% | 7.94% | 6.74s | 7,096 | 0 | 0.53% |
 
 ### Detailed Performance Analysis
 
@@ -261,6 +265,14 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reasoning**: Moderate reasoning usage (3,078 avg tokens)
 - **Reliability**: Excellent with 0% no-response rate
 - **Note**: 1.06% error rate but still highly reliable
+
+**Gemini 2.5 Flash** (New Addition)
+- **Accuracy**: 73.54% (139/189 correct)
+- **Enigma Performance**: 22.22% (2/9 correct)
+- **Normal Questions**: 76.11% (137/180 correct)
+- **Speed**: Fastest among top models (17.85s)
+- **Efficiency**: Excellent balance - 73.54% accuracy with minimal reasoning tokens (439 avg)
+- **Note**: Small 2.65% no-response rate but overall highly reliable
 
 **Claude Sonnet 4**
 - **Accuracy**: 67.20% (127/189 correct)
@@ -296,6 +308,13 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Enigma Performance**: 0% (failed all enigma questions)
 - **Reliability**: Perfect 0% no-response rate
 
+**Horizon Alpha** (New Addition)
+- **Accuracy**: 33.33% (63/189 correct)
+- **Enigma Performance**: 33.33% (3/9 correct, strong enigma performance)
+- **Speed**: Very fast (5.34s average)
+- **Token Efficiency**: Minimal usage (17,512 total)
+- **Note**: Better at enigmas than normal questions
+
 **Hunyuan A13B**
 - **Accuracy**: 30.16% (57/189 correct)
 - **Enigma Performance**: 11.11% (1/9 correct)
@@ -316,20 +335,35 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Speed**: Moderate (13.03s average)
 - **Reliability**: Perfect 0% no-response rate
 
+**Qwen 3 Coder** (New Addition)
+- **Accuracy**: 21.16% (40/189 correct)
+- **Enigma Performance**: 11.11% (1/9 correct)
+- **Speed**: Moderate (18.01s average)
+- **Token Usage**: Higher than similar performers (40,031 total)
+- **Note**: Despite being a coding model, struggles with relational reasoning
+
 **Gemma 3 27B**
 - **Accuracy**: 17.99% (34/189 correct)
 - **Speed**: Very fast (4.97s average)
 - **Token Efficiency**: Extremely minimal (2,888 total)
 - **Enigma Performance**: 0% (failed all enigma questions)
 
+**Qwen 3 30B A3B** (New Addition - Lowest Performer)
+- **Accuracy**: 7.94% (15/189 correct)
+- **Enigma Performance**: 0% (failed all enigma questions)
+- **Speed**: Fast (6.74s average)
+- **Token Efficiency**: Very minimal (7,096 total)
+- **Note**: Waiting to test the thinking model !
+
 ### Key Insights
 
-1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%) and DeepSeek R1 (75.66%) significantly outperform all others
-2. **Reasoning Capabilities Matter**: All top 4 models have reasoning capabilities, with Claude Sonnet 4 (67.20%) and GLM 4.5 (64.02%) forming a strong second tier
-3. **Enigma Challenge**: All models struggle with enigma questions, with most achieving only 0-40% accuracy. Interestingly, GLM 4.5 Air and Qwen Thinking perform better on enigmas despite lower overall scores
-4. **Reliability vs Performance**: High no-response rates (GLM 4.5 Air: 26.46%, Qwen Thinking: 20.63%) make these models impractical despite decent accuracy
-5. **Speed-Accuracy Trade-off**: The fastest models (Gemma 3: 4.97s, Qwen 3.2: 5.06s) have the lowest accuracy (17.99%, 28.04%)
-6. **Token Efficiency**: Gemini 2.5 Pro achieves the best accuracy with only 504 reasoning tokens, while DeepSeek R1 uses 3,078 for slightly lower accuracy
+1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), DeepSeek R1 (75.66%), and Gemini 2.5 Flash (73.54%) significantly outperform all others
+2. **Gemini Family Dominance**: Both Gemini models (Pro and Flash) are in the top 3, with Flash offering an excellent speed-accuracy balance
+3. **Reasoning Capabilities Matter**: All top 5 models have reasoning capabilities, with Claude Sonnet 4 (67.20%) and GLM 4.5 (64.02%) forming a strong second tier
+4. **Enigma Challenge**: All models struggle with enigma questions, with most achieving only 0-40% accuracy. Interestingly, Horizon Alpha (33.33%), GLM 4.5 Air, and Qwen Thinking perform better on enigmas despite lower overall scores
+5. **Reliability vs Performance**: High no-response rates (GLM 4.5 Air: 26.46%, Qwen Thinking: 20.63%) make these models impractical despite decent accuracy
+6. **Speed-Accuracy Trade-off**: The fastest models (Gemma 3: 4.97s, Qwen 3.2: 5.06s, Horizon Alpha: 5.34s) have lower accuracy, though Gemini 2.5 Flash breaks this pattern with fast speed and high accuracy
+7. **Token Efficiency**: Gemini 2.5 Flash achieves 73.54% accuracy with only 439 reasoning tokens average, making it the most efficient top performer
 
 ### Benchmark Difficulty
 
