@@ -121,34 +121,53 @@ models:
   #     max_tokens: 8000
 
 
-  - name: "horizon-alpha"
+  # - name: "horizon-alpha"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "openrouter/horizon-alpha"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "qwen-3-30b-a3b-instruct-2507"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "qwen/qwen3-30b-a3b-instruct-2507"
+  #   temperature: 0.3
+
+  # - name: "qwen3-coder"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "qwen/qwen3-coder"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "google/gemini-2.5-flash"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "google/gemini-2.5-flash"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  
+  - name: "gpt-oss-120b"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "openrouter/horizon-alpha"
+    model: "openai/gpt-oss-120b"
     temperature: 0.3
     max_tokens: 16000
     reasoning:
-      max_tokens: 8000
+      effort: "low"
 
-  - name: "qwen-3-30b-a3b-instruct-2507"
+  - name: "gpt-oss-20b"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "qwen/qwen3-30b-a3b-instruct-2507"
-    temperature: 0.3
-
-  - name: "qwen3-coder"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "qwen/qwen3-coder"
-    temperature: 0.3
-    max_tokens: 16000
-    reasoning:
-      max_tokens: 8000
-
-  - name: "google/gemini-2.5-flash"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "google/gemini-2.5-flash"
+    model: "openai/gpt-oss-20b"
     temperature: 0.3
     max_tokens: 16000
     reasoning:

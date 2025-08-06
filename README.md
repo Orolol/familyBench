@@ -223,7 +223,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 ### Evaluation Configuration
 - **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
 - **Temperature**: 0.3 for all models
-- **Evaluation Date**: July 28, 2025
+- **Evaluation Date**: August 06, 2025
 - **Total Questions**: 189 per model (after filtering)
 
 ### Results Summary
@@ -236,10 +236,11 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **Claude Sonnet 4** | 67.20% | 65.08% | 32.93s | 258,883 | 150,642 | 1.06% |
 | **GLM 4.5** | 64.02% | 61.90% | 81.98s | 216,281 | 292,394 | 2.12% |
 | **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 26.46% |
+| **GPT-OSS 120B** (New) | **50.26%** | 50.26% | 14.46s | 177,523 | 167,938 | 1.06% |
 | **Qwen 3.2 Thinking** | 50.26% | 50.26% | 326.30s | 743,131 | 1,077,814 | 20.63% |
 | **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
-| **Horizon Alpha** | 33.33% | 33.33% | 5.34s | 17,512 | 0 | 0.53% |
 | **Hunyuan A13B** | 30.16% | 30.16% | 91.52s | 131,672 | 121,150 | 2.12% |
+| **GPT-OSS 20B** (New) | **30.16%** | 30.16% | 26.40s | 264,276 | 201,172 | 0% |
 | **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0.53% |
 | **Mistral Small 3.2** | 22.22% | 22.22% | 13.03s | 5,353 | 0 | 0% |
 | **Qwen 3 Coder** | 21.16% | 21.16% | 18.01s | 40,031 | 0 | 0% |
@@ -266,7 +267,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reliability**: Excellent with 0% no-response rate
 - **Note**: 1.06% error rate but still highly reliable
 
-**Gemini 2.5 Flash** (New Addition)
+**Gemini 2.5 Flash**
 - **Accuracy**: 73.54% (139/189 correct)
 - **Enigma Performance**: 22.22% (2/9 correct)
 - **Normal Questions**: 76.11% (137/180 correct)
@@ -296,6 +297,14 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Token Usage**: 4.2x more tokens than standard GLM 4.5
 - **Weakness**: Very high no-response rate (26.46%)
 
+**GPT-OSS 120B** (New)
+- **Accuracy**: 50.26% (95/189 correct)
+- **Enigma Performance**: 11.11% (1/9 correct)
+- **Normal Questions**: 52.22% (94/180 correct)
+- **Speed**: Fast for its size (14.46s)
+- **Reasoning**: Uses reasoning tokens extensively (1,200 avg)
+- **Note**: A solid mid-tier performer, outperforming many similarly sized models.
+
 **Qwen 3.2 Thinking**
 - **Accuracy**: 50.26% (95/189 correct)
 - **Enigma Performance**: 37.5% (3/8 correct, second best enigma)
@@ -308,18 +317,19 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Enigma Performance**: 0% (failed all enigma questions)
 - **Reliability**: Perfect 0% no-response rate
 
-**Horizon Alpha** (New Addition)
-- **Accuracy**: 33.33% (63/189 correct)
-- **Enigma Performance**: 33.33% (3/9 correct, strong enigma performance)
-- **Speed**: Very fast (5.34s average)
-- **Token Efficiency**: Minimal usage (17,512 total)
-- **Note**: Better at enigmas than normal questions
-
 **Hunyuan A13B**
 - **Accuracy**: 30.16% (57/189 correct)
 - **Enigma Performance**: 11.11% (1/9 correct)
 - **Reasoning**: Light reasoning usage (641 avg tokens)
 - **Response Time**: Slower at 91.52s average
+
+**GPT-OSS 20B** (New)
+- **Accuracy**: 30.16% (57/189 correct)
+- **Enigma Performance**: 0% (0/9 correct)
+- **Normal Questions**: 31.67% (57/180 correct)
+- **Reliability**: Perfect 0% no-response rate
+- **Reasoning**: High reasoning token usage for its performance level (2,211 avg)
+- **Note**: Performance is in line with other models in its tier, but with higher token consumption.
 
 #### Lower Performers
 
@@ -335,7 +345,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Speed**: Moderate (13.03s average)
 - **Reliability**: Perfect 0% no-response rate
 
-**Qwen 3 Coder** (New Addition)
+**Qwen 3 Coder**
 - **Accuracy**: 21.16% (40/189 correct)
 - **Enigma Performance**: 11.11% (1/9 correct)
 - **Speed**: Moderate (18.01s average)
@@ -348,7 +358,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Token Efficiency**: Extremely minimal (2,888 total)
 - **Enigma Performance**: 0% (failed all enigma questions)
 
-**Qwen 3 30B A3B** (New Addition - Lowest Performer)
+**Qwen 3 30B A3B** (Lowest Performer)
 - **Accuracy**: 7.94% (15/189 correct)
 - **Enigma Performance**: 0% (failed all enigma questions)
 - **Speed**: Fast (6.74s average)
