@@ -155,25 +155,41 @@ models:
   #     max_tokens: 8000
 
   
-  - name: "gpt-oss-120b"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "openai/gpt-oss-120b"
-    temperature: 0.3
-    max_tokens: 16000
-    reasoning:
-      effort: "low"
+  # - name: "gpt-oss-120b"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "openai/gpt-oss-120b"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     effort: "low"
 
-  - name: "gpt-oss-20b"
+  # - name: "gpt-oss-20b"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "openai/gpt-oss-20b"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "gpt-5"
+  #   api_base: "https://api.openai.com/v1"
+  #   api_key: "${OPENAI_API_KEY}"
+  #   model: "gpt-5"
+  #   temperature: 0.3
+  #   max_tokens: 16000
+  #   reasoning:
+  #     effort: "low"
+
+  - name: "mistral-medium-3.1"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "openai/gpt-oss-20b"
+    model: "mistralai/mistral-medium-3.1"
     temperature: 0.3
     max_tokens: 16000
     reasoning:
       max_tokens: 8000
-
-
 
 
 

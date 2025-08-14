@@ -223,7 +223,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 ### Evaluation Configuration
 - **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
 - **Temperature**: 0.3 for all models
-- **Evaluation Date**: August 06, 2025
+- **Evaluation Date**: August 14, 2025
 - **Total Questions**: 189 per model (after filtering)
 
 ### Results Summary
@@ -241,6 +241,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
 | **Hunyuan A13B** | 30.16% | 30.16% | 91.52s | 131,672 | 121,150 | 2.12% |
 | **GPT-OSS 20B** (New) | **30.16%** | 30.16% | 26.40s | 264,276 | 201,172 | 0% |
+| **Mistral Medium 3.1** (New) | 29.63% | 29.63% | 6.64s | 6,062 | 0 | 0.53% |
 | **Qwen 3.2** | 28.04% | 28.04% | 5.06s | 3,098 | 0 | 0.53% |
 | **Mistral Small 3.2** | 22.22% | 22.22% | 13.03s | 5,353 | 0 | 0% |
 | **Qwen 3 Coder** | 21.16% | 21.16% | 18.01s | 40,031 | 0 | 0% |
@@ -330,6 +331,15 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reliability**: Perfect 0% no-response rate
 - **Reasoning**: High reasoning token usage for its performance level (2,211 avg)
 - **Note**: Performance is in line with other models in its tier, but with higher token consumption.
+
+**Mistral Medium 3.1** (New)
+- **Accuracy**: 29.63% (56/189 correct)
+- **Enigma Performance**: 22.22% (2/9 correct)
+- **Normal Questions**: 30.00% (54/180 correct)
+- **Speed**: Fast (6.64s average)
+- **Token Efficiency**: Very low token usage (6,062 total)
+- **Reliability**: 0.53% no-response rate
+- **Reasoning**: No reasoning tokens used
 
 #### Lower Performers
 
