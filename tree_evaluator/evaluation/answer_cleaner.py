@@ -167,17 +167,23 @@ class AnswerCleaner:
         
         # Vérifier si la réponse correspond à un pattern de non-réponse
         answer_lower = answer.lower().strip()
-        
+
+        # Les réponses numériques valides ne sont jamais des non-réponses
+        if answer.strip().isdigit():
+            return False
+
         # Vérification exacte
         if answer_lower in no_response_patterns:
             return True
         
         # Vérification si la réponse contient uniquement des caractères non alphabétiques
-        if not any(c.isalpha() for c in answer):
+        # Exception: les réponses numériques sont valides
+        if not any(c.isalpha() for c in answer) and not answer.strip().isdigit():
             return True
-        
+
         # Vérification si la réponse est trop courte et ne contient pas de nom propre
-        if len(answer_lower) < 3 and not answer[0].isupper():
+        # Exception: les réponses numériques sont valides même si courtes
+        if len(answer_lower) < 3 and not answer[0].isupper() and not answer.strip().isdigit():
             return True
         
         # Vérifier si c'est une phrase complète au lieu d'une réponse

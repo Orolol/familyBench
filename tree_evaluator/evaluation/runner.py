@@ -47,26 +47,64 @@ async def run_benchmark_evaluation(model: ModelEvaluator,
         results = []
         
         if batch_size > 1:
-            # Évaluation par batch
-            for i in range(0, len(questions), batch_size):
-                batch = questions[i:i + batch_size]
-                batch_results = await model.evaluate_questions_batch(
-                    tree_description, batch, session, timeout, language
-                )
-                results.extend(batch_results)
-                
-                # Afficher la progression
-                if len(questions) > 10:
-                    progress = min(i + batch_size, len(questions))
-                    print(f"    Progress: {progress}/{len(questions)} questions")
+            # Choix entre traitement parallèle ou séquentiel des batches selon la configuration de délai
+            if model.request_delay_ms > 0:
+                # Traitement séquentiel des batches avec délai
+                for i in range(0, len(questions), batch_size):
+                    batch = questions[i:i + batch_size]
+                    batch_results = await model.evaluate_questions_batch(
+                        tree_description, batch, session, timeout, language
+                    )
+                    results.extend(batch_results)
+
+                    # Afficher la progression
+                    if len(questions) > 10:
+                        progress = min(i + batch_size, len(questions))
+                        print(f"    Progress: {progress}/{len(questions)} questions")
+
+                    # Appliquer le délai configuré après chaque batch (sauf le dernier)
+                    if i + batch_size < len(questions):
+                        delay_seconds = model.request_delay_ms / 1000.0
+                        logger.debug(f"Applying {model.request_delay_ms}ms delay between batches for {model.name}")
+                        await asyncio.sleep(delay_seconds)
+            else:
+                # Traitement parallèle des batches pour les meilleures performances
+                batch_tasks = []
+                for i in range(0, len(questions), batch_size):
+                    batch = questions[i:i + batch_size]
+                    task = model.evaluate_questions_batch(
+                        tree_description, batch, session, timeout, language
+                    )
+                    batch_tasks.append(task)
+
+                batch_results_list = await asyncio.gather(*batch_tasks)
+                for batch_results in batch_results_list:
+                    results.extend(batch_results)
         else:
-            # Évaluation individuelle (comportement original)
-            tasks = []
-            for question in questions:
-                task = model.evaluate_question(tree_description, question, session, timeout, language)
-                tasks.append(task)
-            
-            results = await asyncio.gather(*tasks)
+            # Choix entre évaluation parallèle ou séquentielle selon la configuration de délai
+            if model.request_delay_ms > 0:
+                # Évaluation séquentielle avec délai
+                for i, question in enumerate(questions):
+                    result = await model.evaluate_question(tree_description, question, session, timeout, language)
+                    results.append(result)
+
+                    # Afficher la progression
+                    if len(questions) > 10:
+                        print(f"    Progress: {i + 1}/{len(questions)} questions")
+
+                    # Appliquer le délai configuré après chaque question (sauf la dernière)
+                    if i < len(questions) - 1:
+                        delay_seconds = model.request_delay_ms / 1000.0
+                        logger.debug(f"Applying {model.request_delay_ms}ms delay between questions for {model.name}")
+                        await asyncio.sleep(delay_seconds)
+            else:
+                # Évaluation parallèle (comportement original) pour les meilleures performances
+                tasks = []
+                for question in questions:
+                    task = model.evaluate_question(tree_description, question, session, timeout, language)
+                    tasks.append(task)
+
+                results = await asyncio.gather(*tasks)
     
     # Ajouter le nom du benchmark
     for result in results:

@@ -233,6 +233,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **Gemini 2.5 Pro** | **81.48%** | 77.25% | 22.54s | 271,500 | 95,260 | 0% |
 | **DeepSeek R1** | 75.66% | 74.07% | 97.83s | 430,628 | 575,624 | 0% |
 | **Gemini 2.5 Flash** | 73.54% | 71.43% | 17.85s | 258,214 | 83,022 | 2.65% |
+| **Qwen 3 Next 80B A3B Thinking** (New)| **71.43%** | 71.43% | 68.02s | 809,409 | 1,076,302 | 3.17% |
 | **Claude Sonnet 4** | 67.20% | 65.08% | 32.93s | 258,883 | 150,642 | 1.06% |
 | **GLM 4.5** | 64.02% | 61.90% | 81.98s | 216,281 | 292,394 | 2.12% |
 | **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 26.46% |
@@ -275,6 +276,15 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Speed**: Fastest among top models (17.85s)
 - **Efficiency**: Excellent balance - 73.54% accuracy with minimal reasoning tokens (439 avg)
 - **Note**: Small 2.65% no-response rate but overall highly reliable
+
+**Qwen 3 Next 80B A3B Thinking**
+- **Accuracy**: 71.43% (135/189 correct)
+- **Enigma Performance**: 33.33% (3/9 correct, tied for best enigma performance)
+- **Normal Questions**: 73.33% (132/180 correct)
+- **Reasoning**: Extensive reasoning usage (5,818 avg tokens)
+- **Response Time**: Moderate at 68.02s average
+- **Reliability**: Good with 3.17% no-response rate
+- **Note**: Strong overall performance with particularly good enigma handling
 
 **Claude Sonnet 4**
 - **Accuracy**: 67.20% (127/189 correct)
@@ -377,13 +387,14 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 
 ### Key Insights
 
-1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), DeepSeek R1 (75.66%), and Gemini 2.5 Flash (73.54%) significantly outperform all others
-2. **Gemini Family Dominance**: Both Gemini models (Pro and Flash) are in the top 3, with Flash offering an excellent speed-accuracy balance
-3. **Reasoning Capabilities Matter**: All top 5 models have reasoning capabilities, with Claude Sonnet 4 (67.20%) and GLM 4.5 (64.02%) forming a strong second tier
-4. **Enigma Challenge**: All models struggle with enigma questions, with most achieving only 0-40% accuracy. Interestingly, Horizon Alpha (33.33%), GLM 4.5 Air, and Qwen Thinking perform better on enigmas despite lower overall scores
-5. **Reliability vs Performance**: High no-response rates (GLM 4.5 Air: 26.46%, Qwen Thinking: 20.63%) make these models impractical despite decent accuracy
-6. **Speed-Accuracy Trade-off**: The fastest models (Gemma 3: 4.97s, Qwen 3.2: 5.06s, Horizon Alpha: 5.34s) have lower accuracy, though Gemini 2.5 Flash breaks this pattern with fast speed and high accuracy
-7. **Token Efficiency**: Gemini 2.5 Flash achieves 73.54% accuracy with only 439 reasoning tokens average, making it the most efficient top performer
+1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), DeepSeek R1 (75.66%), Gemini 2.5 Flash (73.54%), and Qwen 3 Next 80B A3B Thinking (71.43%) form the elite group, all exceeding 70% accuracy
+2. **Gemini Family Dominance**: Both Gemini models (Pro and Flash) remain in the top 3, with Flash offering an excellent speed-accuracy balance
+3. **Qwen Thinking Models Excel**: Qwen 3 Next 80B A3B Thinking (71.43%) significantly outperforms the older Qwen 3.2 Thinking (50.26%), showing substantial improvements in the newer thinking model
+4. **Reasoning Capabilities Matter**: All top 5 models have reasoning capabilities, with Claude Sonnet 4 (67.20%) and GLM 4.5 (64.02%) forming a strong second tier
+5. **Enigma Excellence**: Qwen 3 Next 80B A3B Thinking and GLM 4.5 Air both achieve 33.33% on enigma questions, tied for the best enigma performance across all models tested
+6. **Reliability vs Performance**: High no-response rates (GLM 4.5 Air: 26.46%, Qwen 3.2 Thinking: 20.63%) make these models impractical, while Qwen 3 Next maintains good reliability (3.17%)
+7. **Speed-Accuracy Trade-off**: The fastest models have lower accuracy, though Gemini 2.5 Flash breaks this pattern with fast speed and high accuracy
+8. **Token Efficiency**: Gemini 2.5 Flash achieves 73.54% accuracy with only 439 reasoning tokens average, making it the most efficient top performer, while Qwen 3 Next uses extensive reasoning (5,818 avg tokens) to achieve strong results
 
 ### Benchmark Difficulty
 

@@ -31,6 +31,7 @@ class ModelEvaluator:
         self.max_tokens = config.get('max_tokens', 2000)
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
+        self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
         self.cleaner = AnswerCleaner()
         self.prompt_builder = PromptBuilder()
         
@@ -365,7 +366,7 @@ class ModelEvaluator:
                         is_enigma=question.get('type') == 'enigme',
                         enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
                     ))
-                
+
                 return results
                 
         except asyncio.TimeoutError:
@@ -434,12 +435,38 @@ class ModelEvaluator:
             
             choice = choices[0]
             message = choice.get('message', {})
-            model_answer = message.get('content') or ''
-            
+            content = message.get('content') or ''
+
+            # Handle both string and list content formats
+            if isinstance(content, list):
+                # Extract text from list format (e.g., with thinking/text blocks)
+                text_parts = []
+                thinking_parts = []
+                for item in content:
+                    if isinstance(item, dict):
+                        if item.get('type') == 'text' and 'text' in item:
+                            text_parts.append(item['text'])
+                        elif item.get('type') == 'thinking' and 'thinking' in item:
+                            # Extract reasoning text for models with thinking blocks
+                            thinking_data = item['thinking']
+                            if isinstance(thinking_data, list):
+                                for think_item in thinking_data:
+                                    if isinstance(think_item, dict) and 'text' in think_item:
+                                        thinking_parts.append(think_item['text'])
+                        elif 'text' in item:  # fallback for other structures
+                            text_parts.append(item['text'])
+                model_answer = ' '.join(text_parts)
+                if thinking_parts:
+                    reasoning_text = ' '.join(thinking_parts)
+                    reasoning_tokens = len(reasoning_text.split()) * 2  # Rough estimation
+                    logger.debug(f"Extracted reasoning from thinking blocks for {self.name} ({len(reasoning_text)} chars)")
+            else:
+                model_answer = content
+
             # Log de debug si la réponse est vide
             if not model_answer:
                 logger.warning(f"Empty content in message for {self.name} - Message: {json.dumps(message, indent=2)}")
-            
+
             model_answer = model_answer.strip()
             tokens_used = result.get('usage', {}).get('completion_tokens', 0)
             
