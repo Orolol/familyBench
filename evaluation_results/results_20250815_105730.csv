@@ -1,0 +1,6 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+mistral-medium-3.1,small_tree_en,1,How many salespersons are there?,1,1,False,False,0.0,0.2364192008972168,7,,True,0,comptage,False,
+mistral-medium-3.1,small_tree_en,2,Whose parent is Hugo?,"Hope,Octavia","Hope,Octavia",True,True,1.0,0.23642988204956056,7,,False,0,relation_inverse,False,
+mistral-medium-3.1,small_tree_en,3,Who are Hope's grandmothers?,Tiffany,"Tiffany,Amy",False,False,0.5,0.23643736839294432,7,,False,0,relation_complexe,False,
+mistral-medium-3.1,small_tree_en,4,How many children does Yolanda have?,1,1,False,False,0.0,0.2364631175994873,7,,True,0,comptage,False,
+mistral-medium-3.1,small_tree_en,5,Who has auburn hair?,"Dot,Timothy","Dot,Timothy,Hope",False,False,0.6666666666666666,0.23646979331970214,7,,False,0,recherche_attributs,False,
