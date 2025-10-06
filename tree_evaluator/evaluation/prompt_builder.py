@@ -16,6 +16,8 @@ class PromptBuilder:
 
 Question: {question}
 
+Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
+
 Respond ONLY with the requested name or list of names (separated by commas without spaces), or "None" if no one matches."""
         else:
             return f"""Voici la description d'une famille:
@@ -24,25 +26,29 @@ Respond ONLY with the requested name or list of names (separated by commas witho
 
 Question: {question}
 
+Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
+
 Réponds UNIQUEMENT avec le nom ou la liste de noms demandée (séparés par des virgules sans espaces), ou "Aucun" si personne ne correspond."""
     
     @staticmethod
     def build_batch_prompt(tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> str:
         """Construit le prompt pour un batch de questions."""
         questions_text = "\n".join([f"{i+1}. {q['question']}" for i, q in enumerate(questions)])
-        
+
         if language == 'en':
             return f"""Here is a family description:
 
 {tree_description}
 
-Answer the following questions based on this family description. 
+Answer the following questions based on this family description.
 Provide your answers as a JSON array of strings in the same order as the questions.
 For lists of names, separate them with commas without spaces.
 If no one matches, answer "None".
 
 Questions:
 {questions_text}
+
+Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
 Respond ONLY with a JSON array like: ["Answer1", "Answer2", "Answer3"]"""
         else:
@@ -57,6 +63,8 @@ Si personne ne correspond, réponds "Aucun".
 
 Questions:
 {questions_text}
+
+Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
 Réponds UNIQUEMENT avec un tableau JSON comme: ["Réponse1", "Réponse2", "Réponse3"]"""
     

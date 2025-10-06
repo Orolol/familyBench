@@ -233,6 +233,7 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **Gemini 2.5 Pro** | **81.48%** | 77.25% | 22.54s | 271,500 | 95,260 | 0% |
 | **Claude Sonnet 4.5** (New) | **77.78%** | 75.66% | 25.88s | 211,249 | 128,844 | 0% |
 | **DeepSeek R1** | 75.66% | 74.07% | 97.83s | 430,628 | 575,624 | 0% |
+| **GLM 4.6** (New) | **74.60%** | 72.49% | 89.11s | 245,113 | 305,120 | 0% |
 | **Gemini 2.5 Flash** | 73.54% | 71.43% | 17.85s | 258,214 | 83,022 | 2.65% |
 | **Qwen 3 Next 80B A3B Thinking** | 71.43% | 71.43% | 68.02s | 809,409 | 1,076,302 | 3.17% |
 | **Claude Sonnet 4** | 67.20% | 65.08% | 32.93s | 258,883 | 150,642 | 1.06% |
@@ -241,9 +242,8 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **GLM 4.5 Air** | 57.14% | 56.61% | 268.11s | 909,228 | 1,270,138 | 26.46% |
 | **GPT-OSS 120B** | 50.26% | 50.26% | 14.46s | 177,523 | 167,938 | 1.06% |
 | **Qwen 3.2 Thinking** | 50.26% | 50.26% | 326.30s | 743,131 | 1,077,814 | 20.63% |
-| **GLM 4.6** (New) | **47.62%** | 45.50% | 52.17s | 134,057 | 149,232 | 0% |
 | **Kimi K2** | 34.92% | 34.92% | 16.04s | 67,071 | 0 | 0% |
-| **Kimi K2 0905** (New) | **31.75%** | 31.75% | 7.49s | 18,975 | 0 | 0% |
+| **Kimi K2 0905** (New) | **28.04%** | 28.04% | 9.35s | 7,684 | 0 | 0% |
 | **Hunyuan A13B** | 30.16% | 30.16% | 91.52s | 131,672 | 121,150 | 2.12% |
 | **GPT-OSS 20B** (New) | **30.16%** | 30.16% | 26.40s | 264,276 | 201,172 | 0% |
 | **Mistral Medium 3.1** (New) | 29.63% | 29.63% | 6.64s | 6,062 | 0 | 0.53% |
@@ -281,6 +281,15 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reasoning**: Moderate reasoning usage (3,078 avg tokens)
 - **Reliability**: Excellent with 0% no-response rate
 - **Note**: 1.06% error rate but still highly reliable
+
+**GLM 4.6** (Impressive Improvement)
+- **Accuracy**: 74.60% (141/189 correct)
+- **Enigma Performance**: 44.44% (4/9 correct, **best enigma performance across all models**)
+- **Normal Questions**: 76.11% (137/180 correct)
+- **Response Time**: Moderate at 89.11s average
+- **Reasoning**: Moderate reasoning usage (1,667 avg tokens, 183 questions with reasoning)
+- **Reliability**: Perfect 0% no-response rate, 3.17% error rate
+- **Note**: With improved prompting, GLM 4.6 jumped from 47.62% to 74.60% (+27 points!), showing excellent prompt sensitivity and reasoning capabilities
 
 **Gemini 2.5 Flash**
 - **Accuracy**: 73.54% (139/189 correct)
@@ -344,15 +353,6 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reasoning**: Extensive reasoning (7,185 avg tokens)
 - **Weakness**: 20.63% no-response rate limits reliability
 
-**GLM 4.6**
-- **Accuracy**: 47.62% (90/189 correct)
-- **Enigma Performance**: 44.44% (4/9 correct, best enigma performance)
-- **Normal Questions**: 47.78% (86/180 correct)
-- **Response Time**: Moderate at 52.17s average
-- **Reasoning**: Uses reasoning tokens (1,820 avg tokens, 82 questions with reasoning)
-- **Reliability**: Perfect 0% no-response rate, but 1.59% error rate
-- **Note**: Strong enigma handling but lower overall accuracy compared to GLM 4.5
-
 **Kimi K2**
 - **Accuracy**: 34.92% (66/189 correct)
 - **Speed**: Fast responses (16.04s average)
@@ -360,13 +360,13 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 - **Reliability**: Perfect 0% no-response rate
 
 **Kimi K2 0905**
-- **Accuracy**: 31.75% (60/189 correct)
-- **Normal Questions**: 33.33% (60/180 correct)
-- **Enigma Performance**: 0% (0/9 correct, failed all enigma questions)
-- **Speed**: Very fast responses (7.49s average)
-- **Token Efficiency**: Extremely minimal (18,975 total, no reasoning tokens)
+- **Accuracy**: 28.04% (53/189 correct)
+- **Normal Questions**: 28.89% (52/180 correct)
+- **Enigma Performance**: 11.11% (1/9 correct)
+- **Speed**: Very fast responses (9.35s average)
+- **Token Efficiency**: Extremely minimal (7,684 total, no reasoning tokens)
 - **Reliability**: Perfect 0% no-response rate and 0% error rate
-- **Note**: Slightly lower accuracy than original Kimi K2 but much faster and more efficient
+- **Note**: Lower accuracy than original Kimi K2 (34.92%) but faster and more efficient
 
 **Hunyuan A13B**
 - **Accuracy**: 30.16% (57/189 correct)
@@ -427,14 +427,14 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 
 ### Key Insights
 
-1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), Claude Sonnet 4.5 (77.78%), DeepSeek R1 (75.66%), Gemini 2.5 Flash (73.54%), and Qwen 3 Next 80B A3B Thinking (71.43%) form the elite group, all exceeding 70% accuracy
-2. **Claude Family Evolution**: Claude Sonnet 4.5 (77.78%) shows significant improvement over Sonnet 4 (67.20%), climbing to second place with better enigma handling (33.33% vs 22.22%)
-3. **Gemini Family Dominance**: Both Gemini models (Pro and Flash) remain in the top tier, with Flash offering an excellent speed-accuracy balance
-4. **Reasoning Capabilities Matter**: All top 6 models have reasoning capabilities, with DeepSeek V3.2 Exp (66.67%) and GLM 4.5 (64.02%) forming a strong second tier
-5. **Enigma Excellence**: GLM 4.6 achieves the best enigma performance at 44.44% (4/9 correct), followed by Claude Sonnet 4.5 and Qwen 3 Next at 33.33%
-6. **DeepSeek Evolution**: DeepSeek V3.2 Exp (66.67%) shows competitive accuracy but with higher error rate (11.64%) compared to R1's perfect reliability
-7. **Reliability vs Performance**: High no-response rates (GLM 4.5 Air: 26.46%, Qwen 3.2 Thinking: 20.63%) make these models impractical, while top performers maintain excellent reliability
-8. **Speed-Accuracy Trade-off**: The fastest models have lower accuracy, though Gemini 2.5 Flash breaks this pattern with fast speed and high accuracy
+1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), Claude Sonnet 4.5 (77.78%), DeepSeek R1 (75.66%), GLM 4.6 (74.60%), Gemini 2.5 Flash (73.54%), and Qwen 3 Next 80B A3B Thinking (71.43%) form the elite group, all exceeding 70% accuracy
+2. **Prompt Engineering Matters**: GLM 4.6 demonstrated a massive +27 point improvement (47.62% → 74.60%) with enhanced prompting, showing that prompt quality can dramatically impact model performance
+3. **Claude Family Evolution**: Claude Sonnet 4.5 (77.78%) shows significant improvement over Sonnet 4 (67.20%), climbing to second place with better enigma handling (33.33% vs 22.22%)
+4. **Enigma Excellence**: GLM 4.6 achieves the best enigma performance at 44.44% (4/9 correct), followed by Claude Sonnet 4.5 and Qwen 3 Next at 33.33%
+5. **Qwen Generational Leap**: Qwen 3 Next 80B (71.43%) shows a +21.17 point improvement over Qwen 3.2 Thinking (50.26%), the biggest generational improvement observed
+6. **Reasoning Capabilities Matter**: All top 6 models have reasoning capabilities, with DeepSeek V3.2 Exp (66.67%) and GLM 4.5 (64.02%) forming a strong second tier
+7. **Gemini Family Dominance**: Both Gemini models (Pro and Flash) remain in the top tier, with Flash offering an excellent speed-accuracy balance
+8. **DeepSeek Evolution**: DeepSeek V3.2 Exp (66.67%) shows competitive accuracy but with higher error rate (11.64%) compared to R1's perfect reliability
 9. **Token Efficiency**: Gemini 2.5 Flash achieves 73.54% accuracy with only 439 reasoning tokens average, making it the most efficient top performer
 
 ### Benchmark Difficulty

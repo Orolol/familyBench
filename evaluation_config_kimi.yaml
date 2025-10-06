@@ -219,14 +219,14 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  # - name: "z-ai/glm-4.6"
-  #   api_base: "https://openrouter.ai/api/v1"
-  #   api_key: "${OPENROUTER_API_KEY}"
-  #   model: "z-ai/glm-4.6"
-  #   temperature: 0.7
-  #   max_tokens: 16000
-  #   reasoning:
-  #     max_tokens: 8000
+  - name: "z-ai/glm-4.6"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "z-ai/glm-4.6"
+    temperature: 0.7
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
 
   # - name: "deepseek/deepseek-v3.2-exp"
   #   api_base: "https://openrouter.ai/api/v1"
