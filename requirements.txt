@@ -18,3 +18,5 @@ pytest-asyncio>=0.21.0  # Async test support
 black>=23.0.0      # Code formatting
 flake8>=6.0.0      # Linting
 mypy>=1.0.0        # Type checking
+diskcache>=5.6.0   # Caching
+graphviz>=0.20.0   # Visualization

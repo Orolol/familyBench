@@ -200,15 +200,15 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  - name: "magistral-small-2509"
-    api_base: "https://api.mistral.ai/v1"
-    api_key: "${MISTRAL_API_KEY}"
-    model: "magistral-small-2509"
-    temperature: 0.7
-    max_tokens: 16000
-    request_delay_ms: 20000  # 1 second delay between requests to respect rate limits
-    reasoning:
-      max_tokens: 8000
+  # - name: "magistral-small-2509"
+  #   api_base: "https://api.mistral.ai/v1"
+  #   api_key: "${MISTRAL_API_KEY}"
+  #   model: "magistral-small-2509"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   request_delay_ms: 20000  # 1 second delay between requests to respect rate limits
+  #   reasoning:
+  #     max_tokens: 8000
 
   # - name: "qwen3-plus-2025-07-28-thinking"
   #   api_base: "https://openrouter.ai/api/v1"
@@ -219,6 +219,23 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
+  - name: "gpt-5.1"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.1"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      effort: "low" 
+
+  - name: "google/gemini-3.0-pro"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-3.0-pro"
+    temperature: 0.3
+    max_tokens: 16000
+    reasoning:
+      max_tokens: 8000
 
 
 # Configurations de benchmarks à exécuter

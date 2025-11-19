@@ -11,6 +11,7 @@ from typing import Dict, List, Any
 from tree_evaluator.tree_generator import generate_tree
 from tree_evaluator.text_converter import convert_tree_to_text
 from tree_evaluator.question_generator import generate_questions
+from tree_evaluator.visualizer import visualize_tree
 
 def generate_markdown_output(description: str, questions: List[Dict[str, Any]], language: str = "fr") -> str:
     """Génère le contenu du fichier Markdown pour le LLM."""
@@ -93,6 +94,7 @@ def main():
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
     parser.add_argument("--language", type=str, default="fr", choices=["fr", "en"], help="Langue du benchmark (fr ou en).")
     parser.add_argument("--enigma-percentage", type=int, default=10, help="Pourcentage de questions énigmes (défaut: 10%%)")
+    parser.add_argument("--visualize", action="store_true", help="Générer une visualisation de l'arbre (PNG).")
 
     args = parser.parse_args()
 
@@ -140,6 +142,11 @@ def main():
         markdown_content = generate_markdown_output(description, questions, language=args.language)
         with open(args.md_output, "w", encoding="utf-8") as f:
             f.write(markdown_content)
+
+    if args.visualize:
+        print("Génération de la visualisation...")
+        viz_output = args.output.rsplit('.', 1)[0]
+        visualize_tree(tree, viz_output)
 
     print("Terminé !")
 

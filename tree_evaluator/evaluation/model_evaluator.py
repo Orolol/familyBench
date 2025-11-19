@@ -15,6 +15,7 @@ from tree_evaluator.translations import get_translation
 from .result import EvaluationResult
 from .answer_cleaner import AnswerCleaner
 from .prompt_builder import PromptBuilder
+from ..cache_manager import CacheManager
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +35,7 @@ class ModelEvaluator:
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
         self.cleaner = AnswerCleaner()
         self.prompt_builder = PromptBuilder()
+        self.cache_manager = CacheManager()
         
     def _resolve_api_key(self, key: str) -> str:
         """Résout les variables d'environnement dans la clé API."""
@@ -120,21 +122,38 @@ class ModelEvaluator:
             data = self._build_api_request(prompt, language, batch=False)
             url = self._get_api_url()
             
-            # Log de la requête envoyée
-            logger.debug(f"Sending request to {url} for {self.name}")
-            logger.debug(f"Request data: {json.dumps(data, indent=2)}")
-            
-            async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
-                response_time = time.time() - start_time
+            # Vérifier le cache
+            cache_key = {
+                "model": self.name,
+                "url": url,
+                "data": data
+            }
+            cached_response = self.cache_manager.get(cache_key)
+            if cached_response:
+                logger.info(f"Cache hit for {self.name} - Question {question['id']}")
+                result = cached_response
+                # Simuler un temps de réponse nul ou très court pour le cache
+                response_time = 0.001
+            else:
+                # Log de la requête envoyée
+                logger.debug(f"Sending request to {url} for {self.name}")
+                logger.debug(f"Request data: {json.dumps(data, indent=2)}")
                 
-                if response.status != 200:
-                    error_text = await response.text()
-                    logger.error(f"API Error {response.status} for {self.name}: {error_text}")
-                    return self._create_error_result(
-                        question, f"API Error {response.status}: {error_text}", response_time
-                    )
-                
-                result = await response.json()
+                async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
+                    response_time = time.time() - start_time
+                    
+                    if response.status != 200:
+                        error_text = await response.text()
+                        logger.error(f"API Error {response.status} for {self.name}: {error_text}")
+                        return self._create_error_result(
+                            question, f"API Error {response.status}: {error_text}", response_time
+                        )
+                    
+                    result = await response.json()
+                    
+                    # Sauvegarder dans le cache si succès
+                    if result:
+                        self.cache_manager.set(cache_key, result)
                 
                 # Log de debug pour les réponses API
                 logger.debug(f"API Response for {self.name} - Question {question['id']}: {json.dumps(result, indent=2) if result else 'None'}")
@@ -285,22 +304,38 @@ class ModelEvaluator:
             data = self._build_api_request(prompt, language, batch=True)
             url = self._get_api_url()
             
-            # Log de la requête envoyée
-            logger.debug(f"Sending request to {url} for {self.name}")
-            logger.debug(f"Request data: {json.dumps(data, indent=2)}")
-            
-            async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
-                response_time = time.time() - start_time
+            # Vérifier le cache
+            cache_key = {
+                "model": self.name,
+                "url": url,
+                "data": data
+            }
+            cached_response = self.cache_manager.get(cache_key)
+            if cached_response:
+                logger.info(f"Cache hit for {self.name} - Batch of {len(questions)} questions")
+                result = cached_response
+                response_time = 0.001
+            else:
+                # Log de la requête envoyée
+                logger.debug(f"Sending request to {url} for {self.name}")
+                logger.debug(f"Request data: {json.dumps(data, indent=2)}")
                 
-                if response.status != 200:
-                    error_text = await response.text()
-                    # Retourner des erreurs pour toutes les questions du batch
-                    return [self._create_error_result(
-                        q, f"API Error {response.status}: {error_text}", 
-                        (time.time() - total_start_time) / len(questions)
-                    ) for q in questions]
-                
-                result = await response.json()
+                async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
+                    response_time = time.time() - start_time
+                    
+                    if response.status != 200:
+                        error_text = await response.text()
+                        # Retourner des erreurs pour toutes les questions du batch
+                        return [self._create_error_result(
+                            q, f"API Error {response.status}: {error_text}", 
+                            (time.time() - total_start_time) / len(questions)
+                        ) for q in questions]
+                    
+                    result = await response.json()
+                    
+                    # Sauvegarder dans le cache si succès
+                    if result:
+                        self.cache_manager.set(cache_key, result)
                 
                 # Vérifier que result n'est pas None
                 if result is None:
