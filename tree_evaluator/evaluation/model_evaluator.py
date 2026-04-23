@@ -27,8 +27,8 @@ class ModelEvaluator:
         self.api_base = config['api_base'].rstrip('/')
         self.api_key = self._resolve_api_key(config['api_key'])
         self.model = config['model']
-        self.temperature = config.get('temperature', 0.0)
-        self.max_tokens = config.get('max_tokens', 2000)
+        self.temperature = config.get('temperature', 0.8)
+        self.max_tokens = config.get('max_tokens', 64000)
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
@@ -146,8 +146,8 @@ class ModelEvaluator:
                     )
                 
                 # Extraire la réponse selon le format
-                model_answer, tokens_used, reasoning_tokens, reasoning_text = self._extract_api_response(result)
-                
+                model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens = self._extract_api_response(result)
+
                 # Nettoyer la réponse
                 model_answer = self.cleaner.clean_answer(model_answer, language)
                 
@@ -188,11 +188,12 @@ class ModelEvaluator:
                     no_response=no_response,
                     reasoning_tokens=reasoning_tokens,
                     reasoning_text=reasoning_text,
+                    prompt_tokens=prompt_tokens,
                     question_type=question.get('type'),
                     is_enigma=question.get('type') == 'enigme',
                     enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
                 )
-                
+
         except asyncio.TimeoutError:
             logger.error(f"Timeout after {timeout}s for {self.name} on question {question['id']}")
             return self._create_error_result(question, "Timeout", time.time() - total_start_time)
@@ -309,7 +310,7 @@ class ModelEvaluator:
                     ) for q in questions]
                 
                 # Extraire la réponse selon le format
-                model_response, tokens_used, reasoning_tokens, reasoning_text = self._extract_api_response(result)
+                model_response, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens = self._extract_api_response(result)
                 
                 # Parser la réponse JSON
                 try:
@@ -362,6 +363,7 @@ class ModelEvaluator:
                         no_response=no_response,
                         reasoning_tokens=reasoning_tokens // len(questions) if reasoning_tokens > 0 else 0,
                         reasoning_text=reasoning_text,  # Partagé entre toutes les questions du batch
+                        prompt_tokens=prompt_tokens // len(questions),  # Tokens de prompt moyens par question
                         question_type=question.get('type'),
                         is_enigma=question.get('type') == 'enigme',
                         enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
@@ -414,11 +416,15 @@ class ModelEvaluator:
         else:
             return f"{self.api_base}/chat/completions"
     
-    def _extract_api_response(self, result: Dict[str, Any]) -> tuple[str, int, int, Optional[str]]:
-        """Extrait la réponse du modèle selon le format de l'API."""
+    def _extract_api_response(self, result: Dict[str, Any]) -> tuple[str, int, int, Optional[str], int]:
+        """Extrait la réponse du modèle selon le format de l'API.
+
+        Returns: (model_answer, completion_tokens, reasoning_tokens, reasoning_text, prompt_tokens)
+        """
         reasoning_tokens = 0
         reasoning_text = None
-        
+        prompt_tokens = 0
+
         if "anthropic" in self.api_base:
             content = result.get('content', [{}])
             if content and len(content) > 0:
@@ -426,12 +432,14 @@ class ModelEvaluator:
             else:
                 model_answer = ''
             model_answer = model_answer.strip()
-            tokens_used = result.get('usage', {}).get('output_tokens', 0)
+            usage = result.get('usage', {})
+            tokens_used = usage.get('output_tokens', 0)
+            prompt_tokens = usage.get('input_tokens', 0)
         else:
             choices = result.get('choices', [])
             if not choices:
                 logger.warning(f"No choices in API response for {self.name} - Full response: {json.dumps(result, indent=2)}")
-                return "", 0, 0, None
+                return "", 0, 0, None, 0
             
             choice = choices[0]
             message = choice.get('message', {})
@@ -468,8 +476,10 @@ class ModelEvaluator:
                 logger.warning(f"Empty content in message for {self.name} - Message: {json.dumps(message, indent=2)}")
 
             model_answer = model_answer.strip()
-            tokens_used = result.get('usage', {}).get('completion_tokens', 0)
-            
+            usage = result.get('usage', {})
+            tokens_used = usage.get('completion_tokens', 0)
+            prompt_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
+
             # Extraire les tokens de reasoning si présents (OpenRouter)
             if 'reasoning' in message:
                 reasoning_text = message['reasoning']
@@ -485,11 +495,10 @@ class ModelEvaluator:
                 logger.debug(f"Using reasoning_content as answer for {self.name}")
             
             # Vérifier aussi dans usage pour les tokens de reasoning
-            usage = result.get('usage', {})
             if 'reasoning_tokens' in usage:
                 reasoning_tokens = usage['reasoning_tokens']
-        
-        return model_answer, tokens_used, reasoning_tokens, reasoning_text
+
+        return model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens
     
     def _create_error_result(self, question: Dict[str, Any], error: str, response_time: float, no_response: bool = False) -> EvaluationResult:
         """Crée un résultat d'erreur."""

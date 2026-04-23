@@ -174,7 +174,7 @@ FamilyBench generates 9 types of questions:
 ### Generation Constraints
 
 - **Name uniqueness**: Each person has a unique first name
-- **Profession uniqueness**: Each person has a unique profession
+- **Profession uniqueness**: Professions are NOT unique — multiple people can share the same profession (intentional for attribute-search questions)
 - **Appearance uniqueness**: The combination (hair, eyes, hat) is unique
 - **Simple structure**: No remarriages, each child has exactly 2 parents
 

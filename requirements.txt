@@ -4,6 +4,7 @@
 aiohttp>=3.9.0     # Async HTTP client for APIs
 pyyaml>=6.0        # YAML configuration file reader
 python-dotenv>=1.0.0  # Environment variable management
+rich>=13.0.0          # Rich terminal output with progress bars
 
 # For results analysis (optional)
 pandas>=2.0.0      # CSV data analysis

@@ -69,7 +69,7 @@ def generate_multi_criteria_questions(people: Dict[str, Person], language: str =
                      p.hat_color == person.hat_color]
         if len(matches) > 1 and len(matches) < 5:  # Entre 2 et 4 personnes
             questions.append({
-                "question": f"Qui a les cheveux {person.hair_color}, les yeux {person.eye_color} et porte un chapeau {person.hat_color} ?",
+                "question": get_translation("q_who_has_hair_eyes_hat", language).format(hair=person.hair_color, eyes=person.eye_color, hat=person.hat_color),
                 "answer": format_answer(matches, language),
                 "type": "recherche_multi_criteres"
             })

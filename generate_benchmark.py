@@ -10,7 +10,7 @@ from typing import Dict, List, Any
 
 from tree_evaluator.tree_generator import generate_tree
 from tree_evaluator.text_converter import convert_tree_to_text
-from tree_evaluator.question_generator import generate_questions
+from tree_evaluator.question_generator import generate_questions, VALID_DIFFICULTIES
 
 def generate_markdown_output(description: str, questions: List[Dict[str, Any]], language: str = "fr") -> str:
     """Génère le contenu du fichier Markdown pour le LLM."""
@@ -92,7 +92,14 @@ def main():
     parser.add_argument("--shuffle", action="store_true", help="Mélanger l'ordre des personnes dans la description.")
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
     parser.add_argument("--language", type=str, default="fr", choices=["fr", "en"], help="Langue du benchmark (fr ou en).")
-    parser.add_argument("--enigma-percentage", type=int, default=10, help="Pourcentage de questions énigmes (défaut: 10%%)")
+    parser.add_argument("--enigma-percentage", type=int, default=10, help="Pourcentage de questions énigmes (défaut: 10%%). Ignoré si --difficulty est différent de 'all'.")
+    parser.add_argument(
+        "--difficulty",
+        type=str,
+        default="all",
+        choices=sorted(VALID_DIFFICULTIES),
+        help="Filtre les questions par difficulté: easy, medium, hard, enigma (uniquement énigmes), expert (hard + énigmes c4/5/6) ou all (défaut, mix pondéré par --enigma-percentage).",
+    )
 
     args = parser.parse_args()
 
@@ -109,8 +116,17 @@ def main():
     print("Conversion de l'arbre en texte...")
     description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language)
 
-    print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
-    questions = generate_questions(tree, args.questions, language=args.language, enigma_percentage=args.enigma_percentage)
+    if args.difficulty == "all":
+        print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
+    else:
+        print(f"Génération de {args.questions} questions (difficulté: {args.difficulty})...")
+    questions = generate_questions(
+        tree,
+        args.questions,
+        language=args.language,
+        enigma_percentage=args.enigma_percentage,
+        difficulty=args.difficulty,
+    )
 
     if args.language == "en":
         prompt_template = "You are an assistant who must answer questions about a family. Here is the family description. Respond only with the name or list of names requested."
@@ -127,6 +143,7 @@ def main():
             "max_children_per_person": args.max_children,
             "seed": args.seed,
             "language": args.language,
+            "difficulty": args.difficulty,
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }
     }

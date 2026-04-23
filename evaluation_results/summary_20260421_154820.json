@@ -1,0 +1,52 @@
+{
+  "timestamp": "20260421_154820",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "qwen-3.6-35b-3a"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "qwen-3.6-35b-3a": {
+      "total_questions": 50,
+      "correct_answers": 33,
+      "accuracy": 0.66,
+      "exact_matches": 33,
+      "exact_match_rate": 0.66,
+      "avg_partial_score": 0.7056666666666667,
+      "avg_response_time": 60.04082253456116,
+      "total_tokens": 234166,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 259534,
+      "questions_with_reasoning": 50,
+      "avg_reasoning_tokens": 5190.68,
+      "enigma_stats": {
+        "total": 50,
+        "correct": 33,
+        "accuracy": 0.66,
+        "by_complexity": {
+          "1": {
+            "total": 12,
+            "correct": 12,
+            "accuracy": 1.0
+          },
+          "2": {
+            "total": 10,
+            "correct": 9,
+            "accuracy": 0.9
+          },
+          "3": {
+            "total": 7,
+            "correct": 3,
+            "accuracy": 0.42857142857142855
+          }
+        }
+      },
+      "normal_stats": {}
+    }
+  }
+}

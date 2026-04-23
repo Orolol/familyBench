@@ -1,0 +1,101 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+qwen-3.6-35b-3a,large_tree_en,1,"Who is the mother of the person with blonde hair, green eyes and a pink hat?",Anna,Anna,True,True,1.0,132.36604928970337,5690,,False,5848,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,2,Who is the sister of the mother of Felicity with salt and pepper hair?,Kiara,Kiara,True,True,1.0,27.20035171508789,1607,,False,1892,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,3,"Who is the father of the person with strawberry blonde hair, amber eyes and a cream hat?",Enrique,Enrique,True,True,1.0,13.40658974647522,625,,False,762,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,4,Who is the cousin of the daughter of Kelly wearing a brown hat?,Claudia,Claudia,True,True,1.0,352.48047375679016,8928,,False,10842,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,5,Who is the son of Romilly with jet black hair?,Harley,Harley,True,True,1.0,14.190340757369995,659,,False,788,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,6,"Who is the father of the person with chestnut hair, light brown eyes and a cream hat?",Gianni,,False,False,0.0,1000.0032153129578,0,Timeout,False,0,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,7,Who is the cousin of the son of Leanne with black hair?,Naima,Naima,True,True,1.0,32.79621624946594,2005,,False,2278,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,8,Who is the son of Karl with strawberry blonde hair?,Ivor,Ivor,True,True,1.0,10.891723871231079,446,,False,498,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,9,Who is the daughter of Quentin with black hair?,Laurel,Laurel,True,True,1.0,13.965655088424683,652,,False,718,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,10,Who is the son of Esteban with gray hair?,Barnaby,Barnaby,True,True,1.0,13.661264181137085,637,,False,670,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,11,Who is the cousin of the daughter of Stewart with black hair?,Terry,"Sidney,Terry,Esteban",False,False,0.3333333333333333,46.251081466674805,2958,,False,3226,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,12,Who is the brother of the mother of Lilian with light brown hair?,Brooks,"Brooks,Steven",False,False,0.5,30.810862064361572,1867,,False,2260,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,13,Who is the cousin of the daughter of Summer with brown hair?,Paxton,Paxton,True,True,1.0,31.54304051399231,2230,,False,2712,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,14,Who is the cousin of the daughter of Dale with black hair?,Crispin,None,False,False,0.0,437.92420959472656,9989,,False,11228,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,15,Who is the grandchild of the sister of Eliza with auburn hair?,Ellie,"Conrad,Roger,Ronda",False,False,0.0,712.554767370224,14745,,False,15700,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,16,Who is the daughter of Magnus with blue eyes?,Aliya,Aliya,True,True,1.0,10.789092063903809,776,,False,874,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,17,Who is the child of the son of Konrad with auburn hair?,Patricia,Patricia,True,True,1.0,24.967660903930664,1791,,False,1964,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,18,Who is the brother of the father of Vaughn with strawberry blonde hair?,Orion,Orion,True,True,1.0,11.445877075195312,807,,False,952,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,19,Who is the sister of the mother of Rudolph with platinum blonde hair?,Greta,Greta,True,True,1.0,26.557126998901367,1878,,False,2268,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,20,Who is the cousin of the son of Jacinda with platinum blonde hair?,Urban,Urban,True,True,1.0,21.144391775131226,1499,,False,1754,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,21,Who is the daughter of Octavia with hazel eyes?,Eileen,Eileen,True,True,1.0,8.930689096450806,628,,False,702,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,22,Who is the child of the son of Wallace with red hair?,Lydia,Lydia,True,True,1.0,82.14141321182251,3211,,False,3764,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,23,Who is the grandchild of the sister of Ines with black hair?,Shay,Shay,True,True,1.0,36.39313459396362,2577,,False,3010,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,24,Who is the cousin of the son of Mack with jet black hair?,Janice,None,False,False,0.0,466.734069108963,9060,,False,11240,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,25,Who is the grandchild of the brother of Claire with white hair?,Jeanne,,False,False,0.0,999.5792796611786,0,Timeout,False,0,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,26,Who is the grandchild of the sister of Michelle wearing a blue hat?,Reuben,"Gillian,Ines,Pandora,Godfrey",False,False,0.0,224.13757801055908,4667,,False,5696,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,27,"Who is the mother of the person with salt and pepper hair, light brown eyes and a tan hat?",Jen,Madison,False,False,0.0,735.4850146770477,13911,,False,16408,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,28,Who is the cousin of the son of Uma with auburn hair?,Heather,Heather,True,True,1.0,552.9389276504517,9722,,False,10248,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,29,Who is the child of the daughter of Brady with white hair?,Dixie,Dixie,True,True,1.0,121.51220750808716,1869,,False,2310,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,30,Who is the child of the daughter of Pete with gray hair?,Willem,Willem,True,True,1.0,119.66201949119568,435,,False,456,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,31,Who is the sister of the mother of Clark with brown hair?,Hailey,"Althea,Hailey",False,False,0.5,195.08441257476807,1464,,False,1584,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,32,Who is the sister of the mother of Arlo with silver hair?,Kit,Kit,True,True,1.0,194.5152359008789,1738,,False,2090,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,33,Who is the sister of the father of Liza with brown hair?,Candace,Candace,True,True,1.0,254.79365420341492,1778,,False,2162,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,34,Who is the sister of the father of Eleanor with dark brown hair?,Leanne,"Leanne,Zinnia",False,False,0.5,290.35712909698486,1611,,False,1864,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,35,Who is the child of the daughter of Crispin with salt and pepper hair?,Chase,Chase,True,True,1.0,320.58019638061523,2079,,False,2496,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,36,Who is the brother of the father of Yasmina with gray hair?,Konrad,Konrad,True,True,1.0,196.6466510295868,822,,False,934,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,37,Who is the son of Trudy with green eyes?,Ricardo,Ricardo,True,True,1.0,153.33358669281006,652,,False,752,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,38,Who is the grandchild of the sister of Gillian with light brown eyes?,Amanda,Amanda,True,True,1.0,243.7457458972931,2895,,False,3338,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,39,Who is the daughter of June with salt and pepper hair?,Larissa,Larissa,True,True,1.0,124.76899909973145,795,,False,898,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,40,Who is the daughter of Ana with red hair?,Caitlin,Caitlin,True,True,1.0,98.74385523796082,533,,False,608,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,41,"Who is the father of the person with auburn hair, hazel eyes and a silver hat?",Roy,,False,False,0.0,999.1925783157349,0,Timeout,False,0,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,42,Who is the child of the daughter of Geraldine wearing a maroon hat?,Athena,Athena,True,True,1.0,168.7022786140442,1663,,False,1962,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,43,Who is the daughter of Vince with platinum blonde hair?,Svetlana,Svetlana,True,True,1.0,111.02581930160522,626,,False,694,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,44,Who is the sister of the mother of Ursula with dark brown hair?,Violet,Violet,True,True,1.0,91.81325554847717,1184,,False,1356,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,45,"Who is the mother of the person with white hair, light brown eyes and a blue hat?",Jocelyn,Jocelyn,True,True,1.0,465.43240571022034,10301,,False,10154,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,46,Who is the brother of the father of Russell with black hair?,Crispin,Crispin,True,True,1.0,234.17466020584106,1276,,False,1460,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,47,"Who is the father of the person with blonde hair, green eyes and a turquoise hat?",Dalton,Dalton,True,True,1.0,274.6440119743347,765,,False,934,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,48,Who is the sister of the father of Forest with brown hair?,Kamila,Kamila,True,True,1.0,268.34267354011536,1060,,False,1274,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,49,Who is the grandchild of the brother of Meredith with violet eyes?,Rhonda,"Annalise,Murphy,Wendell",False,False,0.0,674.9882090091705,20042,,False,21784,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,50,Who is the grandchild of the sister of Manon with red hair?,Wendy,Wendy,True,True,1.0,483.8331000804901,10148,,False,9688,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,1,"Who is the mother of the person with blonde hair, green eyes and a pink hat?",Anna,Anna,True,True,1.0,24.431479692459106,521,,False,702,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,2,Who is the sister of the mother of Felicity with salt and pepper hair?,Kiara,Kiara,True,True,1.0,218.7177414894104,1973,,False,2808,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,3,"Who is the father of the person with strawberry blonde hair, amber eyes and a cream hat?",Enrique,Enrique,True,True,1.0,14.103498220443726,274,,False,374,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,4,Who is the cousin of the daughter of Kelly wearing a brown hat?,Claudia,Claudia,True,True,1.0,280.56237840652466,10538,,False,15418,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,5,Who is the son of Romilly with jet black hair?,Harley,Harley,True,True,1.0,20.561437845230103,389,,False,528,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,6,"Who is the father of the person with chestnut hair, light brown eyes and a cream hat?",Gianni,None,False,False,0.0,460.3815186023712,17547,,False,17588,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,7,Who is the cousin of the son of Leanne with black hair?,Naima,Naima,True,True,1.0,207.46724390983582,7770,,False,10968,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,8,Who is the son of Karl with strawberry blonde hair?,Ivor,Ivor,True,True,1.0,17.510767936706543,297,,False,408,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,9,Who is the daughter of Quentin with black hair?,Laurel,Laurel,True,True,1.0,61.347272872924805,297,,False,368,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,10,Who is the son of Esteban with gray hair?,Barnaby,Barnaby,True,True,1.0,105.31170749664307,690,,False,890,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,11,Who is the cousin of the daughter of Stewart with black hair?,Terry,"Sidney,Terry,Esteban",False,False,0.3333333333333333,96.59061050415039,3526,,False,4726,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,12,Who is the brother of the mother of Lilian with light brown hair?,Brooks,"Brooks,Steven",False,False,0.5,52.422760248184204,1704,,False,2388,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,13,Who is the cousin of the daughter of Summer with brown hair?,Paxton,Paxton,True,True,1.0,416.8625559806824,7776,,False,11056,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,14,Who is the cousin of the daughter of Dale with black hair?,Crispin,Crispin,True,True,1.0,194.44360613822937,9923,,False,14354,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,15,Who is the grandchild of the sister of Eliza with auburn hair?,Ellie,"Ellie,Martha,Odelia",False,False,0.3333333333333333,62.50108075141907,2213,,False,2810,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,16,Who is the daughter of Magnus with blue eyes?,Aliya,Aliya,True,True,1.0,8.4579918384552,177,,False,240,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,17,Who is the child of the son of Konrad with auburn hair?,Patricia,Patricia,True,True,1.0,25.65145492553711,834,,False,1090,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,18,Who is the brother of the father of Vaughn with strawberry blonde hair?,Orion,Orion,True,True,1.0,33.143775939941406,1088,,False,1560,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,19,Who is the sister of the mother of Rudolph with platinum blonde hair?,Greta,Greta,True,True,1.0,99.72085356712341,3990,,False,4776,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,20,Who is the cousin of the son of Jacinda with platinum blonde hair?,Urban,Urban,True,True,1.0,49.793476581573486,1770,,False,2282,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,21,Who is the daughter of Octavia with hazel eyes?,Eileen,Eileen,True,True,1.0,10.626847982406616,256,,False,338,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,22,Who is the child of the son of Wallace with red hair?,Lydia,Lydia,True,True,1.0,39.839513301849365,1355,,False,1924,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,23,Who is the grandchild of the sister of Ines with black hair?,Shay,Shay,True,True,1.0,206.15151119232178,7823,,False,10520,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,24,Who is the cousin of the son of Mack with jet black hair?,Janice,Janice,True,True,1.0,334.77387046813965,12676,,False,15600,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,25,Who is the grandchild of the brother of Claire with white hair?,Jeanne,Jeanne,True,True,1.0,622.5568578243256,8623,,False,11238,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,26,Who is the grandchild of the sister of Michelle wearing a blue hat?,Reuben,None,False,False,0.0,109.05162596702576,4038,,False,5828,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,27,"Who is the mother of the person with salt and pepper hair, light brown eyes and a tan hat?",Jen,Jen,True,True,1.0,139.30072331428528,6001,,False,7592,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,28,Who is the cousin of the son of Uma with auburn hair?,Heather,Heather,True,True,1.0,54.453665256500244,2031,,False,2694,enigme,True,3
+moonshotai/kimi-k2.6,large_tree_en,29,Who is the child of the daughter of Brady with white hair?,Dixie,None,False,False,0.0,106.68242478370667,4279,,False,6100,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,30,Who is the child of the daughter of Pete with gray hair?,Willem,Willem,True,True,1.0,12.571089744567871,341,,False,444,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,31,Who is the sister of the mother of Clark with brown hair?,Hailey,"Althea,Hailey",False,False,0.5,35.9507622718811,1312,,False,1638,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,32,Who is the sister of the mother of Arlo with silver hair?,Kit,Kit,True,True,1.0,23.814547061920166,828,,False,1098,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,33,Who is the sister of the father of Liza with brown hair?,Candace,Candace,True,True,1.0,63.09170365333557,2405,,False,3494,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,34,Who is the sister of the father of Eleanor with dark brown hair?,Leanne,None,False,False,0.0,454.91750025749207,17754,,False,19564,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,35,Who is the child of the daughter of Crispin with salt and pepper hair?,Chase,None,False,False,0.0,28.740692138671875,984,,False,1394,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,36,Who is the brother of the father of Yasmina with gray hair?,Konrad,Konrad,True,True,1.0,23.966479063034058,813,,False,1060,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,37,Who is the son of Trudy with green eyes?,Ricardo,Ricardo,True,True,1.0,12.655808687210083,369,,False,480,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,38,Who is the grandchild of the sister of Gillian with light brown eyes?,Amanda,Amanda,True,True,1.0,240.4552595615387,9493,,False,12562,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,39,Who is the daughter of June with salt and pepper hair?,Larissa,Larissa,True,True,1.0,10.046910524368286,244,,False,326,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,40,Who is the daughter of Ana with red hair?,Caitlin,Caitlin,True,True,1.0,10.551968574523926,273,,False,354,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,41,"Who is the father of the person with auburn hair, hazel eyes and a silver hat?",Roy,None,False,False,0.0,541.7146234512329,21822,,False,26196,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,42,Who is the child of the daughter of Geraldine wearing a maroon hat?,Athena,None,False,False,0.0,101.05100464820862,4100,,False,5374,enigme,True,2
+moonshotai/kimi-k2.6,large_tree_en,43,Who is the daughter of Vince with platinum blonde hair?,Svetlana,Svetlana,True,True,1.0,14.298761367797852,418,,False,524,enigme,True,1
+moonshotai/kimi-k2.6,large_tree_en,44,Who is the sister of the mother of Ursula with dark brown hair?,Violet,Violet,True,True,1.0,81.87359499931335,3123,,False,4362,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,45,"Who is the mother of the person with white hair, light brown eyes and a blue hat?",Jocelyn,Jocelyn,True,True,1.0,81.50065851211548,3414,,False,4504,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,46,Who is the brother of the father of Russell with black hair?,Crispin,Crispin,True,True,1.0,171.69392800331116,6541,,False,8362,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,47,"Who is the father of the person with blonde hair, green eyes and a turquoise hat?",Dalton,Dalton,True,True,1.0,169.13193655014038,6826,,False,7310,enigme,True,6
+moonshotai/kimi-k2.6,large_tree_en,48,Who is the sister of the father of Forest with brown hair?,Kamila,Kamila,True,True,1.0,20.0777747631073,643,,False,838,enigme,True,5
+moonshotai/kimi-k2.6,large_tree_en,49,Who is the grandchild of the brother of Meredith with violet eyes?,Rhonda,Rhonda,True,True,1.0,105.60345697402954,4135,,False,5332,enigme,True,4
+moonshotai/kimi-k2.6,large_tree_en,50,Who is the grandchild of the sister of Manon with red hair?,Wendy,None,False,False,0.0,19.244067192077637,525,,False,696,enigme,True,4

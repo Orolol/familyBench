@@ -1,0 +1,59 @@
+{
+  "timestamp": "20260421_164309",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "qwen-3.6-35b-3a",
+    "moonshotai/kimi-k2.6"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "qwen-3.6-35b-3a": {
+      "total_questions": 15,
+      "correct_answers": 5,
+      "accuracy": 0.3333333333333333,
+      "exact_matches": 5,
+      "exact_match_rate": 0.3333333333333333,
+      "avg_partial_score": 0.3333333333333333,
+      "avg_response_time": 100.29319720268249,
+      "total_tokens": 7553,
+      "errors": 9,
+      "error_rate": 0.6,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 8256,
+      "questions_with_reasoning": 6,
+      "avg_reasoning_tokens": 1376.0,
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 15,
+        "correct": 5,
+        "accuracy": 0.3333333333333333
+      }
+    },
+    "moonshotai/kimi-k2.6": {
+      "total_questions": 15,
+      "correct_answers": 8,
+      "accuracy": 0.5333333333333333,
+      "exact_matches": 8,
+      "exact_match_rate": 0.5333333333333333,
+      "avg_partial_score": 0.5333333333333333,
+      "avg_response_time": 74.36265110969543,
+      "total_tokens": 7600,
+      "errors": 7,
+      "error_rate": 0.4666666666666667,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 9924,
+      "questions_with_reasoning": 8,
+      "avg_reasoning_tokens": 1240.5,
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 15,
+        "correct": 8,
+        "accuracy": 0.5333333333333333
+      }
+    }
+  }
+}

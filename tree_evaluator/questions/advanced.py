@@ -75,7 +75,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
                                         s.id != sibling.id]
                     if same_appearance:
                         questions.append({
-                            "question": f"Quels frères ou sœurs de {person.first_name} ont les cheveux {sibling.hair_color} et les yeux {sibling.eye_color} ?",
+                            "question": get_translation("q_siblings_with_hair_and_eyes", language).format(name=person.first_name, hair=sibling.hair_color, eyes=sibling.eye_color),
                             "answer": format_answer(same_appearance, language),
                             "type": "relation_attribut_composee"
                         })
@@ -123,7 +123,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
                 unique_names = list(set(names))
                 if len(unique_names) > 1:  # Au moins 2 pour éviter les cas uniques
                     questions.append({
-                        "question": f"Quels oncles ou tantes de {person.first_name} ont les cheveux {hair_color} ?",
+                        "question": get_translation("q_uncles_aunts_with_hair", language).format(name=person.first_name, color=hair_color),
                         "answer": format_answer(unique_names, language),
                         "type": "relation_attribut_composee"
                     })
@@ -218,7 +218,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
                     
                     if len(matching) > 2 and len(matching) < 10:  # Au moins 3 personnes
                         questions.append({
-                            "question": f"Qui a au moins un parent aux cheveux {color} ?",
+                            "question": get_translation("q_who_has_parent_with_hair", language).format(color=color),
                             "answer": format_answer(list(set(matching)), language),
                             "type": "recherche_inversee_complexe"
                         })
@@ -268,7 +268,7 @@ def generate_multihop_questions(people: Dict[str, Person], language: str = "fr")
         
         if in_laws_hair and len(set(in_laws_hair)) > 1:  # Au moins 2 couleurs différentes
             questions.append({
-                "question": f"Quelles sont les couleurs de cheveux des beaux-parents des enfants de {person.first_name} ?",
+                "question": get_translation("q_hair_colors_of_children_in_laws", language).format(name=person.first_name),
                 "answer": format_answer(list(set(in_laws_hair)), language),
                 "type": "multihop"
             })
@@ -314,17 +314,20 @@ def generate_conditional_questions(people: Dict[str, Person], language: str = "f
     for person in people.values():
         # 1. Si a des frères, qui sont leurs filles
         if person.parent_ids:
+            seen_brothers = set()
             brothers = []
             for pid in person.parent_ids:
                 for sibling_id in people[pid].children_ids:
-                    if sibling_id != person.id and people[sibling_id].gender == 'M':
+                    if sibling_id != person.id and sibling_id not in seen_brothers and people[sibling_id].gender == 'M':
+                        seen_brothers.add(sibling_id)
                         brothers.append(people[sibling_id])
-            
+
             if brothers:
-                daughters = []
-                for brother in brothers:
-                    daughters.extend([people[cid].first_name for cid in brother.children_ids 
-                                    if people[cid].gender == 'F'])
+                daughters = list(set(
+                    people[cid].first_name for brother in brothers
+                    for cid in brother.children_ids
+                    if people[cid].gender == 'F'
+                ))
                 if daughters:
                     questions.append({
                         "question": get_translation("q_if_has_brothers_their_daughters", language).format(name=person.first_name),
@@ -351,22 +354,24 @@ def generate_conditional_questions(people: Dict[str, Person], language: str = "f
                     "type": "conditional"
                 })
         
-        # 3. Qui a plus d'enfants
+        # 3. Qui a le plus d'enfants parmi X et ses frères/sœurs
         if person.parent_ids:
-            siblings = [people[cid] for pid in person.parent_ids 
-                       for cid in people[pid].children_ids if cid != person.id]
-            
+            seen = set()
+            siblings = []
+            for pid in person.parent_ids:
+                for cid in people[pid].children_ids:
+                    if cid != person.id and cid not in seen:
+                        seen.add(cid)
+                        siblings.append(people[cid])
+
             if siblings:
-                person_count = len(person.children_ids)
-                more_children = []
-                for sibling in siblings:
-                    if len(sibling.children_ids) > person_count:
-                        more_children.append(sibling.first_name)
-                
-                answer = format_answer(more_children, language) if more_children else person.first_name
+                all_candidates = [person] + siblings
+                max_count = max(len(c.children_ids) for c in all_candidates)
+                winners = [c.first_name for c in all_candidates if len(c.children_ids) == max_count]
+
                 questions.append({
                     "question": get_translation("q_who_has_more_children", language).format(name=person.first_name),
-                    "answer": answer,
+                    "answer": format_answer(winners, language),
                     "type": "conditional"
                 })
     
@@ -401,7 +406,7 @@ def generate_negation_questions(people: Dict[str, Person], language: str = "fr")
         
         if parents_no_target_eyes:  # Même s'il n'y a qu'une personne
             questions.append({
-                "question": f"Qui dans la famille n'a PAS d'enfants aux yeux {target_color} ?",
+                "question": get_translation("q_who_no_children_with_eye_color", language).format(color=target_color),
                 "answer": format_answer(parents_no_target_eyes, language),
                 "type": "negation"
             })
@@ -437,22 +442,34 @@ def generate_negation_questions(people: Dict[str, Person], language: str = "fr")
             "type": "negation"
         })
     
-    # 4. Génération ne travaillant ni comme avocat ni comme médecin
+    # 4. Génération ne travaillant ni comme profession1 ni comme profession2
+    # Sélectionner dynamiquement les 2 professions les plus communes
+    prof_counts = {}
+    for person in people.values():
+        prof_counts[person.profession] = prof_counts.get(person.profession, 0) + 1
+    top_professions = sorted(prof_counts, key=prof_counts.get, reverse=True)[:2]
+
     generations = {}
     for person in people.values():
         if person.generation not in generations:
             generations[person.generation] = []
         generations[person.generation].append(person)
-    
+
     for person in people.values():
         same_gen = generations.get(person.generation, [])
-        not_lawyer_doctor = [p.first_name for p in same_gen 
-                           if p.profession not in ["avocat", "médecin", "lawyer", "doctor"]]
-        
-        if not_lawyer_doctor and len(not_lawyer_doctor) < len(same_gen):
+        excluded = [p.first_name for p in same_gen
+                    if p.profession not in top_professions]
+
+        if excluded and len(excluded) < len(same_gen):
+            profs_str = ", ".join(top_professions)
+            # On utilise la traduction générique en formatant manuellement
+            if language == "en":
+                q_text = f"Who in {person.first_name}'s generation works neither as a {top_professions[0]} nor as a {top_professions[1]}?"
+            else:
+                q_text = f"Qui de la génération de {person.first_name} ne travaille ni comme {top_professions[0]} ni comme {top_professions[1]} ?"
             questions.append({
-                "question": get_translation("q_generation_not_lawyer_doctor", language).format(name=person.first_name),
-                "answer": format_answer(not_lawyer_doctor, language),
+                "question": q_text,
+                "answer": format_answer(excluded, language),
                 "type": "negation"
             })
             break  # Une seule question de ce type
@@ -491,7 +508,7 @@ def generate_comparative_questions(people: Dict[str, Person], language: str = "f
     # 2. Quelle génération a le plus de blonds
     generations_blond = {}
     for person in people.values():
-        if person.hair_color in ["blond", "blonde"]:
+        if "blond" in person.hair_color.lower():
             if person.generation not in generations_blond:
                 generations_blond[person.generation] = 0
             generations_blond[person.generation] += 1

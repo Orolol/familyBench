@@ -219,14 +219,14 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  - name: "z-ai/glm-4.6"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "z-ai/glm-4.6"
-    temperature: 0.7
-    max_tokens: 16000
-    reasoning:
-      max_tokens: 8000
+  # - name: "z-ai/glm-4.6"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "z-ai/glm-4.6"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
 
   # - name: "deepseek/deepseek-v3.2-exp"
   #   api_base: "https://openrouter.ai/api/v1"
@@ -246,43 +246,41 @@ models:
   #   reasoning:
   #     max_tokens: 8000
 
-  - name: "moonshotai/kimi-k2-0905"
+  - name: "moonshotai/kimi-k2.6"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "moonshotai/kimi-k2-0905"
-    temperature: 0.7
-    max_tokens: 16000
-    reasoning:
-      max_tokens: 8000
+    model: "moonshotai/kimi-k2.6"
 
-
+# Configuration pour l'évaluation automatique des modèles
 
 # Configurations de benchmarks à exécuter
 benchmarks:
 
-
-  - name: "huge_tree_en"
-    people: 400
-    depth: 10
-    questions: 200
-    root_couples: 10
-    seed: 43
+  - name: "large_tree_en"
+    people: 500
+    depth: 6
+    questions: 100
+    root_couples: 4
+    seed: 1
     language: "en"
-
-
 
 # Paramètres d'évaluation
 evaluation:
   # Nombre de tentatives par modèle/benchmark
-  runs_per_benchmark: 1
+  runs_per_benchmark: 3
   
+  # Nombre max de requêtes API en parallèle
+  max_concurrent_requests: 10
+
   # Timeout pour chaque requête API (en secondes)
-  timeout: 600
+  timeout: 999
+  
+  # Taille du batch pour grouper les questions (1 = pas de batching)
+  # Augmenter cette valeur peut améliorer les performances pour certains modèles
+  batch_size: 1
   
   # Dossier de sortie pour les résultats
   output_dir: "evaluation_results"
-
-  batch_size: 1
   
   # Format de sortie
   output_formats:
