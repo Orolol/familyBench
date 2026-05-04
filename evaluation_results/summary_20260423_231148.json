@@ -1,0 +1,40 @@
+{
+  "timestamp": "20260423_231148",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "Intel/Qwen3.6-35B-A3B-int4-AutoRound"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "Intel/Qwen3.6-35B-A3B-int4-AutoRound": {
+      "total_questions": 50,
+      "correct_answers": 6,
+      "accuracy": 0.12,
+      "exact_matches": 6,
+      "exact_match_rate": 0.12,
+      "avg_partial_score": 0.15361344537815128,
+      "avg_response_time": 66.8963120508194,
+      "total_tokens": 46057,
+      "errors": 38,
+      "error_rate": 0.76,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 50132,
+      "questions_with_reasoning": 12,
+      "avg_reasoning_tokens": 4177.666666666667,
+      "enigma_stats": {
+        "total": 20,
+        "correct": 2,
+        "accuracy": 0.1,
+        "by_complexity": {}
+      },
+      "normal_stats": {
+        "total": 30,
+        "correct": 4,
+        "accuracy": 0.13333333333333333
+      }
+    }
+  }
+}

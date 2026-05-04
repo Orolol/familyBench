@@ -270,7 +270,9 @@ class EvalProgress:
         # Métadonnées
         meta_parts = [f"{r.response_time:.1f}s"]
         if r.tokens_used:
-            meta_parts.append(f"{r.tokens_used} tok")
+            meta_parts.append(f"{r.tokens_used} out tok")
+        if r.cost_usd is not None:
+            meta_parts.append(f"${r.cost_usd:.5f}")
         if r.partial_match_score > 0 and not r.is_exact_match:
             meta_parts.append(f"partial: {r.partial_match_score:.0%}")
         grid.add_row("", Text(" • ".join(meta_parts), style="dim"))
@@ -327,7 +329,25 @@ def print_final_summary(summary_stats: Dict, output_paths: Dict[str, str]):
         table.add_row("Exact match", f"{stats['exact_match_rate']:.1%}")
         table.add_row("Non-réponses", f"{stats['no_responses']} ({stats['no_response_rate']:.1%})")
         table.add_row("Temps moyen", f"{stats['avg_response_time']:.2f}s")
-        table.add_row("Tokens", f"{stats['total_tokens']:,}")
+        completion = stats.get("total_completion_tokens", stats.get("total_tokens", 0))
+        avg_completion = stats.get("avg_completion_tokens", 0)
+        table.add_row(
+            "Output tokens",
+            f"{completion:,} (avg: {avg_completion:.0f}/q)",
+        )
+        prompt_total = stats.get("total_prompt_tokens", 0)
+        if prompt_total:
+            table.add_row("Prompt tokens", f"{prompt_total:,}")
+        cached_total = stats.get("total_cached_tokens", 0)
+        if cached_total:
+            table.add_row("Cached input tokens", f"{cached_total:,}")
+        total_cost = stats.get("total_cost_usd")
+        avg_cost = stats.get("avg_cost_usd")
+        if total_cost is not None:
+            table.add_row(
+                "Coût",
+                f"${total_cost:.4f} (avg: ${avg_cost:.5f}/q)",
+            )
 
         if stats["total_reasoning_tokens"] > 0:
             table.add_row("Reasoning tokens", f"{stats['total_reasoning_tokens']:,} (avg: {stats['avg_reasoning_tokens']:.0f})")

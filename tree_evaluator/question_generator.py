@@ -38,6 +38,9 @@ DIFFICULTY_TIERS: Dict[str, set[str]] = {
     "enigma": {"enigme"},
 }
 EXPERT_ENIGMA_COMPLEXITIES = {4, 5, 6}
+EXPERT_ENIGMA_HIGH_COMPLEXITIES = {5, 6}
+EXPERT_HARD_EXCLUDED_TYPES = {"relation_attribut_composee", "relational_path"}
+EXPERT_MIN_HIGH_ENIGMA_RATIO = 0.4
 VALID_DIFFICULTIES = {"all", "expert", *DIFFICULTY_TIERS.keys()}
 
 # Import de tous les modules de questions
@@ -114,15 +117,31 @@ def generate_questions(
         random.shuffle(pool)
         selected = pool[:num_questions]
     elif difficulty == "expert":
-        hard_types = DIFFICULTY_TIERS["hard"]
+        hard_types = DIFFICULTY_TIERS["hard"] - EXPERT_HARD_EXCLUDED_TYPES
         hard_pool = [q for q in unique_normal_questions if q["type"] in hard_types]
-        enigma_pool = [
+        enigma_high_pool = [
             q for q in unique_enigma_questions
-            if q.get("complexity") in EXPERT_ENIGMA_COMPLEXITIES
+            if q.get("complexity") in EXPERT_ENIGMA_HIGH_COMPLEXITIES
         ]
-        pool = hard_pool + enigma_pool
-        random.shuffle(pool)
-        selected = pool[:num_questions]
+        enigma_low_pool = [
+            q for q in unique_enigma_questions
+            if q.get("complexity") in EXPERT_ENIGMA_COMPLEXITIES - EXPERT_ENIGMA_HIGH_COMPLEXITIES
+        ]
+        random.shuffle(hard_pool)
+        random.shuffle(enigma_high_pool)
+        random.shuffle(enigma_low_pool)
+
+        min_high_enigmas = min(
+            len(enigma_high_pool),
+            max(1, int(num_questions * EXPERT_MIN_HIGH_ENIGMA_RATIO)),
+        )
+        selected = enigma_high_pool[:min_high_enigmas]
+        remaining = num_questions - len(selected)
+
+        rest_pool = hard_pool + enigma_low_pool + enigma_high_pool[min_high_enigmas:]
+        random.shuffle(rest_pool)
+        selected.extend(rest_pool[:remaining])
+        random.shuffle(selected)
     elif difficulty in DIFFICULTY_TIERS:
         allowed = DIFFICULTY_TIERS[difficulty]
         pool = [q for q in unique_normal_questions if q["type"] in allowed]

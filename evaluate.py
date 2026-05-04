@@ -58,6 +58,8 @@ def _build_detailed_json(
             "response_time": result.response_time,
             "prompt_tokens": result.prompt_tokens,
             "tokens_used": result.tokens_used,
+            "cached_tokens": result.cached_tokens,
+            "cost_usd": result.cost_usd,
             "reasoning_tokens": result.reasoning_tokens,
             "no_response": result.no_response,
             "error": result.error,

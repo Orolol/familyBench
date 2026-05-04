@@ -2,15 +2,53 @@
 
 # Modèles à évaluer
 models:
-  - name: "qwen-3.6-35b-3a"
+
+  # - name: "deepseek/deepseek-v4-flash"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "deepseek/deepseek-v4-flash"
+  #   provider:
+  #     data_collection: "allow"
+  #     allow_fallbacks: true
+  #   pricing:
+  #     input_per_mtok: 0.14
+  #     output_per_mtok: 0.28
+
+  # - name: "deepseek/deepseek-v4-pro"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "deepseek/deepseek-v4-pro"
+  #   pricing:
+  #     input_per_mtok: 0.435
+  #     output_per_mtok: 0.87
+
+  # - name: "moonshotai/kimi-k2.6"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "moonshotai/kimi-k2.6"
+  #   pricing:
+  #     input_per_mtok: 0.7448
+  #     output_per_mtok: 4.655
+
+  # - name: "openai/gpt-5.5"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "openai/gpt-5.5"
+  #   pricing:
+  #     input_per_mtok: 5.0
+  #     output_per_mtok: 30.0
+
+  # - name: "RedHatAI/Qwen3.6-35B-A3B-NVFP4"
+  #   api_base: "http://127.0.0.1:8080/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "RedHatAI/Qwen3.6-35B-A3B-NVFP4"
+  #   # Local vLLM => no pricing; cost_usd will be None.
+
+  - name: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
     api_base: "http://127.0.0.1:8080/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "RedHatAI/Qwen3.6-35B-A3B-NVFP4"
-
-  - name: "moonshotai/kimi-k2.6"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "moonshotai/kimi-k2.6"
+    model: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
+    # Local vLLM => no pricing; cost_usd will be None.
 
 
 
@@ -20,19 +58,19 @@ benchmarks:
   - name: "large_tree_en"
     people: 1000
     depth: 20
-    questions: 15
+    questions: 100
     root_couples: 8
-    seed: 50
+    seed: 667
     language: "en"
     difficulty: expert 
 
 # Paramètres d'évaluation
 evaluation:
   # Nombre de tentatives par modèle/benchmark
-  runs_per_benchmark: 1
+  runs_per_benchmark: 2
   
   # Nombre max de requêtes API en parallèle
-  max_concurrent_requests: 12
+  max_concurrent_requests: 1
 
   # Timeout pour chaque requête API (en secondes)
   timeout: 999

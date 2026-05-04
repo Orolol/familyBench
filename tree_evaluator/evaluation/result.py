@@ -22,6 +22,8 @@ class EvaluationResult:
     no_response: bool = False
     reasoning_tokens: int = 0
     prompt_tokens: int = 0
+    cached_tokens: int = 0
+    cost_usd: Optional[float] = None
     reasoning_text: Optional[str] = None
     question_type: Optional[str] = None
     is_enigma: bool = False

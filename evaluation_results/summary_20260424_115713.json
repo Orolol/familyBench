@@ -1,0 +1,40 @@
+{
+  "timestamp": "20260424_115713",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "deepseek/deepseek-v4-flash"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "deepseek/deepseek-v4-flash": {
+      "total_questions": 200,
+      "correct_answers": 161,
+      "accuracy": 0.805,
+      "exact_matches": 137,
+      "exact_match_rate": 0.685,
+      "avg_partial_score": 0.8346199890071766,
+      "avg_response_time": 115.13950170874595,
+      "total_tokens": 1645703,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 1868112,
+      "questions_with_reasoning": 200,
+      "avg_reasoning_tokens": 9340.56,
+      "enigma_stats": {
+        "total": 80,
+        "correct": 67,
+        "accuracy": 0.8375,
+        "by_complexity": {}
+      },
+      "normal_stats": {
+        "total": 120,
+        "correct": 94,
+        "accuracy": 0.7833333333333333
+      }
+    }
+  }
+}
