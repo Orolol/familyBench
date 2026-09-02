@@ -165,6 +165,7 @@ Thinking effort is not comparable across vendors, so the benchmark does not pret
 |---|---|
 | `api` | `anthropic` (Messages API), `openai_responses`, or `openai_chat` (any OpenAI-compatible endpoint: OpenAI chat, OpenRouter, DeepSeek, Qwen/DashScope, Moonshot, Z.ai, Gemini's compat endpoint, local servers). Auto-detected from `api_base` when omitted. |
 | `effort` | Generic effort label, translated into the vendor parameter: `output_config.effort` (Anthropic, with adaptive thinking), `reasoning.effort` (OpenAI Responses), `reasoning_effort` (OpenAI-compatible vendors), `reasoning: {effort}` (OpenRouter). |
+| `effort_param` | Where OpenAI-compatible vendors expect the effort: `reasoning_effort` (default: OpenAI chat, Qwen, Moonshot K3, Z.ai, Gemini) or `thinking` (DeepSeek: `thinking.reasoning_effort`), or `none`. |
 | `thinking_level` | Label shown in the leaderboard (defaults to `effort`). |
 | `max_tokens_per_question` | Output cap (reasoning + answer) per question; the request cap is this times the batch size. The only budget notion that is portable across vendors. |
 | `extra_body` | Vendor-specific parameters merged into the request, e.g. `thinking: {type: enabled}` for DeepSeek, Moonshot K2.6 and GLM, or Gemini's `google.thinking_config`. |

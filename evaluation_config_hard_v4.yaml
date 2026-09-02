@@ -8,7 +8,8 @@
 # Paramètres génériques par entrée :
 #   effort:                  libellé passé au paramètre d'effort de l'API
 #                            (Anthropic output_config.effort, OpenAI reasoning.effort,
-#                             reasoning_effort pour les API OpenAI-compatibles)
+#                             reasoning_effort pour les API OpenAI-compatibles ; effort_param: thinking
+#                             pour DeepSeek qui l'attend dans thinking.reasoning_effort)
 #   thinking_level:          libellé affiché dans le leaderboard (défaut = effort)
 #   max_tokens_per_question: plafond de sortie (raisonnement + réponse) par question,
 #                            multiplié par la taille du batch
@@ -19,12 +20,13 @@
 # (2) effort max sans plafond (max_tokens_per_question: 0 => max_tokens) sur une sélection.
 
 models:
-  # --- DeepSeek (API officielle) : thinking.type + reasoning_effort low|high|max
+  # --- DeepSeek (API officielle) : thinking: {type: enabled, reasoning_effort: low|high|max}
   - name: "deepseek-v4-flash@high"
     api_base: "https://api.deepseek.com"
     api_key: "${DEEPSEEK_API_KEY}"
     model: "deepseek-v4-flash"
-    effort: "high"
+    effort: "high"              # low | high | max
+    effort_param: thinking      # DeepSeek attend thinking.reasoning_effort (référence API)
     max_tokens_per_question: 16000
     extra_body:
       thinking: {type: "enabled"}

@@ -116,11 +116,11 @@ async def test_openai_compatible_effort_extra_body_and_vendor_cache_fields():
     app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
     async with TestServer(app) as server, aiohttp.ClientSession() as session:
         m = ModelEvaluator({"name": "deepseek@max", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "k",
-                            "model": "deepseek-v4-flash", "effort": "max", "thinking_level": "max",
+                            "model": "deepseek-v4-flash", "effort": "max", "thinking_level": "max", "effort_param": "thinking",
                             "extra_body": {"thinking": {"type": "enabled"}}, "max_tokens_per_question": 16000, "stream": False})
         r = await m.evaluate_question("TREE", Q, session, timeout=10, language="en")
     b = seen["body"]
-    assert b["reasoning_effort"] == "max" and b["thinking"] == {"type": "enabled"} and b["max_tokens"] == 16000
+    assert "reasoning_effort" not in b and b["thinking"] == {"type": "enabled", "reasoning_effort": "max"} and b["max_tokens"] == 16000
     assert "temperature" not in b and "reasoning" not in b
     assert r.cached_tokens == 40 and r.reasoning_tokens == 2 and r.is_correct
 
@@ -140,3 +140,18 @@ def test_entry_metadata_and_moonshot_cached_tokens():
     assert meta["thinking_level"] == "high" and meta["max_tokens"] == 16000 and meta["api"] == "openai_chat"
     out = m._extract_api_response({"choices": [{"message": {"content": "Bob"}}], "usage": {"prompt_tokens": 10, "completion_tokens": 1, "cached_tokens": 8}})
     assert out[5] == 8
+
+
+def test_default_effort_param_is_reasoning_effort_for_openai_compatible():
+    m = ModelEvaluator({"name": "glm@high", "api_base": "https://api.z.ai/api/paas/v4", "api_key": "k", "model": "glm-5.3",
+                        "effort": "high", "extra_body": {"thinking": {"type": "enabled"}}})
+    d = m._build_api_request("p", "en")
+    assert d["reasoning_effort"] == "high" and d["thinking"] == {"type": "enabled"}
+
+
+def test_openrouter_reasoning_details_streaming_fallback():
+    m = ModelEvaluator({"name": "r", "api_base": "https://openrouter.ai/api/v1", "api_key": "k", "model": "m"})
+    acc = {"content": [], "reasoning": [], "usage": {}, "finish_reason": None, "provider": None, "role": "assistant", "error": None}
+    assert m._consume_event({"choices": [{"delta": {"reasoning_details": [{"type": "reasoning.text", "text": "abc"}]}}]}, acc)
+    assert m._consume_event({"choices": [{"delta": {"reasoning": "def", "reasoning_details": [{"type": "reasoning.text", "text": "def"}]}}]}, acc)
+    assert "".join(acc["reasoning"]) == "abcdef", "no double counting when both fields are present"

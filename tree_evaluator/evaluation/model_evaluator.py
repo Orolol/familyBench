@@ -54,6 +54,11 @@ class ModelEvaluator:
         # la seconde dimension du leaderboard (paire modèle + niveau).
         self.effort = config.get('effort')
         self.thinking_level = str(config.get('thinking_level') or self.effort or 'default')
+        # Où placer l'effort pour les API OpenAI-compatibles :
+        #   "reasoning_effort" (défaut : OpenAI chat, Qwen, Moonshot K3, Z.ai, Gemini compat)
+        #   "thinking"         (DeepSeek : thinking.reasoning_effort, vérifié dans la référence API)
+        #   "none"             (ne rien envoyer, ex. modèle sans contrôle d'effort)
+        self.effort_param = config.get('effort_param', 'reasoning_effort')
         # Paramètres bruts fusionnés dans le corps de la requête (budgets de
         # thinking propres à un vendeur, etc.)
         self.extra_body: Dict[str, Any] = dict(config.get('extra_body') or {})
@@ -167,6 +172,7 @@ class ModelEvaluator:
             "api_base": self.api_base,
             "thinking_level": self.thinking_level,
             "effort": self.effort,
+            "effort_param": self.effort_param,
             "reasoning": self.reasoning_config,
             "extra_body": self.extra_body or None,
             "max_tokens_per_question": self.max_tokens_per_question,
@@ -814,10 +820,18 @@ class ModelEvaluator:
             text = delta.get("content")
             if isinstance(text, str) and text:
                 acc["content"].append(text); progressed = True
+            got_reasoning = False
             for key in ("reasoning", "reasoning_content"):
                 rt = delta.get(key)
                 if isinstance(rt, str) and rt:
-                    acc["reasoning"].append(rt); progressed = True
+                    acc["reasoning"].append(rt); progressed = True; got_reasoning = True
+            if not got_reasoning:
+                # OpenRouter : choices[].delta.reasoning_details = [{type: "reasoning.text", text}, {type: "reasoning.summary", summary}]
+                for item in delta.get("reasoning_details") or []:
+                    if isinstance(item, dict):
+                        rt = item.get("text") or item.get("summary")
+                        if isinstance(rt, str) and rt:
+                            acc["reasoning"].append(rt); progressed = True
             if choice.get("finish_reason"):
                 acc["finish_reason"] = choice["finish_reason"]
         return progressed
@@ -960,11 +974,15 @@ class ModelEvaluator:
             if self.provider_config:
                 data["provider"] = self.provider_config
         else:
-            if self.effort:
+            if self.effort and self.effort_param == "reasoning_effort":
                 data["reasoning_effort"] = self.effort
             if self.reasoning_config:
                 data["reasoning"] = self.reasoning_config
         data.update(self.extra_body)
+        if self.effort and self.effort_param == "thinking" and "openrouter" not in self.api_base:
+            thinking = dict(data.get("thinking") or {"type": "enabled"})
+            thinking["reasoning_effort"] = self.effort
+            data["thinking"] = thinking
         return data
 
     def _get_api_url(self) -> str:
