@@ -107,15 +107,15 @@ class ModelEvaluator:
             + cached_tokens * cached_rate
             + completion_tokens * out_rate
         ) / 1_000_000
-        
+
     def _resolve_api_key(self, key: str) -> str:
         """Résout les variables d'environnement dans la clé API."""
         if key.startswith('${') and key.endswith('}'):
             env_var = key[2:-1]
             return os.environ.get(env_var, 'none')
         return key
-    
-    async def evaluate_question(self, 
+
+    async def evaluate_question(self,
                               tree_description: str,
                               question: Dict[str, Any],
                               session: aiohttp.ClientSession,
@@ -123,11 +123,11 @@ class ModelEvaluator:
                               language: str = 'fr',
                               max_retries: int = 3) -> EvaluationResult:
         """Évalue une question unique avec retry automatique."""
-        
+
         # Mesurer le temps de réponse total
         total_start_time = time.time()
         last_error = None
-        
+
         # Retry loop
         for attempt in range(max_retries):
             if attempt > 0:
@@ -135,71 +135,76 @@ class ModelEvaluator:
                 wait_time = 2 ** attempt
                 logger.info(f"Retry {attempt}/{max_retries} for {self.name} - Question {question['id']} after {wait_time}s wait")
                 await asyncio.sleep(wait_time)
-            
+
             try:
                 result = await self._evaluate_question_single_attempt(
-                    tree_description, question, session, timeout, language, total_start_time
+                    tree_description, question, session, timeout, language, total_start_time,
+                    use_cache=(attempt == 0),
                 )
-                
+
                 # Si la réponse est valide ou si c'est la dernière tentative, retourner
                 if not result.no_response or attempt == max_retries - 1:
                     if attempt > 0 and not result.no_response:
                         logger.info(f"Success after {attempt + 1} attempts for {self.name} - Question {question['id']}")
                     return result
-                
+
                 # Sinon, continuer avec la prochaine tentative
                 logger.warning(f"Empty response on attempt {attempt + 1}/{max_retries} for {self.name} - Question {question['id']}")
                 last_error = result
-                
+
             except Exception as e:
                 logger.error(f"Exception on attempt {attempt + 1}/{max_retries} for {self.name} - Question {question['id']}: {str(e)}")
                 last_error = e
                 if attempt == max_retries - 1:
                     return self._create_error_result(question, str(e), time.time() - total_start_time)
-        
+
         # Si on arrive ici, toutes les tentatives ont échoué
         logger.error(f"All {max_retries} attempts failed for {self.name} - Question {question['id']}")
         if isinstance(last_error, EvaluationResult):
             return last_error
         return self._create_error_result(question, "All retry attempts failed", time.time() - total_start_time)
-    
-    async def _evaluate_question_single_attempt(self, 
+
+    async def _evaluate_question_single_attempt(self,
                                                tree_description: str,
                                                question: Dict[str, Any],
                                                session: aiohttp.ClientSession,
                                                timeout: int,
                                                language: str,
-                                               total_start_time: float) -> EvaluationResult:
-        """Évalue une question unique - une seule tentative."""
-        
+                                               total_start_time: float,
+        use_cache: bool = True) -> EvaluationResult:
+        """Évalue une question unique - une seule tentative.
+
+        use_cache=False (retries) : on ignore le cache, sinon un retry rejouerait
+        la même réponse vide/tronquée."""
+
         # Construire le prompt
         prompt = self.prompt_builder.build_single_question_prompt(
             tree_description, question['question'], language
         )
-        
+
         # Mesurer le temps de réponse
         start_time = time.time()
-        
+
         try:
             # Faire l'appel API
             headers = {
                 "Content-Type": "application/json",
             }
-            
+
             if self.api_key != "none":
                 headers["Authorization"] = f"Bearer {self.api_key}"
-            
+
             # Adapter le format selon le type d'API
             data = self._build_api_request(prompt, language, batch=False)
             url = self._get_api_url()
-            
+
             # Vérifier le cache
             cache_key = {
                 "model": self.name,
                 "url": url,
                 "data": data
             }
-            cached_response = self.cache_manager.get(cache_key)
+            cached_response = self.cache_manager.get(cache_key) if use_cache else None
             if cached_response:
                 logger.info(f"Cache hit for {self.name} - Question {question['id']}")
                 result = cached_response
@@ -209,7 +214,7 @@ class ModelEvaluator:
                 # Log de la requête envoyée
                 logger.debug(f"Sending request to {url} for {self.name}")
                 logger.debug(f"Request data: {json.dumps(data, indent=2)}")
-                
+
                 status, result = await self._call_api(
                     session, url, data, headers, timeout, f"question {question['id']}"
                 )
@@ -220,19 +225,15 @@ class ModelEvaluator:
                         question, f"API Error {status}: {result}", response_time
                     )
 
-                # Sauvegarder dans le cache si succès
-                if result:
-                    self.cache_manager.set(cache_key, result)
-                
             # Log de debug pour les réponses API
             logger.debug(f"API Response for {self.name} - Question {question['id']}: {json.dumps(result, indent=2) if result else 'None'}")
-            
+
             # Vérifier que result n'est pas None
             if result is None:
                 return self._create_error_result(
                     question, "Empty response from API", response_time, no_response=True
                 )
-            
+
             # Extraire la réponse selon le format
             (
                 model_answer,
@@ -243,18 +244,23 @@ class ModelEvaluator:
                 cached_tokens,
             ) = self._extract_api_response(result)
 
+            finish_reason = self._finish_reason(result)
+            # Mettre en cache seulement les réponses exploitables (non vides, non tronquées)
+            if not cached_response and model_answer and finish_reason != "length":
+                self.cache_manager.set(cache_key, result)
+
             # Nettoyer la réponse
             model_answer = self.cleaner.clean_answer(model_answer, language)
-            
+
             # Log si la réponse est vide ou très courte
             if not model_answer or len(model_answer) < 2:
                 logger.warning(f"Empty or very short answer from {self.name} for question {question['id']}: '{model_answer}'")
                 if reasoning_text:
                     logger.debug(f"Reasoning text was: {reasoning_text[:500]}...")
-            
+
             # Détecter les non-réponses
             no_response = self.cleaner.is_no_response(model_answer)
-            
+
             # Évaluer la réponse
             if no_response:
                 is_exact_match = False
@@ -264,10 +270,10 @@ class ModelEvaluator:
                 is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
                 partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
                 is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
-            
+
             # Calculer le temps total depuis le début (incluant les retries)
             total_response_time = time.time() - total_start_time
-            
+
             return EvaluationResult(
                 model_name=self.name,
                 benchmark_name="",
@@ -276,6 +282,7 @@ class ModelEvaluator:
                 expected_answer=question['answer'],
                 model_answer=model_answer,
                 hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
+                finish_reason=finish_reason,
                 is_correct=is_correct,
                 is_exact_match=is_exact_match,
                 partial_match_score=partial_score,
@@ -299,7 +306,7 @@ class ModelEvaluator:
         except Exception as e:
             logger.error(f"Exception for {self.name} on question {question['id']}: {str(e)}", exc_info=True)
             return self._create_error_result(question, str(e), time.time() - total_start_time)
-    
+
     async def evaluate_questions_batch(self,
                                      tree_description: str,
                                      questions: List[Dict[str, Any]],
@@ -308,11 +315,11 @@ class ModelEvaluator:
                                      language: str = 'fr',
                                      max_retries: int = 3) -> List[EvaluationResult]:
         """Évalue un batch de questions en une seule requête avec retry automatique."""
-        
+
         # Mesurer le temps de réponse total
         total_start_time = time.time()
         last_error = None
-        
+
         # Retry loop
         for attempt in range(max_retries):
             if attempt > 0:
@@ -320,25 +327,26 @@ class ModelEvaluator:
                 wait_time = 2 ** attempt
                 logger.info(f"Retry {attempt}/{max_retries} for {self.name} - Batch of {len(questions)} questions after {wait_time}s wait")
                 await asyncio.sleep(wait_time)
-            
+
             try:
                 results = await self._evaluate_questions_batch_single_attempt(
-                    tree_description, questions, session, timeout, language, total_start_time
+                    tree_description, questions, session, timeout, language, total_start_time,
+                    use_cache=(attempt == 0),
                 )
-                
+
                 # Vérifier si toutes les réponses sont vides
                 all_empty = all(r.no_response for r in results)
-                
+
                 # Si au moins une réponse est valide ou si c'est la dernière tentative, retourner
                 if not all_empty or attempt == max_retries - 1:
                     if attempt > 0 and not all_empty:
                         logger.info(f"Success after {attempt + 1} attempts for {self.name} - Batch of {len(questions)} questions")
                     return results
-                
+
                 # Sinon, continuer avec la prochaine tentative
                 logger.warning(f"All responses empty on attempt {attempt + 1}/{max_retries} for {self.name} - Batch of {len(questions)} questions")
                 last_error = results
-                
+
             except Exception as e:
                 logger.error(f"Exception on attempt {attempt + 1}/{max_retries} for {self.name} - Batch: {str(e)}")
                 last_error = e
@@ -347,7 +355,7 @@ class ModelEvaluator:
                     return [self._create_error_result(
                         q, str(e), (time.time() - total_start_time) / len(questions)
                     ) for q in questions]
-        
+
         # Si on arrive ici, toutes les tentatives ont échoué
         logger.error(f"All {max_retries} attempts failed for {self.name} - Batch of {len(questions)} questions")
         if isinstance(last_error, list):
@@ -356,42 +364,43 @@ class ModelEvaluator:
         return [self._create_error_result(
             q, "All retry attempts failed", (time.time() - total_start_time) / len(questions)
         ) for q in questions]
-    
+
     async def _evaluate_questions_batch_single_attempt(self,
                                                      tree_description: str,
                                                      questions: List[Dict[str, Any]],
                                                      session: aiohttp.ClientSession,
                                                      timeout: int,
                                                      language: str,
-                                                     total_start_time: float) -> List[EvaluationResult]:
+                                                     total_start_time: float,
+        use_cache: bool = True) -> List[EvaluationResult]:
         """Évalue un batch de questions en une seule requête - une seule tentative."""
-        
+
         # Construire le prompt pour plusieurs questions
         prompt = self.prompt_builder.build_batch_prompt(tree_description, questions, language)
-        
+
         # Mesurer le temps de réponse
         start_time = time.time()
-        
+
         try:
             # Faire l'appel API
             headers = {
                 "Content-Type": "application/json",
             }
-            
+
             if self.api_key != "none":
                 headers["Authorization"] = f"Bearer {self.api_key}"
-            
+
             # Adapter le format selon le type d'API
             data = self._build_api_request(prompt, language, batch=True)
             url = self._get_api_url()
-            
+
             # Vérifier le cache
             cache_key = {
                 "model": self.name,
                 "url": url,
                 "data": data
             }
-            cached_response = self.cache_manager.get(cache_key)
+            cached_response = self.cache_manager.get(cache_key) if use_cache else None
             if cached_response:
                 logger.info(f"Cache hit for {self.name} - Batch of {len(questions)} questions")
                 result = cached_response
@@ -400,7 +409,7 @@ class ModelEvaluator:
                 # Log de la requête envoyée
                 logger.debug(f"Sending request to {url} for {self.name}")
                 logger.debug(f"Request data: {json.dumps(data, indent=2)}")
-                
+
                 status, result = await self._call_api(
                     session, url, data, headers, timeout, f"batch of {len(questions)}"
                 )
@@ -413,16 +422,12 @@ class ModelEvaluator:
                         (time.time() - total_start_time) / len(questions)
                     ) for q in questions]
 
-                # Sauvegarder dans le cache si succès
-                if result:
-                    self.cache_manager.set(cache_key, result)
-                
             # Vérifier que result n'est pas None
             if result is None:
                 return [self._create_error_result(
                     q, "Empty response from API", response_time, no_response=True
                 ) for q in questions]
-            
+
             # Extraire la réponse selon le format
             (
                 model_response,
@@ -435,18 +440,22 @@ class ModelEvaluator:
 
             # Parser la réponse (objet JSON indexé, tableau JSON ou liste numérotée)
             answers = self.parse_batch_answers(model_response, len(questions))
+            finish_reason = self._finish_reason(result)
             if not any(answers):
                 logger.warning(f"Could not parse any answer from batch response for {self.name}: {model_response[:300]!r}")
-            
+            # Mettre en cache seulement les réponses exploitables (non vides, non tronquées)
+            if not cached_response and any(answers) and finish_reason != "length":
+                self.cache_manager.set(cache_key, result)
+
             # Créer les résultats pour chaque question
             results = []
             for i, (question, answer) in enumerate(zip(questions, answers)):
                 # Nettoyer la réponse
                 model_answer = self.cleaner.clean_answer(str(answer), language)
-                
+
                 # Détecter les non-réponses
                 no_response = self.cleaner.is_no_response(model_answer)
-                
+
                 # Évaluer la réponse
                 if no_response:
                     is_exact_match = False
@@ -456,7 +465,7 @@ class ModelEvaluator:
                     is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
                     partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
                     is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
-                
+
                 per_q_prompt = prompt_tokens // len(questions)
                 per_q_completion = tokens_used // len(questions)
                 per_q_cached = cached_tokens // len(questions)
@@ -468,6 +477,7 @@ class ModelEvaluator:
                     expected_answer=question['answer'],
                     model_answer=model_answer,
                     hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
+                    finish_reason=finish_reason,
                     is_correct=is_correct,
                     is_exact_match=is_exact_match,
                     partial_match_score=partial_score,
@@ -486,17 +496,26 @@ class ModelEvaluator:
                 ))
 
             return results
-                
+
         except asyncio.TimeoutError:
             return [self._create_error_result(
                 q, "Timeout", (time.time() - total_start_time) / len(questions)
             ) for q in questions]
-            
+
         except Exception as e:
             return [self._create_error_result(
                 q, str(e), (time.time() - total_start_time) / len(questions)
             ) for q in questions]
-    
+
+    @staticmethod
+    def _finish_reason(result: Dict[str, Any]) -> Optional[str]:
+        choices = result.get("choices") if isinstance(result, dict) else None
+        if choices and isinstance(choices[0], dict):
+            return choices[0].get("finish_reason") or choices[0].get("stop_reason")
+        if isinstance(result, dict):
+            return result.get("stop_reason")  # Anthropic
+        return None
+
     def _uses_streaming(self) -> bool:
         if not self.stream or "anthropic" in self.api_base:
             return False
@@ -674,20 +693,20 @@ class ModelEvaluator:
                     {"role": "system", "content": self.prompt_builder.get_system_prompt(language, batch)},
                     {"role": "user", "content": prompt}
                 ],
-                # Note: temperature might not be supported or works differently in Responses API, 
+                # Note: temperature might not be supported or works differently in Responses API,
                 # but keeping it if not explicitly forbidden.
-                # "temperature": self.temperature, 
+                # "temperature": self.temperature,
             }
-            
+
             if self.reasoning_config:
                 data["reasoning"] = self.reasoning_config
-                
+
             # Responses API uses max_output_tokens
             if self.max_completion_tokens:
                 data["max_output_tokens"] = self.max_completion_tokens
             elif self.max_tokens:
                  data["max_output_tokens"] = self.max_tokens
-                
+
             return data
         else:
             # Format OpenAI Standard
@@ -699,12 +718,12 @@ class ModelEvaluator:
                 ],
                 "temperature": self.temperature,
             }
-            
+
             if self.max_completion_tokens:
                 data["max_completion_tokens"] = self.max_completion_tokens
             else:
                 data["max_tokens"] = self.max_tokens if self.max_tokens is not None else 2000
-            
+
             # Ajouter la configuration de reasoning si présente (pour OpenRouter etc)
             if self.reasoning_config and "openrouter" in self.api_base:
                 data["reasoning"] = self.reasoning_config
@@ -713,7 +732,7 @@ class ModelEvaluator:
                 data["provider"] = self.provider_config
 
             return data
-    
+
     def _get_api_url(self) -> str:
         """Retourne l'URL de l'API selon le type."""
         if "anthropic" in self.api_base:
@@ -722,7 +741,7 @@ class ModelEvaluator:
             return f"{self.api_base}/responses"
         else:
             return f"{self.api_base}/chat/completions"
-    
+
     def _extract_api_response(
         self, result: Dict[str, Any]
     ) -> tuple[str, int, int, Optional[str], int, int]:
@@ -852,7 +871,7 @@ class ModelEvaluator:
                 reasoning_tokens = usage['reasoning_tokens']
 
         return model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens, cached_tokens
-    
+
     def _create_error_result(self, question: Dict[str, Any], error: str, response_time: float, no_response: bool = False) -> EvaluationResult:
         """Crée un résultat d'erreur."""
         return EvaluationResult(

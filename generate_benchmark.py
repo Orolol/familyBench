@@ -97,6 +97,8 @@ def main():
                         help="Phrases de lien écrites dans la description : parents (défaut, 'X est l'enfant de A et B'), children ('A a N enfants'), both (redondant, plus facile).")
     parser.add_argument("--max-answer-names", type=int, default=10,
                         help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
+    parser.add_argument("--drop-answer-names-above", type=int, default=40,
+                        help="Écarte les questions dont la réponse dépasse ce nombre de prénoms (recensements ; 0 = désactivé, défaut 40).")
     parser.add_argument("--anonymize-percentage", type=int, default=50,
                         help="Part des questions (0-100) dont les prénoms sont remplacés par une description par attributs (défaut 50).")
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
@@ -145,6 +147,7 @@ def main():
         difficulty=args.difficulty,
         max_answer_names=args.max_answer_names,
         anonymize_percentage=args.anonymize_percentage,
+        drop_answer_names_above=args.drop_answer_names_above,
     )
 
     if args.language == "en":
@@ -171,6 +174,7 @@ def main():
             "relations": args.relations,
             "max_answer_names": args.max_answer_names,
             "anonymize_percentage": args.anonymize_percentage,
+            "drop_answer_names_above": args.drop_answer_names_above,
             "questions_requested": args.questions,
             "questions_generated": len(questions),
             "generator_version": GENERATOR_VERSION,
@@ -188,6 +192,7 @@ def main():
                 "relations": args.relations,
                 "max_answer_names": args.max_answer_names,
                 "anonymize_percentage": args.anonymize_percentage,
+                "drop_answer_names_above": args.drop_answer_names_above,
             }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }

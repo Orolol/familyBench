@@ -18,7 +18,7 @@ def save_results_csv(results: List[EvaluationResult], output_path: Path):
             'partial_match_score', 'response_time', 'prompt_tokens', 'tokens_used',
             'cached_tokens', 'cost_usd',
             'error', 'no_response', 'reasoning_tokens', 'question_type',
-            'difficulty', 'hallucinated_names', 'is_enigma', 'enigma_complexity', 'batch_size'
+            'difficulty', 'hallucinated_names', 'is_enigma', 'enigma_complexity', 'batch_size', 'finish_reason'
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()

@@ -90,6 +90,7 @@ These options apply both to `generate_benchmark.py` flags and to `benchmarks:` e
 | Shuffled description | `--no-shuffle` / `shuffle: false` | shuffled | Sorted output (by generation, then name) leaks everyone's generation and keeps parents next to children. The shuffle is seeded from the benchmark seed, so the description is byte-identical across runs and provider prompt caches keep hitting. |
 | One-directional links | `--relations parents\|children\|both` / `relations:` | `parents` | With `parents`, only "X is the child of A and B" is written. Finding someone's children, siblings or descendants requires scanning the whole text. `both` restores the redundant, easier description. |
 | Long answers become counts | `--max-answer-names N` / `max_answer_names:` | 10 | A question whose answer would list more than N names is rewritten as *"How many people answer the following question: …"* with a numeric answer. Enumeration stamina is no longer rewarded, and partial credit cannot inflate the score. `0` disables. |
+| Census questions dropped | `--drop-answer-names-above N` / `drop_answer_names_above:` | 40 | Questions whose answer would list more than N names are removed before sampling. Counting them instead does not remove the work: "who has the same number of children as X" on 1,000 people is a full census that eats the whole reasoning budget. `0` disables. |
 | Attribute references | `--anonymize-percentage P` / `anonymize_percentage:` | 50 | In P % of questions, every first name is replaced by the person's unique attribute description (*"the person with red hair, blue eyes and a green hat"*), so the model must locate the person before reasoning. Enigmas are never anonymized (their own phrasing already does this at levels 6 and 8). |
 | Enigma levels 7-9 | via `difficulty: expert` or `enigma` | | 7: 3-relation chain from a named person + discriminating attribute. 8: same chain from an attribute-described person. 9: two chains joined by an attribute equality (*"the female cousin of X who has the same eye color as the grandmother of Y"*). `expert` now draws enigmas from levels 4-9 with at least 40 % from 7-9. |
 
@@ -137,6 +138,7 @@ benchmarks:
     shuffle: true
     relations: parents      # parents | children | both
     max_answer_names: 10
+    drop_answer_names_above: 40
     anonymize_percentage: 50
 
 evaluation:

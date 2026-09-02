@@ -183,3 +183,23 @@ def convert_long_answers_to_counts(questions: List[Dict[str, Any]], people: Dict
         q["converted_to_count"] = True
         count += 1
     return count
+
+
+def drop_census_questions(questions: List[Dict[str, Any]], people: Dict[str, Person],
+                          language: str, drop_above: int) -> List[Dict[str, Any]]:
+    """Écarte les questions dont la réponse dépasse `drop_above` prénoms.
+
+    Les convertir en dénombrement ne réduit pas le travail : "combien ont le
+    même nombre d'enfants que X" sur 1 000 personnes reste un recensement
+    complet, qui dévore le budget de raisonnement (observé : 64k tokens sans
+    réponse). 0 = désactivé.
+    """
+    if drop_above <= 0:
+        return questions
+    known = {p.first_name for p in people.values()}
+    kept = []
+    for q in questions:
+        if answer_format(q["answer"], known, language) == "names" and len(q["answer"].split(",")) > drop_above:
+            continue
+        kept.append(q)
+    return kept

@@ -41,6 +41,8 @@ EXPERT_ENIGMA_COMPLEXITIES = {4, 5, 6, 7, 8, 9}
 EXPERT_ENIGMA_HIGH_COMPLEXITIES = {7, 8, 9}
 # Réponses de plus de N prénoms converties en dénombrement (0 = désactivé)
 DEFAULT_MAX_ANSWER_NAMES = 10
+# Questions écartées au-delà de N prénoms : ce sont des recensements (0 = désactivé)
+DEFAULT_DROP_ANSWER_NAMES_ABOVE = 40
 # Part des questions dont les prénoms sont remplacés par une description par attributs
 DEFAULT_ANONYMIZE_PERCENTAGE = 50
 EXPERT_HARD_EXCLUDED_TYPES = {"relation_attribut_composee", "relational_path"}
@@ -73,6 +75,7 @@ from tree_evaluator.questions.advanced import (
 from tree_evaluator.questions.enigma import generate_enigma_questions
 from tree_evaluator.questions.rewrite import (
     anonymize_names, convert_long_answers_to_counts, answer_format, fix_english_articles,
+    drop_census_questions,
 )
 
 
@@ -137,6 +140,7 @@ def generate_questions(
     difficulty: str = "all",
     max_answer_names: int = DEFAULT_MAX_ANSWER_NAMES,
     anonymize_percentage: int = DEFAULT_ANONYMIZE_PERCENTAGE,
+    drop_answer_names_above: int = DEFAULT_DROP_ANSWER_NAMES_ABOVE,
 ) -> List[Dict[str, Any]]:
     """Génère une liste de questions de différents types.
 
@@ -149,6 +153,8 @@ def generate_questions(
             un dénombrement ("Combien de personnes répondent à ..."). 0 = désactivé.
         anonymize_percentage: part (0-100) des questions dont les prénoms cités
             sont remplacés par une description par attributs.
+        drop_answer_names_above: les questions dont la réponse dépasse ce nombre
+            de prénoms sont écartées avant tirage (recensements). 0 = désactivé.
     """
     if difficulty not in VALID_DIFFICULTIES:
         raise ValueError(
@@ -171,7 +177,9 @@ def generate_questions(
     normal_questions.extend(generate_comparative_questions(people, language))
     normal_questions.extend(generate_relational_path_questions(people, language))
 
-    unique_normal_questions = _dedupe(normal_questions)
+    unique_normal_questions = drop_census_questions(
+        _dedupe(normal_questions), people, language, drop_answer_names_above
+    )
     unique_enigma_questions = _dedupe(generate_enigma_questions(people, language))
     _stamp_difficulty(unique_normal_questions)
     _stamp_difficulty(unique_enigma_questions)

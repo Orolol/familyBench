@@ -34,3 +34,5 @@ class EvaluationResult:
     enigma_complexity: Optional[int] = None
     # Taille du batch dans lequel la question a été posée (1 = une requête par question)
     batch_size: int = 1
+    # finish_reason renvoyé par l'API ("stop", "length" = coupé par max_tokens...)
+    finish_reason: Optional[str] = None

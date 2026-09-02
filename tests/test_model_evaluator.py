@@ -114,3 +114,17 @@ def test_cache_hit_batch_returns_results_without_network():
 def test_error_result_keeps_difficulty():
     r = make()._create_error_result(QUESTION, "boom", 0.1)
     assert r.error == "boom" and r.difficulty == "easy" and not r.is_correct
+
+
+def test_empty_or_truncated_responses_are_not_cached_and_retries_bypass_cache():
+    m = make()
+    data = m._build_api_request(m.prompt_builder.build_single_question_prompt("tree", QUESTION["question"], "en"), "en")
+    key = {"model": m.name, "url": m._get_api_url(), "data": data}
+    # une réponse tronquée déjà en cache ne doit pas être relue lors d'un retry
+    m.cache_manager.set(key, {"choices": [{"message": {"content": ""}, "finish_reason": "length"}], "usage": {}})
+    hit = asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
+                                                          language="en", total_start_time=0.0, use_cache=True))
+    assert hit.no_response and hit.finish_reason == "length"
+    with pytest.raises(Exception):  # use_cache=False -> tente le réseau (session None)
+        asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
+                                                        language="en", total_start_time=0.0, use_cache=False))

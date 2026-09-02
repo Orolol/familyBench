@@ -170,3 +170,10 @@ def test_expert_uses_high_levels(tree):
     en = [q for q in qs if q["type"] == "enigme"]
     assert en and all(q["complexity"] in EXPERT_ENIGMA_COMPLEXITIES for q in en)
     assert sum(1 for q in en if q["complexity"] >= 7) >= 0.4 * 60 * 0.5
+
+
+def test_census_questions_are_dropped(tree):
+    qs = generate_questions(tree, 150, language="en", anonymize_percentage=0, drop_answer_names_above=40)
+    assert all(not q["converted_to_count"] or q["original_answer_size"] <= 40 for q in qs)
+    keep = generate_questions(tree, 150, language="en", anonymize_percentage=0, drop_answer_names_above=0)
+    assert any(q["converted_to_count"] and q["original_answer_size"] > 40 for q in keep)

@@ -14,7 +14,7 @@ from typing import Any, Dict
 # À incrémenter à chaque changement qui modifie les arbres ou les questions
 # produits pour une seed donnée (algorithme de génération, ordre des tirages
 # aléatoires, nouveaux types de questions, échantillonnage...).
-GENERATOR_VERSION = "3.0"
+GENERATOR_VERSION = "3.1"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -64,4 +64,5 @@ def benchmark_params_from_config(benchmark_config: Dict[str, Any]) -> Dict[str, 
         "relations": benchmark_config.get("relations", "parents"),
         "max_answer_names": benchmark_config.get("max_answer_names", 10),
         "anonymize_percentage": benchmark_config.get("anonymize_percentage", 50),
+        "drop_answer_names_above": benchmark_config.get("drop_answer_names_above", 40),
     }

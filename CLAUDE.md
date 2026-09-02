@@ -22,7 +22,7 @@ Key modules:
 - `cache_manager.py`: optional `diskcache` cache of API responses (in-memory fallback)
 - `evaluation/`: Complete async evaluation framework with answer cleaning, stats, and result formatting
 - `questions/`: Modular question generation system with 21 question types including 9 enigma complexity levels (7-9 use the generic chain engine in `enigma.py`)
-- `questions/rewrite.py`: post-selection difficulty rewrites: `anonymize_names` (names -> unique attribute description, never on enigmas), `convert_long_answers_to_counts` (> `max_answer_names` names -> counting question), `fix_english_articles`
+- `questions/rewrite.py`: post-selection difficulty rewrites: `anonymize_names` (names -> unique attribute description, never on enigmas), `convert_long_answers_to_counts` (> `max_answer_names` names -> counting question), `drop_census_questions`, `fix_english_articles`
 
 ## Common Commands
 
@@ -110,14 +110,14 @@ The system generates multiple output formats:
 
 `--difficulty all` samples evenly across types (round-robin) with `enigma_percentage` enigmas; `expert` = hard tier (minus compound attributes and relational paths) + enigmas of complexity 4-9 (>= 40 % from 7-9).
 
-Difficulty levers (generator 3.0, hard defaults): `shuffle` (default true), `relations` (default `parents`), `max_answer_names` (default 10, 0 disables), `anonymize_percentage` (default 50). All are CLI flags of `generate_benchmark.py` and keys of `benchmarks:` entries, and all are part of the benchmark fingerprint. Questions carry `answer_format`, `anonymized`, `converted_to_count`.
+Difficulty levers (generator 3.0, hard defaults): `shuffle` (default true), `relations` (default `parents`), `max_answer_names` (default 10, 0 disables), `drop_answer_names_above` (default 40: census questions removed before sampling), `anonymize_percentage` (default 50). All are CLI flags of `generate_benchmark.py` and keys of `benchmarks:` entries, and all are part of the benchmark fingerprint. Questions carry `answer_format`, `anonymized`, `converted_to_count`.
 
 Answers are names sorted alphabetically and comma-separated, a number, or `None`/`Aucun`. `multihop` and `relational_path` are the only types whose answer can be an attribute value or a relation label instead of names.
 
 ## Evaluation System
 
 The evaluation framework (`tree_evaluator/evaluation/`) includes:
-- **Async API calls** with a concurrency semaphore (`max_concurrent_requests`), timeout and retries
+- **Async API calls** with a concurrency semaphore (`max_concurrent_requests`), timeout and retries; SSE streaming by default (`stream: false` to disable); empty or `finish_reason=length` responses are never cached and retries bypass the cache
 - **Three request formats**: OpenAI chat completions (default, incl. OpenRouter `reasoning`/`provider`), OpenAI Responses API (when `reasoning` is set and `api_base` is OpenAI), Anthropic messages
 - **Answer cleaning** to normalize LLM responses (handles JSON arrays, numbered lists, tags, etc.)
 - **Scoring**: `is_correct` = exact set match OR Jaccard >= `ModelEvaluator.CORRECT_PARTIAL_THRESHOLD` (0.9); `hallucinated_names` counts names absent from the tree (only when the expected answer is a name list)
