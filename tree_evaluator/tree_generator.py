@@ -50,6 +50,17 @@ def generate_tree(
     language: str = "fr",
 ) -> Dict[str, Person]:
     
+    if total_people < 1:
+        raise ValueError("total_people must be at least 1")
+    if max_depth < 1:
+        raise ValueError("max_depth must be at least 1")
+    if max_children_per_person < 1:
+        raise ValueError("max_children_per_person must be at least 1")
+    if num_root_couples < 1:
+        raise ValueError("num_root_couples must be at least 1")
+    if language not in ("fr", "en"):
+        raise ValueError(f"language must be 'fr' or 'en', got {language!r}")
+    
     if seed is not None:
         random.seed(seed)
 

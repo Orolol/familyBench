@@ -16,21 +16,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
             sibling_names = [s.first_name for s in siblings]
             questions.append({
                 "question": get_translation("q_siblings_of", language).format(name=person.first_name),
-                "answer": format_answer(list(set(sibling_names)), language),
+                "answer": format_answer(sibling_names, language),
                 "type": "relation_complexe"
             })
-            
+
             brothers = [s.first_name for s in siblings if s.gender == 'M']
             questions.append({
                 "question": get_translation("q_brothers_of", language).format(name=person.first_name),
-                "answer": format_answer(list(set(brothers)), language),
+                "answer": format_answer(brothers, language),
                 "type": "relation_complexe"
             })
 
             sisters = [s.first_name for s in siblings if s.gender == 'F']
             questions.append({
                 "question": get_translation("q_sisters_of", language).format(name=person.first_name),
-                "answer": format_answer(list(set(sisters)), language),
+                "answer": format_answer(sisters, language),
                 "type": "relation_complexe"
             })
 
@@ -51,21 +51,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if grandparent_names:
             questions.append({
                 "question": get_translation("q_grandparents_of", language).format(name=person.first_name),
-                "answer": format_answer(list(set(grandparent_names)), language),
+                "answer": format_answer(grandparent_names, language),
                 "type": "relation_complexe"
             })
-            
+
             if grandfathers:
                 questions.append({
                     "question": get_translation("q_grandfathers_of", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(grandfathers)), language),
+                    "answer": format_answer(grandfathers, language),
                     "type": "relation_complexe"
                 })
-            
+
             if grandmothers:
                 questions.append({
                     "question": get_translation("q_grandmothers_of", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(grandmothers)), language),
+                    "answer": format_answer(grandmothers, language),
                     "type": "relation_complexe"
                 })
 
@@ -86,21 +86,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if grandchildren_names:
             questions.append({
                 "question": get_translation("q_grandchildren_of", language).format(name=person.first_name),
-                "answer": format_answer(list(set(grandchildren_names)), language),
+                "answer": format_answer(grandchildren_names, language),
                 "type": "relation_complexe"
             })
-            
+
             if grandsons:
                 questions.append({
                     "question": get_translation("q_grandsons_of", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(grandsons)), language),
+                    "answer": format_answer(grandsons, language),
                     "type": "relation_complexe"
                 })
-            
+
             if granddaughters:
                 questions.append({
                     "question": get_translation("q_granddaughters_of", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(granddaughters)), language),
+                    "answer": format_answer(granddaughters, language),
                     "type": "relation_complexe"
                 })
         
@@ -123,21 +123,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if great_grandparent_names:
             questions.append({
                 "question": get_translation("q_great_grandparents", language).format(name=person.first_name),
-                "answer": format_answer(list(set(great_grandparent_names)), language),
+                "answer": format_answer(great_grandparent_names, language),
                 "type": "relation_complexe"
             })
-            
+
             if great_grandfathers:
                 questions.append({
                     "question": get_translation("q_great_grandfathers", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(great_grandfathers)), language),
+                    "answer": format_answer(great_grandfathers, language),
                     "type": "relation_complexe"
                 })
-            
+
             if great_grandmothers:
                 questions.append({
                     "question": get_translation("q_great_grandmothers", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(great_grandmothers)), language),
+                    "answer": format_answer(great_grandmothers, language),
                     "type": "relation_complexe"
                 })
         
@@ -160,21 +160,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if great_grandchildren_names:
             questions.append({
                 "question": get_translation("q_great_grandchildren", language).format(name=person.first_name),
-                "answer": format_answer(list(set(great_grandchildren_names)), language),
+                "answer": format_answer(great_grandchildren_names, language),
                 "type": "relation_complexe"
             })
-            
+
             if great_grandsons:
                 questions.append({
                     "question": get_translation("q_great_grandsons", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(great_grandsons)), language),
+                    "answer": format_answer(great_grandsons, language),
                     "type": "relation_complexe"
                 })
-            
+
             if great_granddaughters:
                 questions.append({
                     "question": get_translation("q_great_granddaughters", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(great_granddaughters)), language),
+                    "answer": format_answer(great_granddaughters, language),
                     "type": "relation_complexe"
                 })
         
@@ -190,21 +190,21 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
             uncle_aunt_names = [p.first_name for p in uncles_aunts]
             questions.append({
                 "question": get_translation("q_uncles_aunts", language).format(name=person.first_name),
-                "answer": format_answer(list(set(uncle_aunt_names)), language),
+                "answer": format_answer(uncle_aunt_names, language),
                 "type": "relation_complexe"
             })
 
             uncles = [p.first_name for p in uncles_aunts if p.gender == 'M']
             questions.append({
                 "question": get_translation("q_uncles", language).format(name=person.first_name),
-                "answer": format_answer(list(set(uncles)), language),
+                "answer": format_answer(uncles, language),
                 "type": "relation_complexe"
             })
 
             aunts = [p.first_name for p in uncles_aunts if p.gender == 'F']
             questions.append({
                 "question": get_translation("q_aunts", language).format(name=person.first_name),
-                "answer": format_answer(list(set(aunts)), language),
+                "answer": format_answer(aunts, language),
                 "type": "relation_complexe"
             })
 
@@ -222,7 +222,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if cousins:
             questions.append({
                 "question": get_translation("q_cousins_all", language).format(name=person.first_name),
-                "answer": format_answer(list(set(cousins)), language),
+                "answer": format_answer(cousins, language),
                 "type": "relation_complexe"
             })
 
@@ -234,11 +234,11 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                     parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
                     for sibling in parent_siblings:
                         male_cousins.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'M'])
-            
+
             if male_cousins:
                 questions.append({
                     "question": get_translation("q_cousins_male", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(male_cousins)), language),
+                    "answer": format_answer(male_cousins, language),
                     "type": "relation_complexe"
                 })
 
@@ -250,11 +250,11 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                     parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
                     for sibling in parent_siblings:
                         female_cousins.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'F'])
-            
+
             if female_cousins:
                 questions.append({
                     "question": get_translation("q_cousins_female", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(female_cousins)), language),
+                    "answer": format_answer(female_cousins, language),
                     "type": "relation_complexe"
                 })
 
@@ -270,7 +270,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
         if nephews_nieces:
             questions.append({
                 "question": get_translation("q_nephews_nieces", language).format(name=person.first_name),
-                "answer": format_answer(list(set(nephews_nieces)), language),
+                "answer": format_answer(nephews_nieces, language),
                 "type": "relation_complexe"
             })
 
@@ -280,11 +280,11 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
                 for sibling in siblings:
                     nephews.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'M'])
-            
+
             if nephews:
                 questions.append({
                     "question": get_translation("q_nephews", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(nephews)), language),
+                    "answer": format_answer(nephews, language),
                     "type": "relation_complexe"
                 })
 
@@ -294,11 +294,11 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
                 for sibling in siblings:
                     nieces.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'F'])
-            
+
             if nieces:
                 questions.append({
                     "question": get_translation("q_nieces", language).format(name=person.first_name),
-                    "answer": format_answer(list(set(nieces)), language),
+                    "answer": format_answer(nieces, language),
                     "type": "relation_complexe"
                 })
 

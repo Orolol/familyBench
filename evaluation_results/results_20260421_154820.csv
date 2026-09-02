@@ -1,0 +1,51 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+qwen-3.6-35b-3a,large_tree_en,1,Who is the cousin of the daughter of Chase with silver hair?,Liam,None,False,False,0.0,88.22947096824646,6065,,False,7076,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,2,Who is the cousin of the son of Norman with blonde hair?,Gil,"Sheena,Gil,Harlow,Kenneth",False,False,0.25,38.73145508766174,2476,,False,2790,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,3,Who is the grandchild of the sister of Octavia with black hair?,Rhonda,Abigail,False,False,0.0,61.6282639503479,4141,,False,4432,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,4,Who is the child of the son of Jonathan with jet black hair?,Ishmael,Ishmael,True,True,1.0,39.638755321502686,2539,,False,3038,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,5,Who is the cousin of the daughter of Ursula with jet black hair?,Yumi,Willem,False,False,0.0,64.72014927864075,4360,,False,5182,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,6,Who is the sister of the mother of Eunice with brown hair?,Tegan,Tegan,True,True,1.0,28.794121742248535,1747,,False,2112,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,7,Who is the cousin of the daughter of Oswald with white hair?,Jocelyn,Madison,False,False,0.0,236.51409101486206,16974,,False,18088,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,8,Who is the daughter of Conan with jet black hair?,Heather,Heather,True,True,1.0,13.546741962432861,612,,False,716,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,9,Who is the child of the daughter of Reid with white hair?,Vincent,Vincent,True,True,1.0,19.005335330963135,1023,,False,1252,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,10,Who is the son of Aaron with black hair?,Spencer,Spencer,True,True,1.0,12.610179662704468,550,,False,628,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,11,"Who is the mother of the person with jet black hair, black eyes and a white hat?",Margot,Margot,True,True,1.0,134.49039769172668,9842,,False,11492,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,12,Who is the grandchild of the sister of Braxton with salt and pepper hair?,Elyse,Elyse,True,True,1.0,41.060927629470825,3014,,False,3458,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,13,Who is the cousin of the daughter of Aurelia with silver hair?,Morgana,Morgana,True,True,1.0,26.336978673934937,1933,,False,2264,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,14,Who is the child of the son of Mason with salt and pepper hair?,Connor,Connor,True,True,1.0,39.783339500427246,2885,,False,3094,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,15,"Who is the mother of the person with silver hair, hazel eyes and a tan hat?",Marie,Marie,True,True,1.0,156.22869443893433,11412,,False,11618,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,16,"Who is the mother of the person with brown hair, blue-gray eyes and a brown hat?",Sandra,None,False,False,0.0,464.4993495941162,44006,,False,51334,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,17,Who is the daughter of William with gray hair?,Tracey,Tracey,True,True,1.0,8.421344757080078,608,,False,682,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,18,Who is the grandchild of the sister of Yma with strawberry blonde hair?,Milena,Katherine,False,False,0.0,67.83100914955139,4920,,False,5708,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,19,Who is the grandchild of the sister of Wil with black hair?,Leila,"Jewel,Kendra,Leila,Alexandra,Ulysses",False,False,0.2,36.98465704917908,2664,,False,2996,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,20,Who is the cousin of the son of Todd with blonde hair?,Pauline,Pauline,True,True,1.0,112.32249307632446,8216,,False,9266,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,21,Who is the son of Zaria with silver hair?,Denver,Denver,True,True,1.0,8.696891784667969,623,,False,732,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,22,Who is the child of the son of Immanuel with white hair?,Sabine,Sabine,True,True,1.0,29.099787950515747,2096,,False,2514,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,23,Who is the child of the daughter of Reese with auburn hair?,Olivia,"Olivia,Tegan",False,False,0.5,16.75196862220764,1206,,False,1372,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,24,Who is the sister of the mother of Hassan with red hair?,Judy,"Evelyn,Judy",False,False,0.5,91.30744981765747,6698,,False,5850,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,25,Who is the grandchild of the sister of Dustin with strawberry blonde hair?,Odelia,Vex,False,False,0.0,17.12682604789734,1232,,False,1452,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,26,Who is the child of the daughter of Ramona with auburn hair?,Jacinda,Jacinda,True,True,1.0,21.933586359024048,1593,,False,1874,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,27,Who is the grandchild of the brother of Stephanie with brown hair?,Janice,"Antonio,Dario,Davina,Morgana,Nikki,Truman",False,False,0.0,41.33571791648865,3054,,False,3492,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,28,Who is the grandchild of the brother of Rudy with blonde hair?,Azalea,Eduardo,False,False,0.0,56.52783393859863,4167,,False,5080,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,29,Who is the grandchild of the brother of Janet with white hair?,Ellie,"Wren,Ellie,Katarina",False,False,0.3333333333333333,173.31382369995117,13530,,False,11576,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,30,Who is the sister of the mother of Yasmin with blonde hair?,Paulina,Paulina,True,True,1.0,34.59543061256409,2550,,False,2818,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,31,Who is the child of the son of Jeanne with brown hair?,Ada,Ada,True,True,1.0,14.743394374847412,1083,,False,1344,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,32,Who is the daughter of Humphrey with white hair?,Sabine,Sabine,True,True,1.0,7.990375280380249,576,,False,662,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,33,Who is the daughter of Braxton with salt and pepper hair?,Ariana,Ariana,True,True,1.0,8.850168228149414,635,,False,710,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,34,Who is the grandchild of the brother of Linda with white hair?,Vera,Vera,True,True,1.0,112.98935985565186,8584,,False,9280,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,35,Who is the child of the son of Blaine with dark brown hair?,Maria,Maria,True,True,1.0,19.02299165725708,1387,,False,1730,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,36,Who is the sister of the father of Alice with black hair?,Rhonda,"Rhonda,Tiffany",False,False,0.5,90.49604487419128,6810,,False,6924,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,37,Who is the child of the daughter of Leah with strawberry blonde hair?,Cecelia,Cecelia,True,True,1.0,34.510727882385254,2525,,False,3056,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,38,Who is the daughter of Irving with gray hair?,Martha,Martha,True,True,1.0,9.90395188331604,716,,False,826,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,39,Who is the child of the son of Willa with gray hair?,Reina,Reina,True,True,1.0,23.35502314567566,1699,,False,2110,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,40,Who is the son of Betty with light brown eyes?,Walt,Walt,True,True,1.0,11.002314805984497,805,,False,952,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,41,Who is the son of Anne with chestnut hair?,Norman,Norman,True,True,1.0,9.134469747543335,662,,False,754,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,42,Who is the son of Zara with black hair?,Xu,Xu,True,True,1.0,10.745643615722656,767,,False,928,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,43,Who is the grandchild of the brother of Linda with gray hair?,Otto,"Carina,Mercy",False,False,0.0,59.886396646499634,4566,,False,5016,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,44,Who is the brother of the father of Dante with gray hair?,Otto,Otto,True,True,1.0,22.145405769348145,1610,,False,1960,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,45,Who is the son of Johanna with white hair?,Landon,Landon,True,True,1.0,5.713059425354004,393,,False,440,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,46,"Who is the mother of the person with silver hair, black eyes and a white hat?",Nessa,Nessa,True,True,1.0,26.095060348510742,1914,,False,2228,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,47,Who is the cousin of the son of Dot with chestnut hair?,Prudence,Prudence,True,True,1.0,77.91571736335754,6314,,False,7306,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,48,Who is the daughter of Opal with white hair?,Candace,Candace,True,True,1.0,8.01120138168335,588,,False,638,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,49,"Who is the mother of the person with strawberry blonde hair, violet eyes and a yellow hat?",Lacey,Lacey,True,True,1.0,52.497394323349,4137,,False,4538,enigme,True,6
+qwen-3.6-35b-3a,large_tree_en,50,"Who is the mother of the person with platinum blonde hair, light brown eyes and a cream hat?",Sue,Freya,False,False,0.0,214.96535348892212,21659,,False,24146,enigme,True,6

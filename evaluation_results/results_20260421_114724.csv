@@ -1,0 +1,31 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+qwen-3.6-35b-3a,large_tree_en,1,Who is the cousin of the daughter of Chase with silver hair?,Liam,Liam,True,True,1.0,16.105674028396606,1629,,False,1990,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,2,Who is the cousin of the son of Norman with blonde hair?,Gil,"Wes,Connie,Valerie",False,False,0.0,20.383901596069336,2063,,False,2344,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,3,Who is the grandchild of the sister of Octavia with black hair?,Rhonda,"Rhonda,Sylvester,Tiffany",False,False,0.3333333333333333,14.004328489303589,1418,,False,1492,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,4,Who is the child of the son of Jonathan with jet black hair?,Ishmael,Ishmael,True,True,1.0,26.869449853897095,2751,,False,3498,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,5,Who is the cousin of the daughter of Ursula with jet black hair?,Yumi,"Willem,Yumi,Brittany",False,False,0.3333333333333333,28.975378036499023,2973,,False,3398,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,6,Who is the sister of the mother of Eunice with brown hair?,Tegan,Tegan,True,True,1.0,10.191820859909058,1037,,False,1210,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,7,Who is the cousin of the daughter of Oswald with white hair?,Jocelyn,Jocelyn,True,True,1.0,1044.4563827514648,5271,,False,5816,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,8,Who is the daughter of Conan with jet black hair?,Heather,Heather,True,True,1.0,4.8608245849609375,487,,False,574,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,9,Who is the child of the daughter of Reid with white hair?,Vincent,"Quinn,Vincent",False,False,0.5,26.242843627929688,2692,,False,3102,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,10,Who is the son of Aaron with black hair?,Spencer,Spencer,True,True,1.0,4.902371644973755,483,,False,568,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,1,Who is the cousin of the daughter of Chase with silver hair?,Liam,None,False,False,0.0,57.22693920135498,5979,,False,7448,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,2,Who is the cousin of the son of Norman with blonde hair?,Gil,"Sheena,Gil,Harlow,Kenneth",False,False,0.25,18.798804998397827,1951,,False,2232,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,3,Who is the grandchild of the sister of Octavia with black hair?,Rhonda,Abigail,False,False,0.0,9.673184871673584,998,,False,1118,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,4,Who is the child of the son of Jonathan with jet black hair?,Ishmael,"Chance,Ishmael",False,False,0.5,17.066362142562866,1785,,False,2232,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,5,Who is the cousin of the daughter of Ursula with jet black hair?,Yumi,"Willem,Yumi,Brittany",False,False,0.3333333333333333,31.464510440826416,3276,,False,3658,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,6,Who is the sister of the mother of Eunice with brown hair?,Tegan,Tegan,True,True,1.0,10.709604501724243,1116,,False,1268,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,7,Who is the cousin of the daughter of Oswald with white hair?,Jocelyn,None,False,False,0.0,58.467963218688965,6852,,False,8068,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,8,Who is the daughter of Conan with jet black hair?,Heather,Heather,True,True,1.0,4.285883665084839,433,,False,506,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,9,Who is the child of the daughter of Reid with white hair?,Vincent,"Quinn,Vincent",False,False,0.5,16.567286729812622,1725,,False,2074,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,10,Who is the son of Aaron with black hair?,Spencer,Spencer,True,True,1.0,2.7578840255737305,269,,False,334,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,1,Who is the cousin of the daughter of Chase with silver hair?,Liam,None,False,False,0.0,74.7533757686615,7803,,False,8928,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,2,Who is the cousin of the son of Norman with blonde hair?,Gil,"Sheena,Gil,Harlow,Kenneth",False,False,0.25,25.032387733459473,2606,,False,2816,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,3,Who is the grandchild of the sister of Octavia with black hair?,Rhonda,"Rhonda,Sylvester,Tiffany",False,False,0.3333333333333333,13.353149652481079,1386,,False,1522,enigme,True,4
+qwen-3.6-35b-3a,large_tree_en,4,Who is the child of the son of Jonathan with jet black hair?,Ishmael,Virginia,False,False,0.0,30.131283044815063,3146,,False,4200,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,5,Who is the cousin of the daughter of Ursula with jet black hair?,Yumi,"Brittany,Jolene",False,False,0.0,24.276253938674927,2516,,False,2750,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,6,Who is the sister of the mother of Eunice with brown hair?,Tegan,Tegan,True,True,1.0,10.308793544769287,1067,,False,1258,enigme,True,5
+qwen-3.6-35b-3a,large_tree_en,7,Who is the cousin of the daughter of Oswald with white hair?,Jocelyn,Jocelyn,True,True,1.0,23.012521982192993,2384,,False,2934,enigme,True,3
+qwen-3.6-35b-3a,large_tree_en,8,Who is the daughter of Conan with jet black hair?,Heather,Heather,True,True,1.0,4.312913417816162,430,,False,518,enigme,True,1
+qwen-3.6-35b-3a,large_tree_en,9,Who is the child of the daughter of Reid with white hair?,Vincent,"Quinn,Vincent",False,False,0.5,12.9243803024292,1334,,False,1594,enigme,True,2
+qwen-3.6-35b-3a,large_tree_en,10,Who is the son of Aaron with black hair?,Spencer,Spencer,True,True,1.0,4.022927284240723,467,,False,538,enigme,True,1

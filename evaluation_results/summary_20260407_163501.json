@@ -1,0 +1,35 @@
+{
+  "timestamp": "20260407_163501",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "qwen-3.5-27b-turboquant-3"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "qwen-3.5-27b-turboquant-3": {
+      "total_questions": 5,
+      "correct_answers": 4,
+      "accuracy": 0.8,
+      "exact_matches": 4,
+      "exact_match_rate": 0.8,
+      "avg_partial_score": 0.9,
+      "avg_response_time": 90.84537172317505,
+      "total_tokens": 16297,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 5,
+        "correct": 4,
+        "accuracy": 0.8
+      }
+    }
+  }
+}

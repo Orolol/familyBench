@@ -1,6 +1,5 @@
 """Fonctions de base pour la génération de questions."""
 
-import json
 from typing import Dict, List, Any
 from tree_evaluator.models import Person
 from tree_evaluator.translations import get_translation
@@ -10,7 +9,9 @@ def format_answer(names: List[str], language: str = "fr") -> str:
     """Formate une liste de noms en une chaîne de réponse."""
     if not names:
         return get_translation("none", language)
-    return ",".join(sorted(names))
+    # dict.fromkeys preserves insertion order while deduplicating
+    unique_names = list(dict.fromkeys(names))
+    return ",".join(sorted(unique_names))
 
 
 def get_common_attributes(people: Dict[str, Person], attribute: str, min_count: int = 2) -> List[str]:

@@ -18,7 +18,11 @@ Question: {question}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
-Respond ONLY with the requested name or list of names (separated by commas without spaces), or "None" if no one matches."""
+Response format:
+- If the question asks "how many" or "combien", respond with a single NUMBER (e.g. 3), not names.
+- If the question asks for people/names, respond with FIRST NAMES only, separated by commas without spaces (e.g. Alice,Bob,Claire).
+- If no one matches, respond "None".
+- Do NOT add any explanation, just the answer."""
         else:
             return f"""Voici la description d'une famille:
 
@@ -28,7 +32,11 @@ Question: {question}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
-Réponds UNIQUEMENT avec le nom ou la liste de noms demandée (séparés par des virgules sans espaces), ou "Aucun" si personne ne correspond."""
+Format de réponse :
+- Si la question demande "combien" ou un dénombrement, réponds avec un CHIFFRE uniquement (ex: 3), pas des noms.
+- Si la question demande des personnes/noms, réponds avec les PRÉNOMS uniquement, séparés par des virgules sans espaces (ex: Alice,Bob,Claire).
+- Si personne ne correspond, réponds "Aucun".
+- N'ajoute AUCUNE explication, juste la réponse."""
     
     @staticmethod
     def build_batch_prompt(tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> str:
@@ -42,8 +50,11 @@ Réponds UNIQUEMENT avec le nom ou la liste de noms demandée (séparés par des
 
 Answer the following questions based on this family description.
 Provide your answers as a JSON array of strings in the same order as the questions.
-For lists of names, separate them with commas without spaces.
-If no one matches, answer "None".
+
+Response format rules:
+- If a question asks "how many", answer with a NUMBER (e.g. "3"), not names.
+- If a question asks for people/names, answer with FIRST NAMES only, separated by commas without spaces (e.g. "Alice,Bob").
+- If no one matches, answer "None".
 
 Questions:
 {questions_text}
@@ -58,8 +69,11 @@ Respond ONLY with a JSON array like: ["Answer1", "Answer2", "Answer3"]"""
 
 Réponds aux questions suivantes basées sur cette description familiale.
 Fournis tes réponses sous forme d'un tableau JSON de chaînes dans le même ordre que les questions.
-Pour les listes de noms, sépare-les par des virgules sans espaces.
-Si personne ne correspond, réponds "Aucun".
+
+Règles de format :
+- Si une question demande "combien", réponds avec un CHIFFRE (ex: "3"), pas des noms.
+- Si une question demande des personnes/noms, réponds avec les PRÉNOMS uniquement, séparés par des virgules sans espaces (ex: "Alice,Bob").
+- Si personne ne correspond, réponds "Aucun".
 
 Questions:
 {questions_text}
@@ -73,11 +87,11 @@ Réponds UNIQUEMENT avec un tableau JSON comme: ["Réponse1", "Réponse2", "Rép
         """Retourne le prompt système selon la langue et le mode."""
         if batch:
             return {
-                "fr": "Tu es un assistant expert en analyse de texte. Réponds au format JSON demandé.",
-                "en": "You are an expert text analysis assistant. Respond in the requested JSON format."
+                "fr": "Tu es un assistant expert en analyse de texte. Réponds au format JSON demandé. Pour les questions de dénombrement, réponds par un chiffre. Pour les questions de noms, réponds par des prénoms.",
+                "en": "You are an expert text analysis assistant. Respond in the requested JSON format. For counting questions, answer with a number. For name questions, answer with first names."
             }.get(language, "Tu es un assistant expert en analyse de texte. Réponds au format JSON demandé.")
         else:
             return {
-                "fr": "Tu es un assistant expert en analyse de texte. Réponds UNIQUEMENT avec le nom ou la liste de noms demandée, sans aucune explication.",
-                "en": "You are an expert text analysis assistant. Respond ONLY with the requested name or list of names, without any explanation."
-            }.get(language, "Tu es un assistant expert en analyse de texte. Réponds UNIQUEMENT avec le nom ou la liste de noms demandée, sans aucune explication.")
+                "fr": "Tu es un assistant expert en analyse de texte. Pour les questions de dénombrement, réponds par un chiffre uniquement. Pour les questions de noms, réponds par des prénoms uniquement, sans explication.",
+                "en": "You are an expert text analysis assistant. For counting questions, respond with a number only. For name questions, respond with first names only, without any explanation."
+            }.get(language, "Tu es un assistant expert en analyse de texte. Réponds UNIQUEMENT avec la réponse demandée, sans aucune explication.")

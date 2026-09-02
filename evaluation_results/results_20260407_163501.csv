@@ -1,0 +1,6 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+qwen-3.5-27b-turboquant-3,large_tree_en,1,Who in the family does NOT have children with black eyes?,"Max,Ora,Rue,Wilfredo","Kit,Quinn,Rue,Max,Wendy,Ora,Wilfredo,Xara",False,False,0.5,239.24434399604797,9896,,False,0,negation,False,
+qwen-3.5-27b-turboquant-3,large_tree_en,2,How many web designers are there?,1,1,True,True,1.0,42.863115549087524,652,,False,0,comptage,False,
+qwen-3.5-27b-turboquant-3,large_tree_en,3,Who are Xara's uncles?,None,None,True,True,1.0,117.32265520095825,4217,,False,0,relation_complexe,False,
+qwen-3.5-27b-turboquant-3,large_tree_en,4,Who is Xara's father?,Wilfredo,Wilfredo,True,True,1.0,22.816179752349854,643,,False,0,relation_directe,False,
+qwen-3.5-27b-turboquant-3,large_tree_en,5,How many granddaughters does Eleanor have?,1,1,True,True,1.0,31.98056411743164,889,,False,0,comptage_complexe,False,

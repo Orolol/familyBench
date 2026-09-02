@@ -75,7 +75,7 @@ pytest
 
 When modifying the code, maintain these unique constraints:
 - Each person must have a unique first name
-- Each person must have a unique profession
+- Professions are NOT unique — multiple people can share the same profession (intentional for attribute-search questions)
 - The combination (hair_color, eye_color, hat_color) must be unique
 - Simple tree structure: no remarriages, each child has exactly 2 parents
 - Support both French and English throughout the codebase

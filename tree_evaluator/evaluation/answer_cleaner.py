@@ -113,7 +113,7 @@ class AnswerCleaner:
             'three': '3', 'trois': '3',
             'four': '4', 'quatre': '4',
             'five': '5', 'cinq': '5',
-            'six': '6', 'six': '6',
+            'six': '6',
             'seven': '7', 'sept': '7',
             'eight': '8', 'huit': '8',
             'nine': '9', 'neuf': '9',
@@ -199,8 +199,8 @@ class AnswerCleaner:
     def check_exact_match(model_answer: str, expected_answer: str) -> bool:
         """Vérifie si la réponse correspond exactement."""
         # Normaliser les deux réponses
-        model_normalized = set(model_answer.split(',')) if ',' in model_answer else {model_answer}
-        expected_normalized = set(expected_answer.split(',')) if ',' in expected_answer else {expected_answer}
+        model_normalized = {x.strip() for x in model_answer.split(',')} if ',' in model_answer else {model_answer.strip()}
+        expected_normalized = {x.strip() for x in expected_answer.split(',')} if ',' in expected_answer else {expected_answer.strip()}
         
         return model_normalized == expected_normalized
     
@@ -212,8 +212,8 @@ class AnswerCleaner:
         
         # Pour les listes
         if ',' in expected_answer or ',' in model_answer:
-            model_set = set(model_answer.split(',')) if model_answer else set()
-            expected_set = set(expected_answer.split(',')) if expected_answer else set()
+            model_set = {x.strip() for x in model_answer.split(',') if x.strip()} if model_answer else set()
+            expected_set = {x.strip() for x in expected_answer.split(',') if x.strip()} if expected_answer else set()
             
             if not expected_set:
                 return 0.0

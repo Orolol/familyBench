@@ -15,6 +15,12 @@ def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
     avg_partial_score = sum(r.partial_match_score for r in results) / total
     avg_response_time = sum(r.response_time for r in results) / total
     total_tokens = sum(r.tokens_used for r in results)
+    total_prompt_tokens = sum(r.prompt_tokens for r in results)
+    total_completion_tokens = total_tokens  # `tokens_used` is completion tokens
+    total_cached_tokens = sum(r.cached_tokens for r in results)
+    costs = [r.cost_usd for r in results if r.cost_usd is not None]
+    total_cost_usd = sum(costs) if costs else None
+    avg_cost_usd = (sum(costs) / len(costs)) if costs else None
     errors = sum(1 for r in results if r.error)
     no_responses = sum(1 for r in results if r.no_response)
     total_reasoning_tokens = sum(r.reasoning_tokens for r in results)
@@ -65,6 +71,12 @@ def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
         'avg_partial_score': avg_partial_score,
         'avg_response_time': avg_response_time,
         'total_tokens': total_tokens,
+        'total_prompt_tokens': total_prompt_tokens,
+        'total_completion_tokens': total_completion_tokens,
+        'avg_completion_tokens': total_completion_tokens / total if total > 0 else 0,
+        'total_cached_tokens': total_cached_tokens,
+        'total_cost_usd': total_cost_usd,
+        'avg_cost_usd': avg_cost_usd,
         'errors': errors,
         'error_rate': errors / total,
         'no_responses': no_responses,

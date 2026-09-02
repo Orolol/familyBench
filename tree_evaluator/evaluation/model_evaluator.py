@@ -28,15 +28,36 @@ class ModelEvaluator:
         self.api_base = config['api_base'].rstrip('/')
         self.api_key = self._resolve_api_key(config['api_key'])
         self.model = config['model']
-        self.temperature = config.get('temperature', 0.0)
-        self.max_tokens = config.get('max_tokens')
+        self.temperature = config.get('temperature', 0.8)
+        self.max_tokens = config.get('max_tokens', 64000)
         self.max_completion_tokens = config.get('max_completion_tokens')
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
+        self.provider_config = config.get('provider', None)
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
+        # Pricing (USD per million tokens). Optional; absent => no cost computed.
+        # Expected keys: input_per_mtok, output_per_mtok, cached_input_per_mtok (optional).
+        self.pricing: Optional[Dict[str, float]] = config.get('pricing')
         self.cleaner = AnswerCleaner()
         self.prompt_builder = PromptBuilder()
         self.cache_manager = CacheManager()
+
+    def _compute_cost(
+        self, prompt_tokens: int, completion_tokens: int, cached_tokens: int
+    ) -> Optional[float]:
+        """Cost in USD given the pricing dict, or None if no pricing set."""
+        if not self.pricing:
+            return None
+        in_rate = float(self.pricing.get('input_per_mtok', 0.0) or 0.0)
+        out_rate = float(self.pricing.get('output_per_mtok', 0.0) or 0.0)
+        cached_rate_raw = self.pricing.get('cached_input_per_mtok')
+        cached_rate = float(cached_rate_raw) if cached_rate_raw is not None else in_rate
+        non_cached_in = max(0, prompt_tokens - cached_tokens)
+        return (
+            non_cached_in * in_rate
+            + cached_tokens * cached_rate
+            + completion_tokens * out_rate
+        ) / 1_000_000
         
     def _resolve_api_key(self, key: str) -> str:
         """Résout les variables d'environnement dans la clé API."""
@@ -166,8 +187,15 @@ class ModelEvaluator:
                     )
                 
                 # Extraire la réponse selon le format
-                model_answer, tokens_used, reasoning_tokens, reasoning_text = self._extract_api_response(result)
-                
+                (
+                    model_answer,
+                    tokens_used,
+                    reasoning_tokens,
+                    reasoning_text,
+                    prompt_tokens,
+                    cached_tokens,
+                ) = self._extract_api_response(result)
+
                 # Nettoyer la réponse
                 model_answer = self.cleaner.clean_answer(model_answer, language)
                 
@@ -208,11 +236,14 @@ class ModelEvaluator:
                     no_response=no_response,
                     reasoning_tokens=reasoning_tokens,
                     reasoning_text=reasoning_text,
+                    prompt_tokens=prompt_tokens,
+                    cached_tokens=cached_tokens,
+                    cost_usd=self._compute_cost(prompt_tokens, tokens_used, cached_tokens),
                     question_type=question.get('type'),
                     is_enigma=question.get('type') == 'enigme',
                     enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
                 )
-                
+
         except asyncio.TimeoutError:
             logger.error(f"Timeout after {timeout}s for {self.name} on question {question['id']}")
             return self._create_error_result(question, "Timeout", time.time() - total_start_time)
@@ -345,8 +376,15 @@ class ModelEvaluator:
                     ) for q in questions]
                 
                 # Extraire la réponse selon le format
-                model_response, tokens_used, reasoning_tokens, reasoning_text = self._extract_api_response(result)
-                
+                (
+                    model_response,
+                    tokens_used,
+                    reasoning_tokens,
+                    reasoning_text,
+                    prompt_tokens,
+                    cached_tokens,
+                ) = self._extract_api_response(result)
+
                 # Parser la réponse JSON
                 try:
                     # Extraire le JSON de la réponse
@@ -383,6 +421,9 @@ class ModelEvaluator:
                         partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
                         is_correct = is_exact_match or partial_score >= 0.9
                     
+                    per_q_prompt = prompt_tokens // len(questions)
+                    per_q_completion = tokens_used // len(questions)
+                    per_q_cached = cached_tokens // len(questions)
                     results.append(EvaluationResult(
                         model_name=self.name,
                         benchmark_name="",
@@ -394,10 +435,13 @@ class ModelEvaluator:
                         is_exact_match=is_exact_match,
                         partial_match_score=partial_score,
                         response_time=(time.time() - total_start_time) / len(questions),  # Temps moyen par question
-                        tokens_used=tokens_used // len(questions),  # Tokens moyens par question
+                        tokens_used=per_q_completion,
                         no_response=no_response,
                         reasoning_tokens=reasoning_tokens // len(questions) if reasoning_tokens > 0 else 0,
                         reasoning_text=reasoning_text,  # Partagé entre toutes les questions du batch
+                        prompt_tokens=per_q_prompt,
+                        cached_tokens=per_q_cached,
+                        cost_usd=self._compute_cost(per_q_prompt, per_q_completion, per_q_cached),
                         question_type=question.get('type'),
                         is_enigma=question.get('type') == 'enigme',
                         enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
@@ -467,7 +511,10 @@ class ModelEvaluator:
             # Ajouter la configuration de reasoning si présente (pour OpenRouter etc)
             if self.reasoning_config and "openrouter" in self.api_base:
                 data["reasoning"] = self.reasoning_config
-            
+
+            if self.provider_config and "openrouter" in self.api_base:
+                data["provider"] = self.provider_config
+
             return data
     
     def _get_api_url(self) -> str:
@@ -479,19 +526,46 @@ class ModelEvaluator:
         else:
             return f"{self.api_base}/chat/completions"
     
-    def _extract_api_response(self, result: Dict[str, Any]) -> tuple[str, int, int, Optional[str]]:
-        """Extrait la réponse du modèle selon le format de l'API."""
+    def _extract_api_response(
+        self, result: Dict[str, Any]
+    ) -> tuple[str, int, int, Optional[str], int, int]:
+        """Extrait la réponse du modèle selon le format de l'API.
+
+        Returns: (model_answer, completion_tokens, reasoning_tokens,
+                  reasoning_text, prompt_tokens, cached_tokens)
+
+        Tolère les deux schémas d'usage:
+          • OpenAI / vLLM: prompt_tokens, completion_tokens,
+            prompt_tokens_details.cached_tokens
+          • Anthropic / OpenRouter récent: input_tokens, output_tokens,
+            input_tokens_details.cached_tokens
+        """
         reasoning_tokens = 0
         reasoning_text = None
-        
-        # Format Responses API (OpenAI)
-        if "output_text" in result:
-            model_answer = result.get("output_text", "")
-            model_answer = model_answer.strip()
-            # Usage info might be different or absent in this specific response format example
-            # Assuming standard usage if present
-            tokens_used = result.get('usage', {}).get('total_tokens', 0)
-            return model_answer, tokens_used, 0, None
+        prompt_tokens = 0
+        cached_tokens = 0
+
+        # Format Responses API (OpenAI, /responses) : la réponse est dans
+        # result["output"] = [{type: "reasoning"...}, {type: "message", content: [{type: "output_text", text}]}]
+        if "output" in result and "choices" not in result:
+            text_parts = []
+            for item in result.get("output") or []:
+                if not isinstance(item, dict) or item.get("type") != "message":
+                    continue
+                for part in item.get("content") or []:
+                    if isinstance(part, dict) and part.get("type") == "output_text":
+                        text_parts.append(part.get("text") or "")
+            model_answer = (result.get("output_text") or "\n".join(text_parts)).strip()
+            usage = result.get("usage", {}) or {}
+            tokens_used = int(usage.get("output_tokens", 0) or 0)
+            prompt_tokens = int(usage.get("input_tokens", 0) or 0)
+            in_details = usage.get("input_tokens_details") or {}
+            out_details = usage.get("output_tokens_details") or {}
+            cached_tokens = int(in_details.get("cached_tokens", 0) or 0)
+            reasoning_tokens = int(out_details.get("reasoning_tokens", 0) or 0)
+            if not model_answer:
+                logger.warning(f"Empty output in Responses API result for {self.name} - Full response: {json.dumps(result, indent=2)}")
+            return model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens, cached_tokens
 
         if "anthropic" in self.api_base:
             content = result.get('content', [{}])
@@ -500,13 +574,17 @@ class ModelEvaluator:
             else:
                 model_answer = ''
             model_answer = model_answer.strip()
-            tokens_used = result.get('usage', {}).get('output_tokens', 0)
+            usage = result.get('usage', {}) or {}
+            tokens_used = usage.get('output_tokens', 0)
+            prompt_tokens = usage.get('input_tokens', 0)
+            in_details = usage.get('input_tokens_details') or {}
+            cached_tokens = int(in_details.get('cached_tokens', 0) or 0)
         else:
             choices = result.get('choices', [])
             if not choices:
                 logger.warning(f"No choices in API response for {self.name} - Full response: {json.dumps(result, indent=2)}")
-                return "", 0, 0, None
-            
+                return "", 0, 0, None, 0, 0
+
             choice = choices[0]
             message = choice.get('message', {})
             content = message.get('content') or ''
@@ -542,28 +620,41 @@ class ModelEvaluator:
                 logger.warning(f"Empty content in message for {self.name} - Message: {json.dumps(message, indent=2)}")
 
             model_answer = model_answer.strip()
-            tokens_used = result.get('usage', {}).get('completion_tokens', 0)
-            
+            usage = result.get('usage', {}) or {}
+            tokens_used = usage.get('completion_tokens', usage.get('output_tokens', 0))
+            prompt_tokens = usage.get('prompt_tokens', usage.get('input_tokens', 0))
+            in_details = (
+                usage.get('prompt_tokens_details') or usage.get('input_tokens_details') or {}
+            )
+            out_details = (
+                usage.get('completion_tokens_details')
+                or usage.get('output_tokens_details')
+                or {}
+            )
+            cached_tokens = int((in_details or {}).get('cached_tokens', 0) or 0)
+            reasoning_from_details = int((out_details or {}).get('reasoning_tokens', 0) or 0)
+            if reasoning_from_details:
+                reasoning_tokens = reasoning_from_details
+
             # Extraire les tokens de reasoning si présents (OpenRouter)
             if 'reasoning' in message:
                 reasoning_text = message['reasoning']
                 # Les tokens de reasoning sont comptabilisés dans le total
                 # On peut estimer en fonction de la longueur du texte
-                if reasoning_text:
+                if reasoning_text and not reasoning_tokens:
                     reasoning_tokens = len(reasoning_text.split()) * 2  # Estimation approximative
                     logger.debug(f"Found reasoning text ({len(reasoning_text)} chars) for {self.name}")
-            
+
             # Vérifier si le contenu est dans un format différent pour les modèles de reasoning
             if not model_answer and 'reasoning_content' in message:
                 model_answer = message.get('reasoning_content', '')
                 logger.debug(f"Using reasoning_content as answer for {self.name}")
-            
-            # Vérifier aussi dans usage pour les tokens de reasoning
-            usage = result.get('usage', {})
-            if 'reasoning_tokens' in usage:
+
+            # Vérifier aussi dans usage pour les tokens de reasoning (champ legacy)
+            if not reasoning_tokens and 'reasoning_tokens' in usage:
                 reasoning_tokens = usage['reasoning_tokens']
-        
-        return model_answer, tokens_used, reasoning_tokens, reasoning_text
+
+        return model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens, cached_tokens
     
     def _create_error_result(self, question: Dict[str, Any], error: str, response_time: float, no_response: bool = False) -> EvaluationResult:
         """Crée un résultat d'erreur."""

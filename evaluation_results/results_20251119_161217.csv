@@ -1,0 +1,1513 @@
+model_name,benchmark_name,question_id,question,expected_answer,model_answer,is_correct,is_exact_match,partial_match_score,response_time,tokens_used,error,no_response,reasoning_tokens,question_type,is_enigma,enigma_complexity
+gpt-5.1,huge_tree_en,1,Who are Mel's great-grandparents?,"Kathy,Yvon",,False,False,0.0,1.7542519569396973,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,2,Which of Teresa's children have silver hair?,Kelly,,False,False,0.0,1.6565303802490234,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,3,Who are all of Len's descendants?,"Abel,Laura,Mel,Yve",,False,False,0.0,1.768862247467041,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_descendant,False,
+gpt-5.1,huge_tree_en,4,Which of Laura's siblings work as a nurse?,Abel,,False,False,0.0,1.7579810619354248,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,5,Who has more children: Gil or their siblings?,Gil,,False,False,0.0,1.7006757259368896,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,conditional,False,
+gpt-5.1,huge_tree_en,6,How many grandsons does Rhonda have?,1,,False,False,0.0,1.6898188591003418,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage_complexe,False,
+gpt-5.1,huge_tree_en,7,Who are Tex's nephews and nieces?,"Fred,Pia,Rachel",,False,False,0.0,0.9969189167022705,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,8,Who are Oz's brothers?,None,,False,False,0.0,0.9490172863006592,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,9,Which of Brooke's children have gray hair?,Pax,,False,False,0.0,1.5298511981964111,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,10,Who has chestnut hair and violet eyes?,"Todd,Trevor",,False,False,0.0,1.080068588256836,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_multi_criteres,False,
+gpt-5.1,huge_tree_en,11,Who are Melissa's uncles and aunts?,"Orion,Viv",,False,False,0.0,1.0319232940673828,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,12,Quelles sont les couleurs de cheveux des beaux-parents des enfants de Xavier ?,"gray,jet black",,False,False,0.0,1.028815746307373,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,multihop,False,
+gpt-5.1,huge_tree_en,13,Which men are in the same generation as Noah?,"Abel,Alexander,Blake,Charles,Colin,Damien,Darren,Diego,Edgar,Edward,Fernando,Francis,Fred,George,Gil,Grant,Gus,Hector,Henry,Hux,Ike,Jack,Jax,Jose,Keith,Kyle,Lance,Leo,Lester,Liam,Louis,Luke,Marcus,Mel,Moe,Nathan,Neil,Nicholas,Nolan,Norman,Oscar,Otto,Owen,Oz,Philip,Sam,Samuel,Sebastian,Sid,Steven,Timothy,Tristan,Tux,Tyler,Vic,Vincent,Wade,Walt,Walter,Warren,Wayne,Wes,Wilfredo,Xen,Xu,York,Yves,Yves,Zane,Zep",,False,False,0.0,1.0254690647125244,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,14,Who has the same number of children as Rodrigo?,"Aaron,Alba,Andrea,Andy,Arthur,Ava,Brooke,Courtney,Diego,Edith,Edward,Emma,Faye,Felicity,Gloria,Gordon,Greta,Hal,Harold,Hugo,Ira,Iris,Ivan,Jade,Jake,James,Janet,Jay,Jeremy,Jim,Kelly,Kenneth,Kristen,Lance,Leonard,Lila,Mason,Max,Michael,Monica,Mya,Nat,Nell,Octavia,Opal,Orion,Pat,Patricia,Paul,Penny,Peter,Petra,Quentin,Ralph,Randall,Robert,Rose,Ruben,Rue,Samantha,Sandra,Sylvia,Tanya,Tara,Tex,Theodore,Tia,Tina,Tony,Trevor,Una,Vera,Vernon,Veronica,Vince,Wil,Win,Xavier,Xia,Ximena,Xiomara,Yann,Yma,Yuki,Yvette,Yvonne,Zach,Zachary,Zyx",,False,False,0.0,1.0486233234405518,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comparative,False,
+gpt-5.1,huge_tree_en,15,Whose parent is Diego?,"Oliver,Rex",,False,False,0.0,1.1435966491699219,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,16,Who are Maya's grandmothers?,Penny,,False,False,0.0,1.0848417282104492,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,17,Who is the brother of Larry who works as a social worker?,Blake,,False,False,0.0,1.098578691482544,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,1
+gpt-5.1,huge_tree_en,18,Who are Mya's nephews and nieces?,"Claire,Damien,Esther,Katherine,Mia,Sue",,False,False,0.0,1.1416687965393066,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,19,Which of Katherine's siblings work as a musician?,Mia,,False,False,0.0,5.101107120513916,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,20,Who are Lester's sisters?,Holly,,False,False,0.0,1.151503562927246,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,21,Who is Natalie's father?,Cameron,,False,False,0.0,1.2177727222442627,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,22,Whose parent is Uri?,"Orion,Richard,Viv",,False,False,0.0,1.2109897136688232,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,23,Who is the child of the son of Ken?,Fatima,,False,False,0.0,1.4607875347137451,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,2
+gpt-5.1,huge_tree_en,24,Who is the sister of Yuki with light brown hair?,Ursula,,False,False,0.0,1.3171584606170654,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,1
+gpt-5.1,huge_tree_en,25,Who are Rex's great-grandfathers?,Peter,,False,False,0.0,1.221801996231079,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,26,Who is Molly's mother?,Xenia,,False,False,0.0,5.47929835319519,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,27,Which men are in the same generation as Ursula?,"Adam,Andre,Arthur,Ben,Bob,Brent,Brian,Bruno,Carter,Christopher,Clay,Dave,Ed,Elijah,Emmanuel,Eric,Felix,Floyd,Gavin,Harold,Howard,Ian,Ira,Isaac,Ivan,Jake,Jay,Jeremy,Jim,Joel,Karl,Kenneth,Kent,Larry,Leonard,Lucas,Martin,Mason,Max,Michael,Ned,Orion,Orlando,Paul,Quincy,Ralph,Ray,Rex,Ricardo,Richard,Ruben,Scott,Tex,Theodore,Todd,Tomas,Tony,Ulrich,Ulysses,Urban,Vex,Victor,Wesley,Wyatt,Xander,Zach,Zyx",,False,False,0.0,1.3511278629302979,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,28,Quelles sont les couleurs de cheveux des beaux-parents des enfants de Rose ?,"chestnut,light brown",,False,False,0.0,1.7160654067993164,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,multihop,False,
+gpt-5.1,huge_tree_en,29,Who is Ben's father?,Irving,,False,False,0.0,1.304682731628418,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,30,Who are Erica's nieces?,"Diana,Edith",,False,False,0.0,1.378760576248169,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,31,How many cousins does Edith have?,1,,False,False,0.0,1.3825688362121582,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage_complexe,False,
+gpt-5.1,huge_tree_en,32,Who has the same number of children as Zoe?,"Abigail,Andre,Antonio,Ben,Benjamin,Bob,Bonnie,Brent,Christopher,Clay,Dan,Daniel,Dave,Dean,Delia,Donna,Dot,Eric,Erica,Ethan,Eva,Evelyn,Felix,Fiona,Flo,Floyd,Fox,Gabriel,Grace,Gregory,Hank,Hugh,Ida,Inez,Isaac,Isabel,Jacqueline,Jonathan,Karen,Ken,Kent,Kevin,Kit,Leah,Len,Lisa,Lorenzo,Lucas,Lydia,Martin,Megan,Mona,Ned,Nicolas,Onyx,Otis,Paige,Pam,Pax,Pete,Piper,Quin,Quinn,Rex,Rhonda,Roger,Ross,Sophie,Stephanie,Susan,Teresa,Todd,Vanessa,Victor,Viv,Vivian,Wesley,Xara,Xenia,Xyla,Yael,Yasmin,Zelda",,False,False,0.0,1.40629243850708,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comparative,False,
+gpt-5.1,huge_tree_en,33,Who is George's father?,Tomas,,False,False,0.0,1.3912029266357422,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,34,Which of Dora's children work as a scientist?,Owen,,False,False,0.0,1.4115867614746094,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,35,Who are Belle's great-grandfathers?,Hal,,False,False,0.0,1.4472408294677734,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,36,Which men are in the same generation as Ida?,"Adam,Andre,Arthur,Ben,Bob,Brent,Brian,Bruno,Carter,Christopher,Clay,Dave,Ed,Elijah,Emmanuel,Eric,Felix,Floyd,Gavin,Harold,Howard,Ian,Ira,Isaac,Ivan,Jake,Jay,Jeremy,Jim,Joel,Karl,Kenneth,Kent,Larry,Leonard,Lucas,Martin,Mason,Max,Michael,Ned,Orion,Orlando,Paul,Quincy,Ralph,Ray,Rex,Ricardo,Richard,Ruben,Scott,Tex,Theodore,Todd,Tomas,Tony,Ulrich,Ulysses,Urban,Vex,Victor,Wesley,Wyatt,Xander,Zach,Zyx",,False,False,0.0,1.4742727279663086,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,37,Who are Natalie's nephews?,"Joel,Orlando,Wesley",,False,False,0.0,1.4762935638427734,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,38,Who are Randall's granddaughters?,Nicole,,False,False,0.0,1.4689204692840576,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,39,Who are Paula's uncles and aunts?,"Bruno,Edith",,False,False,0.0,1.474639892578125,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,40,Who has strawberry blonde hair and green eyes?,"Carmen,Grant",,False,False,0.0,2.347031831741333,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_multi_criteres,False,
+gpt-5.1,huge_tree_en,41,Who is Tristan's mother?,Kay,,False,False,0.0,5.390156030654907,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,42,Who are Katherine's siblings?,"Esther,Mia",,False,False,0.0,1.5355923175811768,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,43,Which of Mel's grandparents have brown hair?,Len,,False,False,0.0,1.5172889232635498,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,44,Who are Colin's male cousins?,Sebastian,,False,False,0.0,1.5298371315002441,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,45,Who are the children of Fernando's grandparents' siblings?,"Amy,Rue,Tex",,False,False,0.0,1.5250556468963623,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,multihop,False,
+gpt-5.1,huge_tree_en,46,Who has more children: Mel or their siblings?,Mel,,False,False,0.0,1.5206196308135986,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,conditional,False,
+gpt-5.1,huge_tree_en,47,Who are Vic's great-grandparents?,"Floyd,Kendra",,False,False,0.0,1.520047903060913,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,48,Who are Shay's grandfathers?,James,,False,False,0.0,2.409968137741089,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,49,Who are Jade's great-granddaughters?,"Amelia,Fatima,Nyx,Paula,Sky,Uma,Violet",,False,False,0.0,1.5170295238494873,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,50,Which of Tony's children work as a salesperson?,Unity,,False,False,0.0,1.530193567276001,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,51,Who are Jax's grandparents?,"Uri,Valerie",,False,False,0.0,1.5269708633422852,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,52,Who are Andrea's siblings?,Christopher,,False,False,0.0,1.5069096088409424,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,53,Who are Nicole's siblings?,Grant,,False,False,0.0,3.4967527389526367,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,54,Which men are in the same generation as Vera?,"Abel,Alexander,Blake,Charles,Colin,Damien,Darren,Diego,Edgar,Edward,Fernando,Francis,Fred,George,Gil,Grant,Gus,Hector,Henry,Hux,Ike,Jack,Jax,Jose,Keith,Kyle,Lance,Leo,Lester,Liam,Louis,Luke,Marcus,Mel,Moe,Nathan,Neil,Nicholas,Noah,Nolan,Norman,Oscar,Otto,Owen,Oz,Philip,Sam,Samuel,Sebastian,Sid,Steven,Timothy,Tristan,Tux,Tyler,Vic,Vincent,Wade,Walt,Walter,Warren,Wayne,Wes,Wilfredo,Xen,Xu,York,Yves,Yves,Zane,Zep",,False,False,0.0,1.5525572299957275,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,55,Who are Zoe's children?,Faye,,False,False,0.0,1.5477385520935059,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,56,Who are Xia's oldest ancestors?,"Floyd,Kendra,Yvonne",,False,False,0.0,1.5454058647155762,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_ancetre,False,
+gpt-5.1,huge_tree_en,57,Who has red hair and violet eyes?,"Eric,Fiona",,False,False,0.0,1.5390758514404297,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_multi_criteres,False,
+gpt-5.1,huge_tree_en,58,How many children does Faye have?,2,,False,False,0.0,1.5582554340362549,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,59,Who are Otto's siblings?,None,,False,False,0.0,1.5362277030944824,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,60,Who are Zara's grandparents?,"Vernon,Yuki",,False,False,0.0,1.5425419807434082,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,61,Which of Pia's siblings work as a social worker?,Fred,,False,False,0.0,0.8270277976989746,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,62,Which of Richard's children work as a waiter?,Hector,,False,False,0.0,0.81488037109375,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,63,Who is Alexander's mother?,Sophie,,False,False,0.0,1.0543482303619385,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,64,Who are Richard's brothers?,Orion,,False,False,0.0,0.8302938938140869,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,65,Whose parent is Kit?,Shay,,False,False,0.0,0.8263535499572754,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,66,Which of Ralph's children have auburn hair?,Leo,,False,False,0.0,0.8652248382568359,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,67,Which of Paula's grandparents have salt and pepper hair?,Elena,,False,False,0.0,0.8750007152557373,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,68,Which of Nolan's siblings work as a musician?,Kyle,,False,False,0.0,0.9150621891021729,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,69,Who has blonde hair and blue-gray eyes?,"Fatima,Lydia",,False,False,0.0,0.9014687538146973,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_multi_criteres,False,
+gpt-5.1,huge_tree_en,70,Whose parent is Yasmin?,Yve,,False,False,0.0,0.8813409805297852,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,71,Which of Nell's children work as a mechanic?,Norman,,False,False,0.0,0.9074485301971436,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,72,Who is Ida's mother?,Kayla,,False,False,0.0,0.931286096572876,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,73,Who are Vernon's brothers?,None,,False,False,0.0,0.9503018856048584,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,74,Who are Nathan's brothers?,None,,False,False,0.0,0.9449374675750732,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,75,Who are Fiona's brothers?,None,,False,False,0.0,0.9496760368347168,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,76,Who are Clay's grandmothers?,Kathy,,False,False,0.0,0.9478228092193604,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,77,Who are Kent's uncles and aunts?,Sylvia,,False,False,0.0,1.0012450218200684,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,78,Who is Wilfredo's mother?,Kayla,,False,False,0.0,1.005460500717163,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,79,Who has salt and pepper hair and gray eyes?,"Ira,Margaret",,False,False,0.0,1.003340482711792,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_multi_criteres,False,
+gpt-5.1,huge_tree_en,80,How many children does Estelle have?,0,,False,False,0.0,1.1060459613800049,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,81,Who is Dora's father?,Pete,,False,False,0.0,1.0279717445373535,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,82,Who is the cousin of the daughter of Quentin with red hair?,Kenneth,,False,False,0.0,1.0649926662445068,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,3
+gpt-5.1,huge_tree_en,83,Who are Dan's grandchildren?,"Jennifer,Opal",,False,False,0.0,1.0607233047485352,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,84,Who are Urban's cousins?,Victoria,,False,False,0.0,1.4588918685913086,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,85,Which of Xenia's children work as a mechanic?,Molly,,False,False,0.0,4.471285820007324,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,86,Which of Hector's grandparents have brown hair?,Valerie,,False,False,0.0,1.159902572631836,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,87,How many cousins does Christopher have?,2,,False,False,0.0,1.1511635780334473,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage_complexe,False,
+gpt-5.1,huge_tree_en,88,Which of Una's grandparents have dark brown hair?,Ava,,False,False,0.0,1.1756553649902344,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,89,Who is the child of the daughter of Roger?,Bianca,,False,False,0.0,5.051417827606201,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,2
+gpt-5.1,huge_tree_en,90,How many children does Zelda have?,1,,False,False,0.0,1.2294590473175049,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,91,Who are Vera's grandparents?,"Lisa,Nicolas",,False,False,0.0,1.3008265495300293,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,92,How many children does Octavia have?,2,,False,False,0.0,1.1573407649993896,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,93,Who are Xara's granddaughters?,Ora,,False,False,0.0,1.2922217845916748,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,94,Which of Kristen's children work as a pharmacist?,Oliver,,False,False,0.0,1.2868950366973877,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,95,Who is Philip's father?,Michael,,False,False,0.0,1.247426986694336,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,96,Who is the child of the son of Matthew with auburn hair?,Moe,,False,False,0.0,1.2414395809173584,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,2
+gpt-5.1,huge_tree_en,97,Which of Mel's grandparents have white hair?,Yasmin,,False,False,0.0,1.2730987071990967,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,98,Who are Felix's male cousins?,Bruno,,False,False,0.0,1.3495533466339111,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,99,Who are Iva's parents?,"Tara,Tex",,False,False,0.0,1.2664787769317627,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,100,Who are Christopher's grandfathers?,Nat,,False,False,0.0,1.3009161949157715,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,101,Who are Samuel's uncles and aunts?,"Eric,Ruben",,False,False,0.0,0.7350656986236572,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,102,Which of Ophelia's siblings work as a veterinarian?,Zachary,,False,False,0.0,0.7320363521575928,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,103,Which of Francine's children have black hair?,"Nicholas,Ora",,False,False,0.0,0.8118650913238525,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,104,Who are Len's grandsons?,"Abel,Mel",,False,False,0.0,0.7578797340393066,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,105,Which men are in the same generation as Owen?,"Abel,Alexander,Blake,Charles,Colin,Damien,Darren,Diego,Edgar,Edward,Fernando,Francis,Fred,George,Gil,Grant,Gus,Hector,Henry,Hux,Ike,Jack,Jax,Jose,Keith,Kyle,Lance,Leo,Lester,Liam,Louis,Luke,Marcus,Mel,Moe,Nathan,Neil,Nicholas,Noah,Nolan,Norman,Oscar,Otto,Oz,Philip,Sam,Samuel,Sebastian,Sid,Steven,Timothy,Tristan,Tux,Tyler,Vic,Vincent,Wade,Walt,Walter,Warren,Wayne,Wes,Wilfredo,Xen,Xu,York,Yves,Yves,Zane,Zep",,False,False,0.0,1.105353593826294,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,106,Who are Yves's nieces?,Beatrice,,False,False,0.0,0.7680497169494629,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,107,Which men are in the same generation as Ruben?,"Adam,Andre,Arthur,Ben,Bob,Brent,Brian,Bruno,Carter,Christopher,Clay,Dave,Ed,Elijah,Emmanuel,Eric,Felix,Floyd,Gavin,Harold,Howard,Ian,Ira,Isaac,Ivan,Jake,Jay,Jeremy,Jim,Joel,Karl,Kenneth,Kent,Larry,Leonard,Lucas,Martin,Mason,Max,Michael,Ned,Orion,Orlando,Paul,Quincy,Ralph,Ray,Rex,Ricardo,Richard,Scott,Tex,Theodore,Todd,Tomas,Tony,Ulrich,Ulysses,Urban,Vex,Victor,Wesley,Wyatt,Xander,Zach,Zyx",,False,False,0.0,0.7737922668457031,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,108,Which of Wilfredo's grandparents have blonde hair?,Sylvia,,False,False,0.0,0.7830023765563965,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,109,Who is Antonio's father?,Bud,,False,False,0.0,0.7970726490020752,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,110,Who are Zep's great-grandmothers?,Zoe,,False,False,0.0,0.7741658687591553,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,111,Who are Quentin's nieces?,Kay,,False,False,0.0,0.7678515911102295,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,112,Who are Sky's sisters?,None,,False,False,0.0,0.8024020195007324,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,113,Which of Kathy's children have brown hair?,Len,,False,False,0.0,0.7732694149017334,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,114,Who are Victoria's uncles?,Nicolas,,False,False,0.0,0.7708263397216797,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,115,Who are Ricardo's children?,"Kristen,Neil,Oscar",,False,False,0.0,0.7891042232513428,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,116,Which of Nora's grandparents have brown hair?,Yuki,,False,False,0.0,0.8121418952941895,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,117,Which of Quincy's children work as a dentist?,May,,False,False,0.0,0.8169882297515869,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,118,Which of Zed's children work as a nurse?,Orlando,,False,False,0.0,0.8015232086181641,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,119,Who are Emma's granddaughters?,"Carmen,Heather",,False,False,0.0,0.7983925342559814,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,120,Who are Ricardo's brothers?,Arthur,,False,False,0.0,0.7937929630279541,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,121,Who are Xara's children?,"Mya,Scott,Wendy",,False,False,0.0,0.7982537746429443,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,122,Who is the child of the daughter of Yma with platinum blonde hair?,Nolan,,False,False,0.0,0.7861993312835693,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,2
+gpt-5.1,huge_tree_en,123,Whose parent is Jonathan?,Vernon,,False,False,0.0,0.7926814556121826,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,124,Whose child is Zoe?,"Arthur,Win",,False,False,0.0,0.787982702255249,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,125,Which of Theodore's children work as a dentist?,Samuel,,False,False,0.0,0.8063991069793701,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,126,How many children does Lydia have?,1,,False,False,0.0,0.8139979839324951,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,127,How many children does Xander have?,3,,False,False,0.0,0.7989728450775146,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,128,Who are Esther's cousins?,"Claire,Damien,Philip,Sue,Walt",,False,False,0.0,0.8410854339599609,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,129,Which women are in the same generation as Win?,"Amy,Andrea,Candace,Carla,Cyd,Dawn,Diana,Dora,Edith,Eleanor,Eva,Felicity,Fiona,Flo,Francine,Gail,Greta,Ida,Isabel,Jacqueline,Jen,Jennifer,Karen,Kay,Kayla,Kelly,Kit,Leah,Lee,Lila,Megan,Molly,Mona,Monica,Mya,Nell,Octavia,Opal,Paige,Pam,Penelope,Petra,Piper,Polly,Priscilla,Rue,Sandra,Serena,Sophie,Susan,Tara,Tia,Tina,Ursula,Vanessa,Vera,Victoria,Viv,Wendy,Whitney,Wyx,Xia,Yasmine,Yve,Yvette,Zelda",,False,False,0.0,0.7994635105133057,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,130,Which of Pearl's children work as a electrician?,Yvette,,False,False,0.0,0.8289659023284912,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,131,Who are Melissa's great-grandfathers?,Ross,,False,False,0.0,0.7864570617675781,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,132,Which of Francine's children work as a dentist?,Ora,,False,False,0.0,0.824655294418335,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,133,Quels oncles ou tantes de Sue ont les cheveux gray ?,"Mya,Wendy",,False,False,0.0,0.7990860939025879,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,134,Who is Pearl's father?,Floyd,,False,False,0.0,0.8095147609710693,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,135,Which of Lee's children work as a psychologist?,Oscar,,False,False,0.0,0.8093066215515137,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,136,Who are Scott's grandfathers?,Rodrigo,,False,False,0.0,0.7845830917358398,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,137,Who are Fiona's grandparents?,"Fox,Xyla",,False,False,0.0,0.7944433689117432,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,138,Whose parent is Ken?,Felix,,False,False,0.0,0.8181567192077637,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,139,Who is Valerie's mother?,Bonnie,,False,False,0.0,0.8200993537902832,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,140,Which of Paula's siblings work as a social worker?,Amelia,,False,False,0.0,0.8162813186645508,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,141,Who are all of Vera's descendants?,"Gil,Wade",,False,False,0.0,0.8064513206481934,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_descendant,False,
+gpt-5.1,huge_tree_en,142,Who are Hana's uncles?,"Moe,Warren",,False,False,0.0,0.8395977020263672,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,143,Which of Andy's children have silver hair?,Opal,,False,False,0.0,0.8718791007995605,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,144,Whose child is Cynthia?,"Eleanor,Urban",,False,False,0.0,0.8308353424072266,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,145,Who are Silvia's brothers?,Ike,,False,False,0.0,0.8195681571960449,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,146,Who are Faye's grandchildren?,"Ana,Nathan,Tyler,Zep,Zoe",,False,False,0.0,0.8205575942993164,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,147,Who are Lucas's nephews?,Charles,,False,False,0.0,0.8150055408477783,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,148,Which of Jasmine's children work as a scientist?,Peter,,False,False,0.0,0.8442544937133789,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,149,Which men are in the same generation as Rachel?,"Abel,Alexander,Blake,Charles,Colin,Damien,Darren,Diego,Edgar,Edward,Fernando,Francis,Fred,George,Gil,Grant,Gus,Hector,Henry,Hux,Ike,Jack,Jax,Jose,Keith,Kyle,Lance,Leo,Lester,Liam,Louis,Luke,Marcus,Mel,Moe,Nathan,Neil,Nicholas,Noah,Nolan,Norman,Oscar,Otto,Owen,Oz,Philip,Sam,Samuel,Sebastian,Sid,Steven,Timothy,Tristan,Tux,Tyler,Vic,Vincent,Wade,Walt,Walter,Warren,Wayne,Wes,Wilfredo,Xen,Xu,York,Yves,Yves,Zane,Zep",,False,False,0.0,0.8776576519012451,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,150,Which women are in the same generation as Nyx?,"Alice,Amelia,Ana,Angela,Becca,Belle,Bianca,Bridget,Cara,Carmen,Cassandra,Cecilia,Claire,Cynthia,Danielle,Estelle,Esther,Faith,Fatima,Flora,Gina,Hannah,Heather,Helen,Holly,Ida,Imogen,Ingrid,Iva,Ivy,Joan,Julia,Katherine,Katrina,Kristen,Laura,Linda,Margaret,May,Maya,Melissa,Mia,Nia,Nicole,Nora,Ora,Paula,Pia,Rachel,Rebecca,Rita,Shay,Silvia,Sky,Sue,Tamara,Tiffany,Uma,Una,Una,Una,Unity,Val,Vera,Violet,Virginia,Xenia,Ximena,Yen,Yolanda,Zara,Zara,Zoe,Zoe",,False,False,0.0,0.8414309024810791,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,151,Who has the same number of children as Nicolas?,"Abigail,Andre,Antonio,Ben,Benjamin,Bob,Bonnie,Brent,Christopher,Clay,Dan,Daniel,Dave,Dean,Delia,Donna,Dot,Eric,Erica,Ethan,Eva,Evelyn,Felix,Fiona,Flo,Floyd,Fox,Gabriel,Grace,Gregory,Hank,Hugh,Ida,Inez,Isaac,Isabel,Jacqueline,Jonathan,Karen,Ken,Kent,Kevin,Kit,Leah,Len,Lisa,Lorenzo,Lucas,Lydia,Martin,Megan,Mona,Ned,Onyx,Otis,Paige,Pam,Pax,Pete,Piper,Quin,Quinn,Rex,Rhonda,Roger,Ross,Sophie,Stephanie,Susan,Teresa,Todd,Vanessa,Victor,Viv,Vivian,Wesley,Xara,Xenia,Xyla,Yael,Yasmin,Zelda,Zoe",,False,False,0.0,0.7940535545349121,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comparative,False,
+gpt-5.1,huge_tree_en,152,Who are Jade's grandsons?,"Bruno,Felix",,False,False,0.0,0.8279762268066406,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,153,Which men are in the same generation as Nicole?,"Abel,Alexander,Blake,Charles,Colin,Damien,Darren,Diego,Edgar,Edward,Fernando,Francis,Fred,George,Gil,Grant,Gus,Hector,Henry,Hux,Ike,Jack,Jax,Jose,Keith,Kyle,Lance,Leo,Lester,Liam,Louis,Luke,Marcus,Mel,Moe,Nathan,Neil,Nicholas,Noah,Nolan,Norman,Oscar,Otto,Owen,Oz,Philip,Sam,Samuel,Sebastian,Sid,Steven,Timothy,Tristan,Tux,Tyler,Vic,Vincent,Wade,Walt,Walter,Warren,Wayne,Wes,Wilfredo,Xen,Xu,York,Yves,Yves,Zane,Zep",,False,False,0.0,0.8253114223480225,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,154,"If Richard has brothers, who are their daughters?","Rebecca,Rebecca",,False,False,0.0,0.8220348358154297,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,conditional,False,
+gpt-5.1,huge_tree_en,155,How many children does Natalie have?,3,,False,False,0.0,0.8130300045013428,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comptage,False,
+gpt-5.1,huge_tree_en,156,Who are Edith's aunts?,Erica,,False,False,0.0,0.8114974498748779,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,157,Who are Ross's grandchildren?,"Orion,Richard,Viv",,False,False,0.0,0.8056783676147461,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,158,Who works as a mechanic?,"Claire,Faye,Felicity,Gabriel,Gail,Karen,Molly,Norman,Oz,Richard,Ruben,Steven,Warren",,False,False,0.0,0.8274562358856201,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,recherche_attributs,False,
+gpt-5.1,huge_tree_en,159,Who is Zoe's mother?,Jennifer,,False,False,0.0,0.8010053634643555,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,160,Who are Peter's oldest ancestors?,"Douglas,Jasmine",,False,False,0.0,0.7962164878845215,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_ancetre,False,
+gpt-5.1,huge_tree_en,161,Which of Bob's nephews or nieces have jet black hair?,Virginia,,False,False,0.0,0.8190209865570068,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,162,Which of Amelia's siblings work as a scientist?,Nyx,,False,False,0.0,0.8147506713867188,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,163,Whose parent is Tomas?,"George,Luke,Val",,False,False,0.0,0.7840206623077393,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,164,Who has more children: Melissa or their siblings?,Melissa,,False,False,0.0,0.8384168148040771,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,conditional,False,
+gpt-5.1,huge_tree_en,165,Who are Len's children?,Yve,,False,False,0.0,0.7983694076538086,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,166,Who are Dora's sisters?,None,,False,False,0.0,0.8025686740875244,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,167,Who are Becca's great-grandmothers?,Jasmine,,False,False,0.0,0.8307056427001953,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,168,Which women are in the same generation as Bridget?,"Alice,Amelia,Ana,Angela,Becca,Belle,Bianca,Cara,Carmen,Cassandra,Cecilia,Claire,Cynthia,Danielle,Estelle,Esther,Faith,Fatima,Flora,Gina,Hannah,Heather,Helen,Holly,Ida,Imogen,Ingrid,Iva,Ivy,Joan,Julia,Katherine,Katrina,Kristen,Laura,Linda,Margaret,May,Maya,Melissa,Mia,Nia,Nicole,Nora,Nyx,Ora,Paula,Pia,Rachel,Rebecca,Rita,Shay,Silvia,Sky,Sue,Tamara,Tiffany,Uma,Una,Una,Una,Unity,Val,Vera,Violet,Virginia,Xenia,Ximena,Yen,Yolanda,Zara,Zara,Zoe,Zoe",,False,False,0.0,0.8202195167541504,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,169,Who are Linda's parents?,"Adam,Cyd",,False,False,0.0,0.8191039562225342,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,170,Who is the brother of Elena who works as a scientist?,Bruno,,False,False,0.0,0.8454701900482178,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,1
+gpt-5.1,huge_tree_en,171,Who are all of Dan's descendants?,"Ana,Faye,Jennifer,Nathan,Opal,Tyler,Zep,Zoe",,False,False,0.0,0.808142900466919,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_descendant,False,
+gpt-5.1,huge_tree_en,172,Who has the same number of children as Edward?,"Aaron,Alba,Andrea,Andy,Arthur,Ava,Brooke,Courtney,Diego,Edith,Emma,Faye,Felicity,Gloria,Gordon,Greta,Hal,Harold,Hugo,Ira,Iris,Ivan,Jade,Jake,James,Janet,Jay,Jeremy,Jim,Kelly,Kenneth,Kristen,Lance,Leonard,Lila,Mason,Max,Michael,Monica,Mya,Nat,Nell,Octavia,Opal,Orion,Pat,Patricia,Paul,Penny,Peter,Petra,Quentin,Ralph,Randall,Robert,Rodrigo,Rose,Ruben,Rue,Samantha,Sandra,Sylvia,Tanya,Tara,Tex,Theodore,Tia,Tina,Tony,Trevor,Una,Vera,Vernon,Veronica,Vince,Wil,Win,Xavier,Xia,Ximena,Xiomara,Yann,Yma,Yuki,Yvette,Yvonne,Zach,Zachary,Zyx",,False,False,0.0,0.8083896636962891,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comparative,False,
+gpt-5.1,huge_tree_en,173,Who are Moe's uncles and aunts?,"Andre,Isaac",,False,False,0.0,0.8378274440765381,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,174,Who are Yasmine's children?,"Estelle,Ike,Silvia",,False,False,0.0,0.8370938301086426,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_directe,False,
+gpt-5.1,huge_tree_en,175,Which of Maya's grandparents have salt and pepper hair?,Ivan,,False,False,0.0,0.799109697341919,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,176,Who has the same number of children as Courtney?,"Aaron,Alba,Andrea,Andy,Arthur,Ava,Brooke,Diego,Edith,Edward,Emma,Faye,Felicity,Gloria,Gordon,Greta,Hal,Harold,Hugo,Ira,Iris,Ivan,Jade,Jake,James,Janet,Jay,Jeremy,Jim,Kelly,Kenneth,Kristen,Lance,Leonard,Lila,Mason,Max,Michael,Monica,Mya,Nat,Nell,Octavia,Opal,Orion,Pat,Patricia,Paul,Penny,Peter,Petra,Quentin,Ralph,Randall,Robert,Rodrigo,Rose,Ruben,Rue,Samantha,Sandra,Sylvia,Tanya,Tara,Tex,Theodore,Tia,Tina,Tony,Trevor,Una,Vera,Vernon,Veronica,Vince,Wil,Win,Xavier,Xia,Ximena,Xiomara,Yann,Yma,Yuki,Yvette,Yvonne,Zach,Zachary,Zyx",,False,False,0.0,0.8248491287231445,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,comparative,False,
+gpt-5.1,huge_tree_en,177,Who are Wade's oldest ancestors?,"Abigail,Gabriel,Vera,Xavier",,False,False,0.0,0.8225209712982178,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_ancetre,False,
+gpt-5.1,huge_tree_en,178,Who are Ximena's great-grandfathers?,Cameron,,False,False,0.0,0.8214356899261475,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,179,Who is the child of the son of Hal with white hair?,Sandra,,False,False,0.0,0.8139307498931885,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,enigme,True,2
+gpt-5.1,huge_tree_en,180,Who are Jack's oldest ancestors?,"Cameron,Nina,Zed,Zelda",,False,False,0.0,0.8147537708282471,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,verticale_ancetre,False,
+gpt-5.1,huge_tree_en,181,Who are Brian's female cousins?,Lila,,False,False,0.0,0.8126099109649658,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,182,Which of Peter's children work as a banker?,Ricardo,,False,False,0.0,1.814661979675293,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,183,Who are Rhonda's grandsons?,Xen,,False,False,0.0,0.804659366607666,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,184,Which of Lucas's siblings work as a manager?,Leonard,,False,False,0.0,0.8302228450775146,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,185,Who are Kay's nephews?,Grant,,False,False,0.0,0.8288791179656982,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,
+gpt-5.1,huge_tree_en,186,Which of Ricardo's children have salt and pepper hair?,Neil,,False,False,0.0,0.8174092769622803,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_attribut_composee,False,
+gpt-5.1,huge_tree_en,187,Which women are in the same generation as Pat?,"Abigail,Bonnie,Brooke,Courtney,Delia,Donna,Eve,Gloria,Grace,Jade,Jasmine,Kathy,Kendra,Lydia,Nina,Rose,Tanya,Xiomara,Xyla,Zoe",,False,False,0.0,0.8160736560821533,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,transversale_generation,False,
+gpt-5.1,huge_tree_en,188,Whose parent is Ethan?,Greta,,False,False,0.0,0.8237195014953613,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_inverse,False,
+gpt-5.1,huge_tree_en,189,Who are Jack's cousins?,"Francis,Gina,Hux,Liam,Vincent",,False,False,0.0,0.8463590145111084,0,"API Error 400: {
+  ""error"": {
+    ""message"": ""Unsupported parameter: 'max_completion_tokens'. In the Responses API, this parameter has moved to 'max_output_tokens'. Try again with the new parameter. See the API documentation for more information: https://platform.openai.com/docs/api-reference/responses/create."",
+    ""type"": ""invalid_request_error"",
+    ""param"": null,
+    ""code"": ""unsupported_parameter""
+  }
+}",False,0,relation_complexe,False,

@@ -15,8 +15,10 @@ def save_results_csv(results: List[EvaluationResult], output_path: Path):
         fieldnames = [
             'model_name', 'benchmark_name', 'question_id', 'question',
             'expected_answer', 'model_answer', 'is_correct', 'is_exact_match',
-            'partial_match_score', 'response_time', 'tokens_used', 'error', 
-            'no_response', 'reasoning_tokens', 'question_type', 'is_enigma', 'enigma_complexity'
+            'partial_match_score', 'response_time', 'prompt_tokens', 'tokens_used',
+            'cached_tokens', 'cost_usd',
+            'error', 'no_response', 'reasoning_tokens', 'question_type',
+            'is_enigma', 'enigma_complexity'
         ]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()

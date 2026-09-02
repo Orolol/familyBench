@@ -1,0 +1,40 @@
+{
+  "timestamp": "20260425_162724",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP": {
+      "total_questions": 200,
+      "correct_answers": 1,
+      "accuracy": 0.005,
+      "exact_matches": 1,
+      "exact_match_rate": 0.005,
+      "avg_partial_score": 0.005,
+      "avg_response_time": 9.575777082443237,
+      "total_tokens": 863,
+      "errors": 199,
+      "error_rate": 0.995,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 854,
+      "questions_with_reasoning": 1,
+      "avg_reasoning_tokens": 854.0,
+      "enigma_stats": {
+        "total": 80,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {}
+      },
+      "normal_stats": {
+        "total": 120,
+        "correct": 1,
+        "accuracy": 0.008333333333333333
+      }
+    }
+  }
+}

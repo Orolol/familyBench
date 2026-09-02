@@ -2,89 +2,78 @@
 
 # Modèles à évaluer
 models:
-  - name: "glm-4.1v-9b-thinking"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "thudm/glm-4.1v-9b-thinking"
-    temperature: 0.3
-  - name: "o4-mini-high"
 
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "openai/o4-mini-high"
-    temperature: 0.3
-  - name: "deepseek-r1-0528"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "deepseek/deepseek-r1-0528"
-    temperature: 0.3
+  # - name: "deepseek/deepseek-v4-flash"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "deepseek/deepseek-v4-flash"
+  #   provider:
+  #     data_collection: "allow"
+  #     allow_fallbacks: true
+  #   pricing:
+  #     input_per_mtok: 0.14
+  #     output_per_mtok: 0.28
 
-  - name: "qwen-3.2-2507"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "qwen/qwen3-235b-a22b-thinking-2507"
-    temperature: 0.3
+  # - name: "deepseek/deepseek-v4-pro"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "deepseek/deepseek-v4-pro"
+  #   pricing:
+  #     input_per_mtok: 0.435
+  #     output_per_mtok: 0.87
 
-  - name: "claude-opus-4"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "anthropic/claude-opus-4"
-    temperature: 0.3
+  # - name: "moonshotai/kimi-k2.6"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "moonshotai/kimi-k2.6"
+  #   pricing:
+  #     input_per_mtok: 0.7448
+  #     output_per_mtok: 4.655
 
-  - name: "gemini-2.5-pro"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "google/gemini-2.5-pro"
-    temperature: 0.3  
+  # - name: "openai/gpt-5.5"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "openai/gpt-5.5"
+  #   pricing:
+  #     input_per_mtok: 5.0
+  #     output_per_mtok: 30.0
 
-  - name: "kimi-k2"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "moonshotai/kimi-k2"
-    temperature: 0.3
+  # - name: "RedHatAI/Qwen3.6-35B-A3B-NVFP4"
+  #   api_base: "http://127.0.0.1:8080/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "RedHatAI/Qwen3.6-35B-A3B-NVFP4"
+  #   # Local vLLM => no pricing; cost_usd will be None.
 
-  - name: "mistral-small-3.2-24b-instruct"
-    api_base: "https://openrouter.ai/api/v1"
+  - name: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
+    api_base: "http://127.0.0.1:8080/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "mistralai/mistral-small-3.2-24b-instruct"
-    temperature: 0.3
+    model: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
+    # Local vLLM => no pricing; cost_usd will be None.
 
-  - name: "magistral-medium-2506"
-    api_base: "https://openrouter.ai/api/v1"
-    api_key: "${OPENROUTER_API_KEY}"
-    model: "mistralai/magistral-medium-2506"
-    temperature: 0.3
 
 
 # Configurations de benchmarks à exécuter
 benchmarks:
 
-
-
   - name: "large_tree_en"
-    people: 100
-    depth: 4
-    questions: 100
-    root_couples: 3
-    seed: 1
-    language: "en"
-
-  - name: "huge_tree_en"
-    people: 200
-    depth: 8
+    people: 1000
+    depth: 20
     questions: 100
     root_couples: 8
-    seed: 2
+    seed: 667
     language: "en"
-
+    difficulty: expert 
 
 # Paramètres d'évaluation
 evaluation:
   # Nombre de tentatives par modèle/benchmark
-  runs_per_benchmark: 3
+  runs_per_benchmark: 2
   
+  # Nombre max de requêtes API en parallèle
+  max_concurrent_requests: 1
+
   # Timeout pour chaque requête API (en secondes)
-  timeout: 60
+  timeout: 999
   
   # Taille du batch pour grouper les questions (1 = pas de batching)
   # Augmenter cette valeur peut améliorer les performances pour certains modèles

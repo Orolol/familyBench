@@ -1,0 +1,146 @@
+{
+  "timestamp": "20251119_151019",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "gpt-5.1",
+    "google/gemini-3.0-pro",
+    "moonshotai/kimi-k2-thinking"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "gpt-5.1": {
+      "total_questions": 189,
+      "correct_answers": 63,
+      "accuracy": 0.3333333333333333,
+      "exact_matches": 62,
+      "exact_match_rate": 0.328042328042328,
+      "avg_partial_score": 0.4094592581867022,
+      "avg_response_time": 5.557306531875852,
+      "total_tokens": 6342,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 3,
+        "accuracy": 0.3333333333333333,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 60,
+        "accuracy": 0.3333333333333333
+      }
+    },
+    "google/gemini-3.0-pro": {
+      "total_questions": 189,
+      "correct_answers": 0,
+      "accuracy": 0.0,
+      "exact_matches": 0,
+      "exact_match_rate": 0.0,
+      "avg_partial_score": 0.0,
+      "avg_response_time": 0.8270898041901765,
+      "total_tokens": 0,
+      "errors": 189,
+      "error_rate": 1.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    },
+    "moonshotai/kimi-k2-thinking": {
+      "total_questions": 189,
+      "correct_answers": 104,
+      "accuracy": 0.5502645502645502,
+      "exact_matches": 104,
+      "exact_match_rate": 0.5502645502645502,
+      "avg_partial_score": 0.5595238095238095,
+      "avg_response_time": 213.21576280820938,
+      "total_tokens": 267664,
+      "errors": 63,
+      "error_rate": 0.3333333333333333,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 363116,
+      "questions_with_reasoning": 126,
+      "avg_reasoning_tokens": 2881.873015873016,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 1,
+        "accuracy": 0.1111111111111111,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 1,
+            "accuracy": 0.2
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 103,
+        "accuracy": 0.5722222222222222
+      }
+    }
+  }
+}

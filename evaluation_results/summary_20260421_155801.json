@@ -1,0 +1,93 @@
+{
+  "timestamp": "20260421_155801",
+  "config": "evaluation_config.yaml",
+  "models_evaluated": [
+    "qwen-3.6-35b-3a",
+    "moonshotai/kimi-k2.6"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "qwen-3.6-35b-3a": {
+      "total_questions": 50,
+      "correct_answers": 37,
+      "accuracy": 0.74,
+      "exact_matches": 37,
+      "exact_match_rate": 0.74,
+      "avg_partial_score": 0.7766666666666667,
+      "avg_response_time": 243.14365562438965,
+      "total_tokens": 167301,
+      "errors": 3,
+      "error_rate": 0.06,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 187100,
+      "questions_with_reasoning": 47,
+      "avg_reasoning_tokens": 3980.851063829787,
+      "enigma_stats": {
+        "total": 50,
+        "correct": 37,
+        "accuracy": 0.74,
+        "by_complexity": {
+          "1": {
+            "total": 10,
+            "correct": 10,
+            "accuracy": 1.0
+          },
+          "2": {
+            "total": 6,
+            "correct": 6,
+            "accuracy": 1.0
+          },
+          "3": {
+            "total": 8,
+            "correct": 5,
+            "accuracy": 0.625
+          }
+        }
+      },
+      "normal_stats": {}
+    },
+    "moonshotai/kimi-k2.6": {
+      "total_questions": 50,
+      "correct_answers": 38,
+      "accuracy": 0.76,
+      "exact_matches": 38,
+      "exact_match_rate": 0.76,
+      "avg_partial_score": 0.7933333333333333,
+      "avg_response_time": 125.92745562076568,
+      "total_tokens": 206742,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 263080,
+      "questions_with_reasoning": 50,
+      "avg_reasoning_tokens": 5261.6,
+      "enigma_stats": {
+        "total": 50,
+        "correct": 38,
+        "accuracy": 0.76,
+        "by_complexity": {
+          "1": {
+            "total": 10,
+            "correct": 10,
+            "accuracy": 1.0
+          },
+          "2": {
+            "total": 6,
+            "correct": 3,
+            "accuracy": 0.5
+          },
+          "3": {
+            "total": 8,
+            "correct": 7,
+            "accuracy": 0.875
+          }
+        }
+      },
+      "normal_stats": {}
+    }
+  }
+}

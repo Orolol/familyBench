@@ -1,0 +1,56 @@
+{
+  "timestamp": "20260421_105957",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "moonshotai/kimi-k2.6"
+  ],
+  "benchmarks_run": [
+    "large_tree_en"
+  ],
+  "summary_stats": {
+    "moonshotai/kimi-k2.6": {
+      "total_questions": 300,
+      "correct_answers": 245,
+      "accuracy": 0.8166666666666667,
+      "exact_matches": 245,
+      "exact_match_rate": 0.8166666666666667,
+      "avg_partial_score": 0.8297777777777778,
+      "avg_response_time": 165.66216726382572,
+      "total_tokens": 823365,
+      "errors": 18,
+      "error_rate": 0.06,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 995970,
+      "questions_with_reasoning": 282,
+      "avg_reasoning_tokens": 3531.808510638298,
+      "enigma_stats": {
+        "total": 30,
+        "correct": 3,
+        "accuracy": 0.1,
+        "by_complexity": {
+          "1": {
+            "total": 15,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 12,
+            "correct": 3,
+            "accuracy": 0.25
+          },
+          "3": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 270,
+        "correct": 242,
+        "accuracy": 0.8962962962962963
+      }
+    }
+  }
+}
