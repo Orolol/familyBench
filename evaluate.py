@@ -90,6 +90,7 @@ def _build_detailed_json(
         "tree_people": benchmark_run.tree_people,
         "tree_depth_requested": benchmark_run.tree_depth_requested,
         "tree_depth_actual": benchmark_run.tree_depth_actual,
+        "batch_size": benchmark_run.batch_size,
         "system_prompt": benchmark_run.system_prompt,
         "tree_description": benchmark_run.tree_description,
         "questions_answers": qa_list,
@@ -114,6 +115,10 @@ async def main():
         help="Liste des benchmarks à exécuter (override la config)",
     )
 
+    parser.add_argument("--batch-size", type=int, help="Override evaluation.batch_size (questions par requête)")
+    parser.add_argument("--runs", type=int, help="Override evaluation.runs_per_benchmark")
+    parser.add_argument("--max-concurrent", type=int, help="Override evaluation.max_concurrent_requests")
+    parser.add_argument("--output-dir", type=str, help="Override evaluation.output_dir")
     parser.add_argument(
         "--debug", action="store_true",
         help="Active le logging DEBUG (requêtes/réponses complètes) dans evaluation_debug.log",
@@ -126,8 +131,10 @@ async def main():
         config = yaml.safe_load(f)
 
     # Créer le dossier de sortie
+    if args.output_dir:
+        config["evaluation"]["output_dir"] = args.output_dir
     output_dir = Path(config["evaluation"]["output_dir"])
-    output_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -142,8 +149,15 @@ async def main():
             b for b in config["benchmarks"] if b["name"] in args.benchmarks
         ]
 
+    if args.batch_size is not None:
+        config["evaluation"]["batch_size"] = args.batch_size
+    if args.runs is not None:
+        config["evaluation"]["runs_per_benchmark"] = args.runs
+    if args.max_concurrent is not None:
+        config["evaluation"]["max_concurrent_requests"] = args.max_concurrent
     runs_per_benchmark = config["evaluation"].get("runs_per_benchmark", 1)
     max_concurrent = config["evaluation"].get("max_concurrent_requests", 10)
+    batch_size = config["evaluation"].get("batch_size", 1)
 
     # --- Rich progress ---
     progress = EvalProgress(
@@ -176,7 +190,7 @@ async def main():
                         model,
                         benchmark,
                         config["evaluation"].get("timeout", 60),
-                        config["evaluation"].get("batch_size", 1),
+                        batch_size,
                         max_concurrent=max_concurrent,
                         on_question_done=progress.update_question,
                         on_batch_done=progress.update_questions_batch,
@@ -198,6 +212,7 @@ async def main():
                         "depth_requested": benchmark_run.tree_depth_requested,
                         "depth_actual": benchmark_run.tree_depth_actual,
                         "questions": len(benchmark_run.questions),
+                        "batch_size": benchmark_run.batch_size,
                     }
                     # Collecter le JSON détaillé
                     detailed_runs.append(

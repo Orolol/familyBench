@@ -32,3 +32,5 @@ class EvaluationResult:
     hallucinated_names: int = 0
     is_enigma: bool = False
     enigma_complexity: Optional[int] = None
+    # Taille du batch dans lequel la question a été posée (1 = une requête par question)
+    batch_size: int = 1

@@ -40,48 +40,55 @@ Format de réponse :
     
     @staticmethod
     def build_batch_prompt(tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> str:
-        """Construit le prompt pour un batch de questions."""
+        """Construit le prompt pour un batch de questions.
+
+        Les réponses sont demandées sous forme d'objet JSON indexé par numéro
+        de question ({"1": ..., "2": ...}) : contrairement à un tableau, une
+        question sautée ne décale pas toutes les suivantes.
+        """
         questions_text = "\n".join([f"{i+1}. {q['question']}" for i, q in enumerate(questions)])
+        n = len(questions)
+        example = ", ".join(f'"{i}": "..."' for i in range(1, min(n, 3) + 1))
+        if n > 3:
+            example += f', ..., "{n}": "..."'
 
         if language == 'en':
             return f"""Here is a family description:
 
 {tree_description}
 
-Answer the following questions based on this family description.
-Provide your answers as a JSON array of strings in the same order as the questions.
-
-Response format rules:
-- If a question asks "how many", answer with a NUMBER (e.g. "3"), not names.
-- If a question asks for people/names, answer with FIRST NAMES only, separated by commas without spaces (e.g. "Alice,Bob").
-- If no one matches, answer "None".
+Answer the following {n} questions based on this family description.
 
 Questions:
 {questions_text}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
-Respond ONLY with a JSON array like: ["Answer1", "Answer2", "Answer3"]"""
+Response format:
+- If a question asks "how many", answer with a single NUMBER (e.g. "3"), not names.
+- If a question asks for people/names, answer with FIRST NAMES only, separated by commas without spaces (e.g. "Alice,Bob,Claire").
+- If no one matches, answer "None".
+- Answer every question, using its number as the key.
+- Respond ONLY with one JSON object like: {{{example}}} and no other text."""
         else:
             return f"""Voici la description d'une famille:
 
 {tree_description}
 
-Réponds aux questions suivantes basées sur cette description familiale.
-Fournis tes réponses sous forme d'un tableau JSON de chaînes dans le même ordre que les questions.
-
-Règles de format :
-- Si une question demande "combien", réponds avec un CHIFFRE (ex: "3"), pas des noms.
-- Si une question demande des personnes/noms, réponds avec les PRÉNOMS uniquement, séparés par des virgules sans espaces (ex: "Alice,Bob").
-- Si personne ne correspond, réponds "Aucun".
+Réponds aux {n} questions suivantes en te basant sur cette description familiale.
 
 Questions:
 {questions_text}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
-Réponds UNIQUEMENT avec un tableau JSON comme: ["Réponse1", "Réponse2", "Réponse3"]"""
-    
+Format de réponse :
+- Si une question demande "combien" ou un dénombrement, réponds avec un CHIFFRE uniquement (ex: "3"), pas des noms.
+- Si une question demande des personnes/noms, réponds avec les PRÉNOMS uniquement, séparés par des virgules sans espaces (ex: "Alice,Bob,Claire").
+- Si personne ne correspond, réponds "Aucun".
+- Réponds à toutes les questions, en utilisant leur numéro comme clé.
+- Réponds UNIQUEMENT avec un objet JSON comme: {{{example}}} et rien d'autre."""
+
     @staticmethod
     def get_system_prompt(language: str = 'fr', batch: bool = False) -> str:
         """Retourne le prompt système selon la langue et le mode."""

@@ -142,6 +142,24 @@ python evaluate.py --config my_eval_config.yaml
 python evaluate.py --debug
 ```
 
+#### Batch mode (cost control)
+
+With `batch_size: 1` every question is a separate request that carries the whole tree description, so prompt tokens dominate the bill (about 48k tokens per question on a 500-person tree). With `batch_size: N` the tree is sent once for N questions; the model answers with a JSON object keyed by question number, so a skipped question does not shift the others. Missing answers count as no-responses.
+
+```bash
+python evaluate.py --batch-size 20            # override evaluation.batch_size
+python evaluate.py --runs 3 --max-concurrent 4 --output-dir evaluation_results/exp1
+```
+
+To measure what batching costs in accuracy for a given model, run the same benchmark with several batch sizes and compare:
+
+```bash
+python scripts/batch_sweep.py --config evaluation_config_batch_sweep.yaml --batch-sizes 1 5 10 20
+python scripts/batch_sweep.py --report-only evaluation_results/batch_sweep   # re-print the table
+```
+
+The report shows, per batch size: accuracy, exact match, no-response and error rates, hallucination rate, prompt / completion / reasoning tokens, cost, accuracy per difficulty tier, and the question-by-question agreement with the smallest batch size (questions lost and gained). In batch mode `response_time`, `tokens_used` and `reasoning_tokens` are averaged over the questions of the batch, and `reasoning_text` is shared. Every result row carries `batch_size`, and `analyze_results.py` groups by it automatically when several sizes are mixed.
+
 Each run writes `results_<ts>.csv/json` (one row per question), `detailed_<ts>.json` (system prompt, tree description and every Q&A, enough to replay the run) and `summary_<ts>.json` (per-model stats, per-type and per-tier accuracy, hallucination rate, benchmark fingerprint and actual tree depth). API responses are cached in `.cache/` when `diskcache` is installed, so re-running an identical request costs nothing.
 
 ### Results Analysis

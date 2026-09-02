@@ -430,22 +430,10 @@ class ModelEvaluator:
                 cached_tokens,
             ) = self._extract_api_response(result)
 
-            # Parser la réponse JSON
-            try:
-                # Extraire le JSON de la réponse
-                json_match = re.search(r'\[.*\]', model_response, re.DOTALL)
-                if json_match:
-                    answers = json.loads(json_match.group())
-                else:
-                    answers = json.loads(model_response)
-                
-                # S'assurer qu'on a le bon nombre de réponses
-                if len(answers) != len(questions):
-                    answers = answers[:len(questions)] + [''] * (len(questions) - len(answers))
-                
-            except:
-                # Si le parsing échoue, retourner des non-réponses
-                answers = [''] * len(questions)
+            # Parser la réponse (objet JSON indexé, tableau JSON ou liste numérotée)
+            answers = self.parse_batch_answers(model_response, len(questions))
+            if not any(answers):
+                logger.warning(f"Could not parse any answer from batch response for {self.name}: {model_response[:300]!r}")
             
             # Créer les résultats pour chaque question
             results = []
@@ -506,6 +494,73 @@ class ModelEvaluator:
                 q, str(e), (time.time() - total_start_time) / len(questions)
             ) for q in questions]
     
+    @staticmethod
+    def _to_text(value: Any) -> str:
+        if value is None:
+            return ""
+        if isinstance(value, list):
+            return ",".join(str(v).strip() for v in value if str(v).strip())
+        return str(value).strip()
+
+    @classmethod
+    def parse_batch_answers(cls, text: str, n: int) -> List[str]:
+        """Extrait `n` réponses d'une réponse batch.
+
+        Stratégies, dans l'ordre :
+        1. le dernier objet JSON de la réponse, indexé par numéro de question
+           ({"1": "Alice", "2": "3"}) : les clés absentes donnent "" ;
+        2. le dernier tableau JSON (positionnel) ;
+        3. des lignes numérotées ("1. Alice", "2) 3").
+        Les réponses manquantes sont renvoyées comme chaînes vides.
+        """
+        answers = [""] * n
+        if not text:
+            return answers
+        # Retirer les blocs de raisonnement / fences markdown éventuels
+        cleaned = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+        cleaned = cleaned.replace("```json", "```")
+
+        # 1 & 2 : tout JSON valide commençant à un '{' ou '[' (raw_decode gère
+        # l'imbrication). Priorité : le dernier objet indexé par numéro, sinon
+        # le tableau le plus long (le tableau externe, pas une sous-liste).
+        decoder = json.JSONDecoder()
+        best_dict = None
+        best_list = None  # (span, parsed)
+        for pos in range(len(cleaned) - 1, -1, -1):
+            if cleaned[pos] not in "{[":
+                continue
+            try:
+                parsed, consumed = decoder.raw_decode(cleaned[pos:])
+            except ValueError:
+                continue
+            if isinstance(parsed, dict) and best_dict is None:
+                if any(re.search(r"\d+", str(k)) for k in parsed):
+                    best_dict = parsed
+                    break  # le dernier objet numéroté gagne
+            elif isinstance(parsed, list) and parsed:
+                if best_list is None or consumed > best_list[0]:
+                    best_list = (consumed, parsed)
+        if best_dict is not None:
+            for key, value in best_dict.items():
+                m = re.search(r"\d+", str(key))
+                if not m:
+                    continue
+                idx = int(m.group()) - 1
+                if 0 <= idx < n:
+                    answers[idx] = cls._to_text(value)
+            return answers
+        if best_list is not None:
+            for idx, value in enumerate(best_list[1][:n]):
+                answers[idx] = cls._to_text(value)
+            return answers
+
+        # 3 : lignes numérotées
+        for m in re.finditer(r"^\s*\**(\d{1,3})\**\s*[.):\-]\s*(.+?)\s*$", cleaned, re.MULTILINE):
+            idx = int(m.group(1)) - 1
+            if 0 <= idx < n:
+                answers[idx] = m.group(2).strip().strip('"\'')
+        return answers
+
     def _build_api_request(self, prompt: str, language: str, batch: bool = False) -> Dict[str, Any]:
         """Construit la requête API selon le type d'API."""
         if "anthropic" in self.api_base:

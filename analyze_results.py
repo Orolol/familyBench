@@ -60,6 +60,8 @@ def load_results(file_paths: List[Path], exclude_failed_runs: bool = False) -> p
 def compute_stats(df: pd.DataFrame) -> Dict[str, Any]:
     """Compute summary statistics per model."""
     stats = {}
+    if "batch_size" in df.columns and df["batch_size"].nunique() > 1:
+        df = df.assign(model_name=df["model_name"] + " [batch=" + df["batch_size"].astype(int).astype(str) + "]")
     for model, group in df.groupby("model_name"):
         total = len(group)
         correct = group["is_correct"].sum()

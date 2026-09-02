@@ -56,6 +56,12 @@ python evaluate.py --benchmarks small_fr large_en
 
 # With custom configuration
 python evaluate.py --config my_eval_config.yaml
+
+# Overrides: batch size (questions per request), runs, concurrency, output dir, debug logging
+python evaluate.py --batch-size 20 --runs 2 --max-concurrent 4 --output-dir evaluation_results/exp --debug
+
+# Compare batch sizes on one model (accuracy vs cost)
+python scripts/batch_sweep.py --config evaluation_config_batch_sweep.yaml --batch-sizes 1 5 10 20
 ```
 
 ### Development Commands

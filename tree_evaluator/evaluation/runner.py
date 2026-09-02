@@ -31,6 +31,7 @@ class BenchmarkRun:
     tree_depth_requested: int = 0
     tree_depth_actual: int = 0
     difficulty: str = "all"
+    batch_size: int = 1
 
 
 async def run_benchmark_evaluation(
@@ -158,6 +159,7 @@ async def run_benchmark_evaluation(
     # Ajouter le nom du benchmark
     for result in results:
         result.benchmark_name = benchmark_config['name']
+        result.batch_size = batch_size
 
     return BenchmarkRun(
         results=list(results),
@@ -169,4 +171,5 @@ async def run_benchmark_evaluation(
         tree_depth_requested=benchmark_config['depth'],
         tree_depth_actual=depth_actual,
         difficulty=difficulty,
+        batch_size=batch_size,
     )

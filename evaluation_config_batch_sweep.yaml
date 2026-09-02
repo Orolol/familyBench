@@ -1,0 +1,36 @@
+# Configuration pour scripts/batch_sweep.py : même modèle, même benchmark,
+# une passe par taille de batch. Remplace le modèle par celui à tester.
+
+models:
+  - name: "moonshotai/kimi-k2.6"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "moonshotai/kimi-k2.6"
+    temperature: 0.3
+    max_tokens: 64000
+    reasoning:
+      max_tokens: 32000
+    # Prix indicatifs (USD / million de tokens) pour la colonne coût ; à ajuster
+    pricing:
+      input_per_mtok: 0.6
+      output_per_mtok: 2.5
+
+benchmarks:
+  - name: "large_tree_en"
+    people: 500
+    depth: 6
+    questions: 100
+    root_couples: 4
+    seed: 1
+    language: "en"
+    difficulty: all
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 5
+  timeout: 999
+  batch_size: 1          # écrasé par le script pour chaque taille testée
+  output_dir: "evaluation_results/batch_sweep"
+  output_formats:
+    - csv
+    - json
