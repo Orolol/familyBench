@@ -56,10 +56,11 @@ async def run_benchmark_evaluation(
     tree = generate_tree(
         total_people=benchmark_config['people'],
         max_depth=benchmark_config['depth'],
-        max_children_per_person=benchmark_config.get('max_children', 3),
+        max_children_per_person=benchmark_config.get('max_children', 2),
         seed=benchmark_config.get('seed'),
         num_root_couples=benchmark_config.get('root_couples', 1),
-        language=language
+        language=language,
+        second_union_percentage=benchmark_config.get('second_union_percentage', 20),
     )
 
     # Description : mélangée par défaut (l'ordre trié révèle la génération),
@@ -69,8 +70,9 @@ async def run_benchmark_evaluation(
         tree,
         shuffle=benchmark_config.get('shuffle', True),
         language=language,
-        relations=benchmark_config.get('relations', 'parents'),
+        relations=benchmark_config.get('relations', 'mixed'),
         seed=benchmark_config.get('seed'),
+        derived_links_percentage=benchmark_config.get('derived_links_percentage', 30),
     )
     enigma_percentage = benchmark_config.get('enigma_percentage', 10)
     difficulty = benchmark_config.get('difficulty', 'all')

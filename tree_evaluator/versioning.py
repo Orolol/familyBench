@@ -14,7 +14,7 @@ from typing import Any, Dict
 # À incrémenter à chaque changement qui modifie les arbres ou les questions
 # produits pour une seed donnée (algorithme de génération, ordre des tirages
 # aléatoires, nouveaux types de questions, échantillonnage...).
-GENERATOR_VERSION = "3.1"
+GENERATOR_VERSION = "4.0"
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
@@ -56,13 +56,15 @@ def benchmark_params_from_config(benchmark_config: Dict[str, Any]) -> Dict[str, 
         "questions": benchmark_config["questions"],
         "seed": benchmark_config.get("seed"),
         "language": benchmark_config.get("language", "fr"),
-        "max_children": benchmark_config.get("max_children", 3),
+        "max_children": benchmark_config.get("max_children", 2),
         "root_couples": benchmark_config.get("root_couples", 1),
         "enigma_percentage": benchmark_config.get("enigma_percentage", 10),
         "difficulty": benchmark_config.get("difficulty", "all"),
         "shuffle": benchmark_config.get("shuffle", True),
-        "relations": benchmark_config.get("relations", "parents"),
+        "relations": benchmark_config.get("relations", "mixed"),
         "max_answer_names": benchmark_config.get("max_answer_names", 10),
         "anonymize_percentage": benchmark_config.get("anonymize_percentage", 50),
         "drop_answer_names_above": benchmark_config.get("drop_answer_names_above", 40),
+        "second_union_percentage": benchmark_config.get("second_union_percentage", 20),
+        "derived_links_percentage": benchmark_config.get("derived_links_percentage", 30),
     }

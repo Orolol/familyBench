@@ -87,8 +87,11 @@ These options apply both to `generate_benchmark.py` flags and to `benchmarks:` e
 
 | Lever | Flag / config key | Default | Effect |
 |---|---|---|---|
+| Second unions | `--second-union-percentage P` / `second_union_percentage:` | 20 | P % of people also have children with a second partner. This creates half-siblings and step-parents; "brother/sister" means both parents in common, "half-brother/half-sister" exactly one (the convention is written at the top of every description). New question types `demi_fratrie` and `beaux_parents`. `0` restores the single-union tree. |
+| Deeper trees | `--max-children N` / `max_children:` | 2 | Maximum children per union. 2 instead of 3 gives more generations for the same number of people, hence longer ancestor chains. |
+| Mixed-direction links | `--relations mixed` / `relations: mixed` | `mixed` | Every parent-child link is stated exactly once, in a random direction and place: "Ana is the mother of Leo" here, "Leo is the son of Marc" forty lines later. Knowing both parents of someone means joining two distant sentences. `parents`, `children` and `both` remain available. |
+| Derived links | `--derived-links-percentage P` / `derived_links_percentage:` | 30 | P % of people are described only as "X is the sister of Y" instead of through their parents; Y keeps explicit links and is never derived itself, so the tree stays fully reconstructible (checked by a test). |
 | Shuffled description | `--no-shuffle` / `shuffle: false` | shuffled | Sorted output (by generation, then name) leaks everyone's generation and keeps parents next to children. The shuffle is seeded from the benchmark seed, so the description is byte-identical across runs and provider prompt caches keep hitting. |
-| One-directional links | `--relations parents\|children\|both` / `relations:` | `parents` | With `parents`, only "X is the child of A and B" is written. Finding someone's children, siblings or descendants requires scanning the whole text. `both` restores the redundant, easier description. |
 | Long answers become counts | `--max-answer-names N` / `max_answer_names:` | 10 | A question whose answer would list more than N names is rewritten as *"How many people answer the following question: …"* with a numeric answer. Enumeration stamina is no longer rewarded, and partial credit cannot inflate the score. `0` disables. |
 | Census questions dropped | `--drop-answer-names-above N` / `drop_answer_names_above:` | 40 | Questions whose answer would list more than N names are removed before sampling. Counting them instead does not remove the work: "who has the same number of children as X" on 1,000 people is a full census that eats the whole reasoning budget. `0` disables. |
 | Attribute references | `--anonymize-percentage P` / `anonymize_percentage:` | 50 | In P % of questions, every first name is replaced by the person's unique attribute description (*"the person with red hair, blue eyes and a green hat"*), so the model must locate the person before reasoning. Enigmas are never anonymized (their own phrasing already does this at levels 6 and 8). |
@@ -99,7 +102,8 @@ Every generated question records `difficulty`, `answer_format` (`names`, `count`
 ```bash
 # Easier, closer to the 2025 protocol
 python generate_benchmark.py --people 400 --depth 6 --questions 200 --seed 43 --language en \
-    --no-shuffle --relations both --max-answer-names 0 --anonymize-percentage 0 --output easy.json
+    --no-shuffle --relations both --max-children 3 --second-union-percentage 0 --derived-links-percentage 0 \
+    --max-answer-names 0 --anonymize-percentage 0 --output easy.json
 ```
 
 > **Depth**: the requested depth is an upper bound. Each couple has 1 to `--max-children` children, so the pool of people is often exhausted before the requested depth (400 people with 10 root couples give 4 generations). The CLI prints a warning and writes `tree_depth_actual` in the metadata.
@@ -136,7 +140,10 @@ benchmarks:
     difficulty: expert      # all | easy | medium | hard | enigma | expert
     # Difficulty levers (defaults shown, see "Difficulty levers" above)
     shuffle: true
-    relations: parents      # parents | children | both
+    relations: mixed        # mixed | parents | children | both
+    max_children: 2
+    second_union_percentage: 20
+    derived_links_percentage: 30
     max_answer_names: 10
     drop_answer_names_above: 40
     anonymize_percentage: 50
@@ -224,13 +231,13 @@ Since generator 3.0, answers longer than `max_answer_names` are asked as counts,
 
 ## 🧠 Question Types
 
-FamilyBench generates 21 question types, grouped in difficulty tiers. `--difficulty all` (default) samples questions **evenly across types** with `--enigma-percentage` enigmas; `easy`, `medium`, `hard` and `enigma` restrict to one tier; `expert` mixes the hard tier (minus compound attributes and relational paths) with enigmas of complexity 4 to 9, at least 40 % of them being complexity 7 to 9.
+FamilyBench generates 23 question types, grouped in difficulty tiers. `--difficulty all` (default) samples questions **evenly across types** with `--enigma-percentage` enigmas; `easy`, `medium`, `hard` and `enigma` restrict to one tier; `expert` mixes the hard tier (minus compound attributes and relational paths) with enigmas of complexity 4 to 9, at least 40 % of them being complexity 7 to 9.
 
 | Tier | Types | Example |
 |---|---|---|
 | **easy** | `relation_directe`, `relation_inverse`, `recherche_attributs`, `comptage` | "Who are Marie's children?", "How many children does Pierre have?" |
 | **medium** | `recherche_multi_criteres`, `relation_complexe`, `transversale_generation`, `verticale_ancetre`, `verticale_racine`, `verticale_feuille`, `verticale_descendant`, `comptage_complexe` | "Who are Sophie's cousins?", "Who is in the same generation as Luc and works as a doctor?" |
-| **hard** | `relation_attribut_composee`, `multihop`, `conditional`, `negation`, `comparative`, `relational_path`, `recherche_inversee_complexe`, `verticale_descendant_critere`, `verticale_racine_critere` | "Which of Paul's children work as engineers?", "Who has more grandsons than granddaughters?" |
+| **hard** | `relation_attribut_composee`, `multihop`, `conditional`, `negation`, `comparative`, `relational_path`, `recherche_inversee_complexe`, `verticale_descendant_critere`, `verticale_racine_critere`, `demi_fratrie`, `beaux_parents` | "Which of Paul's children work as engineers?", "Who has more grandsons than granddaughters?" |
 | **enigma** | `enigme` (complexity 1 to 9) | "Which child of the son of Ken has red hair?", "Who is the female cousin of X who has the same eye color as the grandmother of Y?" |
 
 Every generated question carries `type`, `difficulty` and, for enigmas, `complexity`. Answers are a single name, an alphabetically sorted comma-separated list, a number, or `None` / `Aucun`.
@@ -271,7 +278,7 @@ Every generated question carries `type`, `difficulty` and, for enigmas, `complex
 - **Name uniqueness**: Each person has a unique first name
 - **Profession uniqueness**: Professions are NOT unique — multiple people can share the same profession (intentional for attribute-search questions)
 - **Appearance uniqueness**: The combination (hair, eyes, hat) is unique
-- **Simple structure**: No remarriages, each child has exactly 2 parents
+- **Structure**: each child has exactly 2 parents; a person may have children with up to two partners (`second_union_percentage`), which creates half-siblings and step-parents
 
 ## 🌍 Multi-language Support
 

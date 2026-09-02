@@ -28,7 +28,9 @@ _EN_RELATION_WORDS = {
     "great-grandfathers", "great-grandchild", "great-grandchildren", "great-grandson",
     "great-grandsons", "great-granddaughter", "great-granddaughters", "descendant",
     "descendants", "ancestor", "ancestors", "in-laws", "generation", "son", "sons",
-    "daughter", "daughters", "spouse", "partner", "family",
+    "daughter", "daughters", "spouse", "partner", "partners", "family",
+    "half-sibling", "half-siblings", "half-brother", "half-brothers", "half-sister", "half-sisters",
+    "step-parent", "step-parents", "step-father", "step-mother", "co-parents",
 }
 _EN_MODIFIERS = {"male", "female", "oldest", "youngest", "eldest", "own", "direct"}
 _EN_CONNECTORS = {"or", "and"}

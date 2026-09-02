@@ -34,6 +34,8 @@ DIFFICULTY_TIERS: Dict[str, set[str]] = {
         "recherche_inversee_complexe",
         "verticale_descendant_critere",
         "verticale_racine_critere",
+        "demi_fratrie",
+        "beaux_parents",
     },
     "enigma": {"enigme"},
 }
@@ -59,7 +61,10 @@ from tree_evaluator.questions.attribute_search import (
     generate_multi_criteria_questions
 )
 from tree_evaluator.questions.counting import generate_counting_questions
-from tree_evaluator.questions.complex_relations import generate_complex_relation_questions
+from tree_evaluator.questions.complex_relations import (
+    generate_complex_relation_questions,
+    generate_half_family_questions,
+)
 from tree_evaluator.questions.transversal import (
     generate_transversal_questions,
     generate_vertical_questions
@@ -168,6 +173,7 @@ def generate_questions(
     normal_questions.extend(generate_multi_criteria_questions(people, language))
     normal_questions.extend(generate_counting_questions(people, language))
     normal_questions.extend(generate_complex_relation_questions(people, language))
+    normal_questions.extend(generate_half_family_questions(people, language))
     normal_questions.extend(generate_transversal_questions(people, language))
     normal_questions.extend(generate_vertical_questions(people, language))
     normal_questions.extend(generate_compound_relation_questions(people, language))

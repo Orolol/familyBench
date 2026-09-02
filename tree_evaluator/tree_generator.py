@@ -55,14 +55,27 @@ def _get_unique_attributes(
     
     return unique_names_genders, selected_professions, unique_color_combos
 
+DEFAULT_SECOND_UNION_PERCENTAGE = 20
+
+
 def generate_tree(
     total_people: int,
     max_depth: int,
-    max_children_per_person: int,
+    max_children_per_person: int = 2,
     seed: int | None = None,
     num_root_couples: int = 1,
     language: str = "fr",
+    second_union_percentage: int = DEFAULT_SECOND_UNION_PERCENTAGE,
 ) -> Dict[str, Person]:
+    """Génère un arbre généalogique aléatoire.
+
+    Args:
+        max_children_per_person: nombre max d'enfants PAR UNION (par couple).
+        second_union_percentage: part (0-100) des personnes qui, après une
+            première union, ont aussi des enfants avec un second partenaire.
+            Cela crée des demi-frères/sœurs et des beaux-parents. Chaque
+            enfant a toujours exactement deux parents.
+    """
     
     if total_people < 1:
         raise ValueError("total_people must be at least 1")
@@ -74,6 +87,8 @@ def generate_tree(
         raise ValueError("num_root_couples must be at least 1")
     if language not in ("fr", "en"):
         raise ValueError(f"language must be 'fr' or 'en', got {language!r}")
+    if not 0 <= second_union_percentage <= 100:
+        raise ValueError("second_union_percentage must be between 0 and 100")
     
     if seed is not None:
         random.seed(seed)
@@ -147,49 +162,46 @@ def generate_tree(
         people_to_marry = list(current_generation)
         random.shuffle(people_to_marry)
         
-        for person in people_to_marry:
-            # Il faut au moins un conjoint ET un enfant, sinon le conjoint
-            # entrerait dans l'arbre sans aucun lien de parenté.
-            if len(person_pool) < 2:
-                break
-                
-            # Chercher un partenaire de sexe opposé dans le pool
+        def make_union(person: Person) -> bool:
+            """Marie `person` avec un partenaire du pool et leur donne 1..max enfants."""
             potential_partners = [p for p in person_pool if p.gender != person.gender]
-            
-            if not potential_partners:
-                continue
-                
-            # Choisir un partenaire au hasard
+            if not potential_partners or len(person_pool) < 2:
+                return False
             partner = random.choice(potential_partners)
             person_pool.remove(partner)
             partner.generation = person.generation  # Le partenaire rejoint la même génération
             people_in_tree_ids.add(partner.id)
-            
-            # Décider qui est parent1 et parent2 selon le genre
             if person.gender == 'M':
                 parent1, parent2 = person, partner
             else:
                 parent1, parent2 = partner, person
-            
-            # Avoir des enfants
-            max_possible_children = min(max_children_per_person, len(person_pool)) if person_pool else 0
+            max_possible_children = min(max_children_per_person, len(person_pool))
             if max_possible_children == 0:
-                continue
+                return False
             num_children = random.randint(1, max_possible_children)
-            
             for _ in range(num_children):
                 if not person_pool:
                     break
-                
                 child = person_pool.pop(0)
                 child.generation = gen + 1
                 child.parent_ids = [parent1.id, parent2.id]
                 parent1.children_ids.append(child.id)
                 parent2.children_ids.append(child.id)
-                
                 next_generation.append(child)
                 people_in_tree_ids.add(child.id)
-        
+            return True
+
+        for person in people_to_marry:
+            # Il faut au moins un conjoint ET un enfant, sinon le conjoint
+            # entrerait dans l'arbre sans aucun lien de parenté.
+            if len(person_pool) < 2:
+                break
+            if not make_union(person):
+                continue
+            # Seconde union : demi-frères/sœurs et beaux-parents
+            if random.random() * 100 < second_union_percentage and len(person_pool) >= 2:
+                make_union(person)
+
         if not next_generation:
             break
         

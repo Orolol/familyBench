@@ -17,7 +17,7 @@ BENCH = {"name": "tiny", "people": 25, "depth": 3, "questions": 12, "root_couple
 
 def _oracle():
     """Réponses attendues, calculées comme le runner le fera (même seed)."""
-    tree = generate_tree(BENCH["people"], BENCH["depth"], 3, seed=BENCH["seed"], num_root_couples=1, language="en")
+    tree = generate_tree(BENCH["people"], BENCH["depth"], seed=BENCH["seed"], num_root_couples=1, language="en")
     known = {p.first_name for p in tree.values()}
     answers = {q["question"]: q["answer"] for q in generate_questions(tree, BENCH["questions"], language="en")}
     return answers, known

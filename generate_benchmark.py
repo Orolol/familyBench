@@ -90,11 +90,15 @@ def main():
     parser.add_argument("--output", type=str, default="benchmark.json", help="Fichier de sortie pour le benchmark JSON.")
     parser.add_argument("--md-output", type=str, help="Fichier de sortie optionnel pour le prompt Markdown.")
     parser.add_argument("--seed", type=int, help="Graine pour la reproductibilité.")
-    parser.add_argument("--max-children", type=int, default=3, help="Nombre maximum d'enfants par personne.")
+    parser.add_argument("--max-children", type=int, default=2, help="Nombre maximum d'enfants par union (défaut 2 : arbres plus profonds).")
+    parser.add_argument("--second-union-percentage", type=int, default=20,
+                        help="Part des personnes (0-100) ayant des enfants avec un second partenaire : demi-frères/sœurs, beaux-parents (défaut 20).")
+    parser.add_argument("--derived-links-percentage", type=int, default=30,
+                        help="Part des personnes (0-100) décrites par « X est la sœur de Y » au lieu de leurs liens parentaux (défaut 30).")
     parser.add_argument("--no-shuffle", dest="shuffle", action="store_false",
                         help="Ne pas mélanger la description (par défaut elle est mélangée, de façon seedée ; l'ordre trié révèle la génération).")
-    parser.add_argument("--relations", type=str, default="parents", choices=["parents", "children", "both"],
-                        help="Phrases de lien écrites dans la description : parents (défaut, 'X est l'enfant de A et B'), children ('A a N enfants'), both (redondant, plus facile).")
+    parser.add_argument("--relations", type=str, default="mixed", choices=["mixed", "parents", "children", "both"],
+                        help="Phrases de lien : mixed (défaut, chaque lien une fois dans une direction aléatoire), parents ('X est l'enfant de A et B'), children ('A a N enfants'), both (redondant, plus facile).")
     parser.add_argument("--max-answer-names", type=int, default=10,
                         help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
     parser.add_argument("--drop-answer-names-above", type=int, default=40,
@@ -123,7 +127,8 @@ def main():
         max_children_per_person=args.max_children,
         seed=args.seed,
         num_root_couples=args.root_couples,
-        language=args.language
+        language=args.language,
+        second_union_percentage=args.second_union_percentage,
     )
 
     depth_actual = actual_depth(tree)
@@ -133,7 +138,8 @@ def main():
 
     print("Conversion de l'arbre en texte...")
     description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language,
-                                       relations=args.relations, seed=args.seed)
+                                       relations=args.relations, seed=args.seed,
+                                       derived_links_percentage=args.derived_links_percentage)
 
     if args.difficulty == "all":
         print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
@@ -175,6 +181,8 @@ def main():
             "max_answer_names": args.max_answer_names,
             "anonymize_percentage": args.anonymize_percentage,
             "drop_answer_names_above": args.drop_answer_names_above,
+            "second_union_percentage": args.second_union_percentage,
+            "derived_links_percentage": args.derived_links_percentage,
             "questions_requested": args.questions,
             "questions_generated": len(questions),
             "generator_version": GENERATOR_VERSION,
@@ -193,6 +201,8 @@ def main():
                 "max_answer_names": args.max_answer_names,
                 "anonymize_percentage": args.anonymize_percentage,
                 "drop_answer_names_above": args.drop_answer_names_above,
+                "second_union_percentage": args.second_union_percentage,
+                "derived_links_percentage": args.derived_links_percentage,
             }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }

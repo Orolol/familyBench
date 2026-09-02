@@ -6,7 +6,7 @@ from typing import Dict, List, Any, Tuple
 
 from tree_evaluator.models import Person
 from tree_evaluator.translations import get_translation
-from .base import get_father, get_mother
+from .base import get_siblings, get_cousins, get_father, get_mother
 
 
 DISCRIMINATOR_ATTRS = ("hair_color", "eye_color", "hat_color")
@@ -47,24 +47,11 @@ def _unique_discriminator(target: Person, pool: List[Person]) -> Tuple[str, str]
 
 
 def _siblings(person: Person, people: Dict[str, Person]) -> List[Person]:
-    out = []
-    for pid in person.parent_ids:
-        for cid in people[pid].children_ids:
-            if cid != person.id:
-                out.append(people[cid])
-    return _dedupe(out)
+    return get_siblings(person, people)
 
 
 def _cousins(person: Person, people: Dict[str, Person]) -> List[Person]:
-    out = []
-    for pid in person.parent_ids:
-        parent = people[pid]
-        for gpid in parent.parent_ids:
-            for auid in people[gpid].children_ids:
-                if auid == pid:
-                    continue
-                out.extend(people[cid] for cid in people[auid].children_ids)
-    return _dedupe(out)
+    return get_cousins(person, people)
 
 
 def _grandchildren(person: Person, people: Dict[str, Person]) -> List[Person]:

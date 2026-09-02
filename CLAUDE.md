@@ -10,8 +10,8 @@ TreeEval is a multi-language LLM evaluation tool that generates dynamic benchmar
 
 The system follows a pipeline architecture:
 1. **Tree Generation** (`tree_generator.py`): Creates random family trees with configurable constraints
-2. **Text Conversion** (`text_converter.py`): Converts trees to structured descriptions (French/English). Options: `shuffle` (seeded from the benchmark seed, default on), `relations` = parents|children|both (default `parents`: only "X is the child of A and B")
-3. **Question Generation** (`question_generator.py`): 21 question types in 4 difficulty tiers (easy/medium/hard/enigma), stratified sampling across types, `expert` mode; every question carries `type` and `difficulty`
+2. **Text Conversion** (`text_converter.py`): Converts trees to structured descriptions (French/English). Options: `shuffle` (seeded, default on), `relations` = mixed|parents|children|both (default `mixed`: each parent-child link stated once, random direction and place), `derived_links_percentage` (default 30: "X is the sister of Y" instead of parent links, anchor Y always explicit), a conventions line (brother = both parents in common) heads every description
+3. **Question Generation** (`question_generator.py`): 23 question types in 4 difficulty tiers (easy/medium/hard/enigma), stratified sampling across types, `expert` mode; every question carries `type` and `difficulty`
 4. **Model Evaluation** (`evaluate.py`): Async evaluation system for testing LLMs via OpenAI-compatible APIs
 5. **CLI Scripts**: `generate_benchmark.py`, `evaluate.py`, `analyze_results.py` (placeholder)
 
@@ -21,7 +21,7 @@ Key modules:
 - `versioning.py`: `GENERATOR_VERSION` and `benchmark_fingerprint()` (bump the version whenever a change alters the tree or questions produced for a given seed)
 - `cache_manager.py`: optional `diskcache` cache of API responses (in-memory fallback)
 - `evaluation/`: Complete async evaluation framework with answer cleaning, stats, and result formatting
-- `questions/`: Modular question generation system with 21 question types including 9 enigma complexity levels (7-9 use the generic chain engine in `enigma.py`)
+- `questions/`: Modular question generation system with 23 question types including 9 enigma complexity levels (7-9 use the generic chain engine in `enigma.py`)
 - `questions/rewrite.py`: post-selection difficulty rewrites: `anonymize_names` (names -> unique attribute description, never on enigmas), `convert_long_answers_to_counts` (> `max_answer_names` names -> counting question), `drop_census_questions`, `fix_english_articles`
 
 ## Common Commands
@@ -89,7 +89,7 @@ When modifying the code, maintain these unique constraints:
 - Each person must have a unique first name
 - Professions are NOT unique — multiple people can share the same profession (intentional for attribute-search questions)
 - The combination (hair_color, eye_color, hat_color) must be unique
-- Simple tree structure: no remarriages, each child has exactly 2 parents
+- Each child has exactly 2 parents; a person may have children with up to two partners (`second_union_percentage`, default 20): half-siblings and step-parents exist. Sibling/uncle/cousin/nephew semantics live in `questions/base.py` (`get_siblings` = both parents in common, `get_half_siblings` = exactly one) and every question module must use these helpers
 - Support both French and English throughout the codebase
 
 ## Output Formats
@@ -105,12 +105,12 @@ The system generates multiple output formats:
 21 types grouped in tiers (see `DIFFICULTY_TIERS` in `question_generator.py`):
 - **easy**: direct/inverse relations, attribute search, counting
 - **medium**: multi-criteria search, complex relations (grandparents, cousins...), cross-sectional, vertical (ancestors/descendants), complex counting
-- **hard**: compound relation+attribute, multihop, conditional, negation, comparative, relational path, inverse complex search, vertical with criteria
+- **hard**: compound relation+attribute, multihop, conditional, negation, comparative, relational path, inverse complex search, vertical with criteria, half-siblings (`demi_fratrie`), step-parents/co-parents (`beaux_parents`)
 - **enigma**: riddles of complexity 1 to 9 (`complexity` field). Levels with a discriminating attribute are phrased "Which son of X has black hair?" / "Quel fils de X a les cheveux noirs ?" so the attribute cannot be read as qualifying X
 
 `--difficulty all` samples evenly across types (round-robin) with `enigma_percentage` enigmas; `expert` = hard tier (minus compound attributes and relational paths) + enigmas of complexity 4-9 (>= 40 % from 7-9).
 
-Difficulty levers (generator 3.0, hard defaults): `shuffle` (default true), `relations` (default `parents`), `max_answer_names` (default 10, 0 disables), `drop_answer_names_above` (default 40: census questions removed before sampling), `anonymize_percentage` (default 50). All are CLI flags of `generate_benchmark.py` and keys of `benchmarks:` entries, and all are part of the benchmark fingerprint. Questions carry `answer_format`, `anonymized`, `converted_to_count`.
+Difficulty levers (generator 4.0, hard defaults): `max_children` (default 2), `second_union_percentage` (20), `derived_links_percentage` (30), `shuffle` (default true), `relations` (default `mixed`), `max_answer_names` (default 10, 0 disables), `drop_answer_names_above` (default 40: census questions removed before sampling), `anonymize_percentage` (default 50). All are CLI flags of `generate_benchmark.py` and keys of `benchmarks:` entries, and all are part of the benchmark fingerprint. Questions carry `answer_format`, `anonymized`, `converted_to_count`.
 
 Answers are names sorted alphabetically and comma-separated, a number, or `None`/`Aucun`. `multihop` and `relational_path` are the only types whose answer can be an attribute value or a relation label instead of names.
 
@@ -130,7 +130,7 @@ The evaluation framework (`tree_evaluator/evaluation/`) includes:
 ✅ Fully Implemented:
 - Core tree generation with all constraints, actual-depth warning
 - Text conversion with BFS ordering
-- 21 question types, 6 enigma levels, difficulty tiers and stratified sampling
+- 23 question types, 6 enigma levels, difficulty tiers and stratified sampling
 - Benchmark generation (JSON and Markdown) with fingerprint metadata
 - Complete async evaluation system with cache, cost tracking and rich progress display
 - Multi-language support (French/English)

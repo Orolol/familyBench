@@ -3,7 +3,7 @@
 from typing import Dict, List, Any
 from tree_evaluator.models import Person
 from tree_evaluator.translations import get_translation
-from .base import format_answer
+from .base import get_siblings, get_uncles_aunts, get_cousins, get_nephews_nieces, get_half_siblings, get_step_parents, get_co_parents, format_answer
 
 
 def generate_complex_relation_questions(people: Dict[str, Person], language: str = "fr") -> List[Dict[str, Any]]:
@@ -12,7 +12,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
     for person in people.values():
         # Frères et soeurs
         if person.parent_ids:
-            siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
+            siblings = get_siblings(person, people)
             sibling_names = [s.first_name for s in siblings]
             questions.append({
                 "question": get_translation("q_siblings_of", language).format(name=person.first_name),
@@ -178,14 +178,9 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                     "type": "relation_complexe"
                 })
         
-        # Oncles/Tantes
-        uncles_aunts = []
-        for pid in person.parent_ids:
-            parent = people[pid]
-            if parent.parent_ids:
-                parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                uncles_aunts.extend(parent_siblings)
-        
+        # Oncles/Tantes (frères et sœurs complets des parents)
+        uncles_aunts = get_uncles_aunts(person, people)
+
         if uncles_aunts:
             uncle_aunt_names = [p.first_name for p in uncles_aunts]
             questions.append({
@@ -208,17 +203,10 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 "type": "relation_complexe"
             })
 
-        # Cousins
-        cousins = []
-        for pid in person.parent_ids:
-            parent = people[pid]
-            if parent.parent_ids:
-                # Frères et sœurs du parent
-                parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                # Enfants des frères et sœurs du parent (= cousins)
-                for sibling in parent_siblings:
-                    cousins.extend([people[cid].first_name for cid in sibling.children_ids])
-        
+        # Cousins (enfants des oncles et tantes)
+        cousin_people = get_cousins(person, people)
+        cousins = [c.first_name for c in cousin_people]
+
         if cousins:
             questions.append({
                 "question": get_translation("q_cousins_all", language).format(name=person.first_name),
@@ -227,13 +215,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
             })
 
             # Cousins masculins
-            male_cousins = []
-            for pid in person.parent_ids:
-                parent = people[pid]
-                if parent.parent_ids:
-                    parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                    for sibling in parent_siblings:
-                        male_cousins.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'M'])
+            male_cousins = [c.first_name for c in cousin_people if c.gender == 'M']
 
             if male_cousins:
                 questions.append({
@@ -243,13 +225,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 })
 
             # Cousines féminines
-            female_cousins = []
-            for pid in person.parent_ids:
-                parent = people[pid]
-                if parent.parent_ids:
-                    parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                    for sibling in parent_siblings:
-                        female_cousins.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'F'])
+            female_cousins = [c.first_name for c in cousin_people if c.gender == 'F']
 
             if female_cousins:
                 questions.append({
@@ -259,14 +235,9 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 })
 
         # Neveux et nièces
-        nephews_nieces = []
-        if person.parent_ids:
-            # Frères et sœurs de la personne
-            siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
-            # Enfants des frères et sœurs
-            for sibling in siblings:
-                nephews_nieces.extend([people[cid].first_name for cid in sibling.children_ids])
-        
+        nephew_people = get_nephews_nieces(person, people)
+        nephews_nieces = [n.first_name for n in nephew_people]
+
         if nephews_nieces:
             questions.append({
                 "question": get_translation("q_nephews_nieces", language).format(name=person.first_name),
@@ -275,11 +246,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
             })
 
             # Neveux masculins
-            nephews = []
-            if person.parent_ids:
-                siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
-                for sibling in siblings:
-                    nephews.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'M'])
+            nephews = [n.first_name for n in nephew_people if n.gender == 'M']
 
             if nephews:
                 questions.append({
@@ -289,11 +256,7 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                 })
 
             # Nièces féminines
-            nieces = []
-            if person.parent_ids:
-                siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
-                for sibling in siblings:
-                    nieces.extend([people[cid].first_name for cid in sibling.children_ids if people[cid].gender == 'F'])
+            nieces = [n.first_name for n in nephew_people if n.gender == 'F']
 
             if nieces:
                 questions.append({
@@ -302,4 +265,45 @@ def generate_complex_relation_questions(people: Dict[str, Person], language: str
                     "type": "relation_complexe"
                 })
 
+    return questions
+
+
+def generate_half_family_questions(people: Dict[str, Person], language: str = "fr") -> List[Dict[str, Any]]:
+    """Demi-fratrie, beaux-parents, co-parents (secondes unions)."""
+    questions: List[Dict[str, Any]] = []
+    for person in people.values():
+        halves = get_half_siblings(person, people)
+        if halves:
+            questions.append({
+                "question": get_translation("q_half_siblings_of", language).format(name=person.first_name),
+                "answer": format_answer([h.first_name for h in halves], language),
+                "type": "demi_fratrie",
+            })
+            questions.append({
+                "question": get_translation("q_how_many_half_siblings", language).format(name=person.first_name),
+                "answer": str(len(halves)),
+                "type": "demi_fratrie",
+            })
+            brothers = [h.first_name for h in halves if h.gender == "M"]
+            sisters = [h.first_name for h in halves if h.gender == "F"]
+            if brothers and sisters:
+                questions.append({
+                    "question": get_translation("q_half_brothers_of", language).format(name=person.first_name),
+                    "answer": format_answer(brothers, language),
+                    "type": "demi_fratrie",
+                })
+        steps = get_step_parents(person, people)
+        if steps:
+            questions.append({
+                "question": get_translation("q_step_parents_of", language).format(name=person.first_name),
+                "answer": format_answer([s.first_name for s in steps], language),
+                "type": "beaux_parents",
+            })
+        partners = get_co_parents(person, people)
+        if len(partners) >= 2:
+            questions.append({
+                "question": get_translation("q_co_parents_of", language).format(name=person.first_name),
+                "answer": format_answer([c.first_name for c in partners], language),
+                "type": "beaux_parents",
+            })
     return questions

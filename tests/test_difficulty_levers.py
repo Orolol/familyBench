@@ -25,14 +25,19 @@ def tree():
 # ---------------------------------------------------------------- description
 def test_shuffle_is_seeded_and_independent_of_global_random(tree):
     random.seed(1)
-    a = convert_tree_to_text(tree, shuffle=True, language="en", seed=8)
+    a = convert_tree_to_text(tree, shuffle=True, language="en", seed=8, relations="parents")
     random.seed(2)
-    b = convert_tree_to_text(tree, shuffle=True, language="en", seed=8)
-    c = convert_tree_to_text(tree, shuffle=True, language="en", seed=9)
-    sorted_desc = convert_tree_to_text(tree, shuffle=False, language="en")
+    b = convert_tree_to_text(tree, shuffle=True, language="en", seed=8, relations="parents")
+    c = convert_tree_to_text(tree, shuffle=True, language="en", seed=9, relations="parents")
+    sorted_desc = convert_tree_to_text(tree, shuffle=False, language="en", relations="parents")
     assert a == b, "same seed -> identical description (prompt cache)"
     assert a != c and a != sorted_desc
-    assert sorted(a.splitlines()) == sorted(sorted_desc.splitlines()), "shuffle only reorders"
+    assert sorted(a.splitlines()) == sorted(sorted_desc.splitlines()), "shuffle only reorders (parents mode)"
+    # en mode mixed, la seed fixe aussi la direction de chaque lien
+    m1 = convert_tree_to_text(tree, shuffle=True, language="en", seed=8, relations="mixed")
+    random.seed(99)
+    m2 = convert_tree_to_text(tree, shuffle=True, language="en", seed=8, relations="mixed")
+    assert m1 == m2
 
 
 def test_relations_modes(tree):
