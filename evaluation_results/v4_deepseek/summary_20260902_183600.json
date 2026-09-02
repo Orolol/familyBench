@@ -1,0 +1,146 @@
+{
+  "timestamp": "20260902_183600",
+  "config": "evaluation_config_deepseek_v4.yaml",
+  "models_evaluated": [
+    "deepseek/deepseek-v4-flash-0731"
+  ],
+  "benchmarks_run": [
+    "tree400_v4_en_expert"
+  ],
+  "benchmarks": {
+    "tree400_v4_en_expert": {
+      "fingerprint": "f204dff83951aa4f",
+      "generator_version": "4.0",
+      "difficulty": "expert",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 40,
+      "batch_size": 1
+    }
+  },
+  "summary_stats": {
+    "deepseek/deepseek-v4-flash-0731": {
+      "total_questions": 40,
+      "correct_answers": 20,
+      "accuracy": 0.5,
+      "exact_matches": 20,
+      "exact_match_rate": 0.5,
+      "avg_partial_score": 0.5807142857142857,
+      "avg_response_time": 151.21702335476874,
+      "total_tokens": 1304816,
+      "total_prompt_tokens": 626770,
+      "total_completion_tokens": 1304816,
+      "avg_completion_tokens": 32620.4,
+      "total_cached_tokens": 491520,
+      "total_cost_usd": 0.4530962800000001,
+      "avg_cost_usd": 0.011327407000000001,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 7,
+      "no_response_rate": 0.175,
+      "total_reasoning_tokens": 954933,
+      "questions_with_reasoning": 40,
+      "avg_reasoning_tokens": 23873.325,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "beaux_parents": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "comparative": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "conditional": {
+          "total": 5,
+          "correct": 2,
+          "accuracy": 0.4
+        },
+        "demi_fratrie": {
+          "total": 3,
+          "correct": 1,
+          "accuracy": 0.3333333333333333
+        },
+        "enigme": {
+          "total": 18,
+          "correct": 14,
+          "accuracy": 0.7777777777777778
+        },
+        "multihop": {
+          "total": 6,
+          "correct": 1,
+          "accuracy": 0.16666666666666666
+        },
+        "negation": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "verticale_descendant_critere": {
+          "total": 4,
+          "correct": 1,
+          "accuracy": 0.25
+        },
+        "verticale_racine_critere": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "enigma": {
+          "total": 18,
+          "correct": 14,
+          "accuracy": 0.7777777777777778
+        },
+        "hard": {
+          "total": 22,
+          "correct": 6,
+          "accuracy": 0.2727272727272727
+        }
+      },
+      "enigma_stats": {
+        "total": 18,
+        "correct": 14,
+        "accuracy": 0.7777777777777778,
+        "by_complexity": {
+          "5": {
+            "total": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          },
+          "6": {
+            "total": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          },
+          "7": {
+            "total": 3,
+            "correct": 3,
+            "accuracy": 1.0
+          },
+          "8": {
+            "total": 9,
+            "correct": 6,
+            "accuracy": 0.6666666666666666
+          },
+          "9": {
+            "total": 4,
+            "correct": 3,
+            "accuracy": 0.75
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 22,
+        "correct": 6,
+        "accuracy": 0.2727272727272727
+      }
+    }
+  }
+}

@@ -350,6 +350,19 @@ Batch-size sweep, generator 3.1 (400 people, 4 root couples, depth 6, seed 43, `
 
 Batching 5 questions per request divides the cost by 2.7 and costs 20 points, mostly on enigmas: the model reasons less per question and loses the chain. Batches of 20 on a 1,000-person tree never produced an answer within 160k reasoning tokens. Files in `evaluation_results/batch_sweep_deepseek/`.
 
+Generator 4.0 (second unions, mixed-direction links, derived links, 2 children per union), same model, batch 1, 400 people, seed 2026, `difficulty: expert`, 40 questions, provider pinned (78 % of prompt tokens served from cache):
+
+| | Generator 3.1 (seed 43) | Generator 4.0 (seed 2026) |
+|---|---|---|
+| Accuracy | 85.0 % | 50.0 % |
+| Enigmas | 100 % | 78 % (3 of 4 misses are truncations) |
+| Hard tier | 74 % | 27 % |
+| Truncated at 160k output tokens | 0 | 7 |
+| Reasoning tokens / question (avg) | 5,000 | 24,000 |
+| Cost | $0.135 | $0.45 |
+
+Files in `evaluation_results/v4_deepseek/`. The failure profile is recall on relatives (one name missing from a list, or "None" when the model does not find a link) and exhaustive comparisons ("who has the most children among X and their siblings") that exceed the token budget.
+
 ### Historical leaderboard (2025)
 
 Here are the evaluation results of several state-of-the-art models on FamilyBench:
