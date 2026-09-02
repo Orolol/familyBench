@@ -1,4 +1,4 @@
-# DeepSeek V4 Flash (0731) via OpenRouter, plus gros arbre, mode expert, batch de 20.
+# DeepSeek V4 Flash (0731) via OpenRouter : générateur 4.0 (secondes unions, liens mêlés, liens dérivés), 400 personnes, expert, batch 1.
 models:
   - name: "deepseek/deepseek-v4-flash-0731"
     api_base: "https://openrouter.ai/api/v1"
@@ -19,20 +19,20 @@ models:
       output_per_mtok: 0.28
 
 benchmarks:
-  - name: "huge_tree_en_expert"
-    people: 1000
-    depth: 20
-    questions: 20
-    root_couples: 8
-    seed: 667
+  - name: "tree400_v4_en_expert"
+    people: 400
+    depth: 8
+    questions: 40
+    root_couples: 4
+    seed: 2026
     language: "en"
     difficulty: expert
-    # leviers 3.1 par défaut : shuffle, relations parents, max_answer_names 10, drop_answer_names_above 40, anonymize 50
+    # leviers 4.0 par défaut : max_children 2, second_union 20 %, relations mixed, derived_links 30 %, shuffle, max_answer_names 10, drop 40, anonymize 50
 
 evaluation:
   runs_per_benchmark: 1
-  max_concurrent_requests: 1
+  max_concurrent_requests: 5
   timeout: 5400
-  batch_size: 20
-  output_dir: "evaluation_results"
+  batch_size: 1
+  output_dir: "evaluation_results/v4_deepseek"
   output_formats: [csv, json]

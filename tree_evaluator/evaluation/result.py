@@ -36,3 +36,5 @@ class EvaluationResult:
     batch_size: int = 1
     # finish_reason renvoyé par l'API ("stop", "length" = coupé par max_tokens...)
     finish_reason: Optional[str] = None
+    # Fournisseur réel (OpenRouter renvoie `provider`) : utile pour le cache de prompt
+    provider: Optional[str] = None

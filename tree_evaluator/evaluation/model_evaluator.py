@@ -291,6 +291,7 @@ class ModelEvaluator:
                 model_answer=model_answer,
                 hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
                 finish_reason=finish_reason,
+                provider=result.get('provider') if isinstance(result, dict) else None,
                 is_correct=is_correct,
                 is_exact_match=is_exact_match,
                 partial_match_score=partial_score,
@@ -493,6 +494,7 @@ class ModelEvaluator:
                     model_answer=model_answer,
                     hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
                     finish_reason=finish_reason,
+                    provider=result.get('provider') if isinstance(result, dict) else None,
                     is_correct=is_correct,
                     is_exact_match=is_exact_match,
                     partial_match_score=partial_score,
@@ -572,6 +574,7 @@ class ModelEvaluator:
         reasoning_parts: List[str] = []
         usage: Dict[str, Any] = {}
         finish_reason = None
+        provider = None
         role = "assistant"
         started = time.time()
         last_log = started
@@ -605,6 +608,8 @@ class ModelEvaluator:
                             continue
                         if event.get("usage"):
                             usage = event["usage"]
+                        if event.get("provider"):
+                            provider = event["provider"]
                         if event.get("error"):
                             return 500, json.dumps(event["error"])
                         for choice in event.get("choices") or []:
@@ -643,6 +648,7 @@ class ModelEvaluator:
         return 200, {
             "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
             "usage": usage,
+            "provider": provider,
             "streamed": True,
         }
 

@@ -8,8 +8,12 @@ models:
     idle_timeout: 300         # flux figé > 5 min => coupé et réessayé
     max_tokens: 160000         # OpenRouter autorise jusqu'à 943k ; 64k a été insuffisant pour 20 questions
     provider:
+      # Un seul fournisseur : le cache de prompt est par fournisseur, et OpenRouter
+      # en propose 12 pour ce modèle ; sans pin, le préfixe commun (arbre) ne
+      # sert presque jamais (4 % de tokens cachés observés).
+      order: ["DeepInfra"]
+      allow_fallbacks: false
       data_collection: "allow"
-      allow_fallbacks: true
     pricing:                   # USD / Mtok, indicatif
       input_per_mtok: 0.14
       output_per_mtok: 0.28
