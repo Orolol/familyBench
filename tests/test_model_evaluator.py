@@ -129,3 +129,13 @@ def test_empty_or_truncated_responses_are_not_cached_and_retries_bypass_cache():
     miss = asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
                                                            language="en", total_start_time=0.0, use_cache=False))
     assert miss.error and "NoneType" in miss.error
+
+
+def test_truncated_generation_is_not_retried():
+    m = make()
+    data = m._build_api_request(m.prompt_builder.build_single_question_prompt("tree", QUESTION["question"], "en"), "en")
+    m.cache_manager.set({"model": m.name, "url": m._get_api_url(), "data": data},
+                        {"choices": [{"message": {"content": ""}, "finish_reason": "length"}], "usage": {}})
+    # session=None : un retry tenterait le réseau et produirait une erreur "NoneType"
+    r = asyncio.run(m.evaluate_question("tree", QUESTION, session=None, timeout=5, language="en"))
+    assert r.no_response and r.finish_reason == "length" and r.error is None

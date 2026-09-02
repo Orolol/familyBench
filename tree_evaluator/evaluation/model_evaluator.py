@@ -150,8 +150,9 @@ class ModelEvaluator:
                     use_cache=(attempt == 0),
                 )
 
-                # Si la réponse est valide ou si c'est la dernière tentative, retourner
-                if not result.no_response or attempt == max_retries - 1:
+                # Si la réponse est valide, coupée par max_tokens (un retry aurait le
+                # même sort) ou si c'est la dernière tentative, retourner
+                if not result.no_response or result.finish_reason == "length" or attempt == max_retries - 1:
                     if attempt > 0 and not result.no_response:
                         logger.info(f"Success after {attempt + 1} attempts for {self.name} - Question {question['id']}")
                     return result
@@ -353,8 +354,10 @@ class ModelEvaluator:
                 # Vérifier si toutes les réponses sont vides
                 all_empty = all(r.no_response for r in results)
 
-                # Si au moins une réponse est valide ou si c'est la dernière tentative, retourner
-                if not all_empty or attempt == max_retries - 1:
+                truncated = all(r.finish_reason == "length" for r in results)
+                # Si au moins une réponse est valide, si la génération a été coupée par
+                # max_tokens (un retry aurait le même sort) ou si c'est la dernière tentative
+                if not all_empty or truncated or attempt == max_retries - 1:
                     if attempt > 0 and not all_empty:
                         logger.info(f"Success after {attempt + 1} attempts for {self.name} - Batch of {len(questions)} questions")
                     return results
