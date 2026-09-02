@@ -67,4 +67,5 @@ def benchmark_params_from_config(benchmark_config: Dict[str, Any]) -> Dict[str, 
         "drop_answer_names_above": benchmark_config.get("drop_answer_names_above", 40),
         "second_union_percentage": benchmark_config.get("second_union_percentage", 20),
         "derived_links_percentage": benchmark_config.get("derived_links_percentage", 30),
+        "exclude_types": sorted(benchmark_config.get("exclude_types") or []),
     }

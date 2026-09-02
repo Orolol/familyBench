@@ -103,6 +103,8 @@ def main():
                         help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
     parser.add_argument("--drop-answer-names-above", type=int, default=40,
                         help="Écarte les questions dont la réponse dépasse ce nombre de prénoms (recensements ; 0 = désactivé, défaut 40).")
+    parser.add_argument("--exclude-types", type=str, nargs="*", default=[],
+                        help="Types de questions à écarter (ex: relational_path relation_attribut_composee).")
     parser.add_argument("--anonymize-percentage", type=int, default=50,
                         help="Part des questions (0-100) dont les prénoms sont remplacés par une description par attributs (défaut 50).")
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
@@ -154,6 +156,7 @@ def main():
         max_answer_names=args.max_answer_names,
         anonymize_percentage=args.anonymize_percentage,
         drop_answer_names_above=args.drop_answer_names_above,
+        exclude_types=args.exclude_types,
     )
 
     if args.language == "en":
@@ -203,6 +206,7 @@ def main():
                 "drop_answer_names_above": args.drop_answer_names_above,
                 "second_union_percentage": args.second_union_percentage,
                 "derived_links_percentage": args.derived_links_percentage,
+                "exclude_types": sorted(args.exclude_types),
             }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }

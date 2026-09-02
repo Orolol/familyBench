@@ -2,7 +2,7 @@
 
 import random
 import json
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Iterable, Optional
 
 from tree_evaluator.models import Person
 
@@ -146,6 +146,7 @@ def generate_questions(
     max_answer_names: int = DEFAULT_MAX_ANSWER_NAMES,
     anonymize_percentage: int = DEFAULT_ANONYMIZE_PERCENTAGE,
     drop_answer_names_above: int = DEFAULT_DROP_ANSWER_NAMES_ABOVE,
+    exclude_types: Optional[Iterable[str]] = None,
 ) -> List[Dict[str, Any]]:
     """Génère une liste de questions de différents types.
 
@@ -160,7 +161,9 @@ def generate_questions(
             sont remplacés par une description par attributs.
         drop_answer_names_above: les questions dont la réponse dépasse ce nombre
             de prénoms sont écartées avant tirage (recensements). 0 = désactivé.
+        exclude_types: types de questions à écarter (ex. relational_path).
     """
+    excluded = set(exclude_types or ())
     if difficulty not in VALID_DIFFICULTIES:
         raise ValueError(
             f"difficulty must be one of {sorted(VALID_DIFFICULTIES)}, got {difficulty!r}"
@@ -186,7 +189,10 @@ def generate_questions(
     unique_normal_questions = drop_census_questions(
         _dedupe(normal_questions), people, language, drop_answer_names_above
     )
+    unique_normal_questions = [q for q in unique_normal_questions if q["type"] not in excluded]
     unique_enigma_questions = _dedupe(generate_enigma_questions(people, language))
+    if "enigme" in excluded:
+        unique_enigma_questions = []
     _stamp_difficulty(unique_normal_questions)
     _stamp_difficulty(unique_enigma_questions)
 

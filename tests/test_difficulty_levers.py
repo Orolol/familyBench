@@ -182,3 +182,9 @@ def test_census_questions_are_dropped(tree):
     assert all(not q["converted_to_count"] or q["original_answer_size"] <= 40 for q in qs)
     keep = generate_questions(tree, 150, language="en", anonymize_percentage=0, drop_answer_names_above=0)
     assert any(q["converted_to_count"] and q["original_answer_size"] > 40 for q in keep)
+
+
+def test_exclude_types(tree):
+    qs = generate_questions(tree, 60, language="en", difficulty="hard",
+                            exclude_types=["relational_path", "relation_attribut_composee"])
+    assert qs and not {q["type"] for q in qs} & {"relational_path", "relation_attribut_composee"}

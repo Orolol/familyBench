@@ -91,6 +91,8 @@ benchmarks:
     seed: 4040
     language: "en"
     difficulty: hard            # tier hard uniquement, tirage équilibré entre types
+    # comme le mode expert : on écarte les deux types hard les plus faciles
+    exclude_types: [relational_path, relation_attribut_composee]
     # leviers 4.0 par défaut : max_children 2, second_union 20 %, relations mixed,
     # derived_links 30 %, shuffle, max_answer_names 10, drop 40, anonymize 50
 

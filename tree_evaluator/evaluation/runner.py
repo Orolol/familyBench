@@ -83,6 +83,7 @@ async def run_benchmark_evaluation(
         max_answer_names=benchmark_config.get('max_answer_names', 10),
         anonymize_percentage=benchmark_config.get('anonymize_percentage', 50),
         drop_answer_names_above=benchmark_config.get('drop_answer_names_above', 40),
+        exclude_types=benchmark_config.get('exclude_types'),
     )
 
     system_prompt = model.prompt_builder.get_system_prompt(language, batch_size > 1)
