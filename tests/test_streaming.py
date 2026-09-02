@@ -66,10 +66,12 @@ async def test_streaming_error_event_and_disable():
         assert r2.model_answer == "Bob"
 
 
-def test_streaming_not_used_for_anthropic_or_responses_api():
-    assert not ModelEvaluator({"name": "a", "api_base": "https://api.anthropic.com/v1", "api_key": "k", "model": "m"})._uses_streaming()
-    assert not ModelEvaluator({"name": "o", "api_base": "https://api.openai.com/v1", "api_key": "k", "model": "m", "reasoning": {"effort": "low"}})._uses_streaming()
-    assert ModelEvaluator({"name": "r", "api_base": "https://openrouter.ai/api/v1", "api_key": "k", "model": "m"})._uses_streaming()
+def test_api_family_detection():
+    assert ModelEvaluator({"name": "a", "api_base": "https://api.anthropic.com/v1", "api_key": "k", "model": "m"}).api == "anthropic"
+    assert ModelEvaluator({"name": "o", "api_base": "https://api.openai.com/v1", "api_key": "k", "model": "m", "effort": "high"}).api == "openai_responses"
+    assert ModelEvaluator({"name": "o", "api_base": "https://api.openai.com/v1", "api_key": "k", "model": "m"}).api == "openai_chat"
+    assert ModelEvaluator({"name": "r", "api_base": "https://openrouter.ai/api/v1", "api_key": "k", "model": "m"}).api == "openai_chat"
+    assert ModelEvaluator({"name": "d", "api_base": "https://api.deepseek.com", "api_key": "k", "model": "m", "api": "openai_chat"}).api == "openai_chat"
 
 
 @pytest.mark.asyncio

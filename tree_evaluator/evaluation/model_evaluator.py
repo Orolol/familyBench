@@ -38,12 +38,29 @@ class ModelEvaluator:
         self.api_base = config['api_base'].rstrip('/')
         self.api_key = self._resolve_api_key(config['api_key'])
         self.model = config['model']
-        self.temperature = config.get('temperature', 0.8)
+        # Température : absente => valeur par défaut du vendeur (Anthropic la
+        # refuse avec le thinking, les modèles de raisonnement OpenAI l'ignorent).
+        self.temperature = config.get('temperature')
         self.max_tokens = config.get('max_tokens', 64000)
         self.max_completion_tokens = config.get('max_completion_tokens')
+        # Plafond de sortie PAR QUESTION (raisonnement + réponse). En batch, le
+        # plafond de la requête est multiplié par le nombre de questions.
+        self.max_tokens_per_question = config.get('max_tokens_per_question')
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
         self.provider_config = config.get('provider', None)
+        # Niveau d'effort générique ("low"|"medium"|"high"|"xhigh"|"max"...), traduit
+        # dans le paramètre propre à chaque API. Le libellé `thinking_level` est
+        # la seconde dimension du leaderboard (paire modèle + niveau).
+        self.effort = config.get('effort')
+        self.thinking_level = str(config.get('thinking_level') or self.effort or 'default')
+        # Paramètres bruts fusionnés dans le corps de la requête (budgets de
+        # thinking propres à un vendeur, etc.)
+        self.extra_body: Dict[str, Any] = dict(config.get('extra_body') or {})
+        # Famille d'API : "anthropic" (Messages), "openai_responses", "openai_chat"
+        # (OpenAI-compatible : OpenAI chat, OpenRouter, DeepSeek, Qwen, Moonshot, Z.ai, Gemini compat, local)
+        self.api = config.get('api') or self._detect_api()
+        self.anthropic_version = config.get('anthropic_version', '2023-06-01')
         # Streaming SSE pour les API chat/completions (défaut: activé). Évite les
         # coupures des réponses longues non streamées et permet de suivre la
         # progression dans les logs. Désactivé automatiquement pour Anthropic et
@@ -116,6 +133,48 @@ class ModelEvaluator:
             + completion_tokens * out_rate
         ) / 1_000_000
 
+    def _detect_api(self) -> str:
+        base = self.api_base.lower()
+        if "anthropic" in base:
+            return "anthropic"
+        if "api.openai.com" in base and (self.reasoning_config or self.effort):
+            return "openai_responses"
+        return "openai_chat"
+
+    def _headers(self) -> Dict[str, str]:
+        headers = {"Content-Type": "application/json"}
+        if self.api == "anthropic":
+            if self.api_key != "none":
+                headers["x-api-key"] = self.api_key
+            headers["anthropic-version"] = self.anthropic_version
+        elif self.api_key != "none":
+            headers["Authorization"] = f"Bearer {self.api_key}"
+        return headers
+
+    def _effective_max_tokens(self, n_questions: int = 1) -> int:
+        """Plafond de sortie de la requête (raisonnement inclus)."""
+        if self.max_tokens_per_question:
+            return int(self.max_tokens_per_question) * max(1, n_questions)
+        if self.max_completion_tokens:
+            return int(self.max_completion_tokens)
+        return int(self.max_tokens) if self.max_tokens is not None else 64000
+
+    def entry_metadata(self) -> Dict[str, Any]:
+        """Description de l'entrée du leaderboard (pour les résumés)."""
+        return {
+            "model": self.model,
+            "api": self.api,
+            "api_base": self.api_base,
+            "thinking_level": self.thinking_level,
+            "effort": self.effort,
+            "reasoning": self.reasoning_config,
+            "extra_body": self.extra_body or None,
+            "max_tokens_per_question": self.max_tokens_per_question,
+            "max_tokens": self._effective_max_tokens(1),
+            "temperature": self.temperature,
+            "provider_routing": self.provider_config,
+        }
+
     def _resolve_api_key(self, key: str) -> str:
         """Résout les variables d'environnement dans la clé API."""
         if key.startswith('${') and key.endswith('}'):
@@ -186,25 +245,18 @@ class ModelEvaluator:
         use_cache=False (retries) : on ignore le cache, sinon un retry rejouerait
         la même réponse vide/tronquée."""
 
-        # Construire le prompt
-        prompt = self.prompt_builder.build_single_question_prompt(
-            tree_description, question['question'], language
-        )
+        # Construire le prompt (préfixe stable = arbre, suffixe = question)
+        parts = self.prompt_builder.single_question_parts(tree_description, question['question'], language)
+        prompt = "\n\n".join(parts)
 
         # Mesurer le temps de réponse
         start_time = time.time()
 
         try:
             # Faire l'appel API
-            headers = {
-                "Content-Type": "application/json",
-            }
-
-            if self.api_key != "none":
-                headers["Authorization"] = f"Bearer {self.api_key}"
-
+            headers = self._headers()
             # Adapter le format selon le type d'API
-            data = self._build_api_request(prompt, language, batch=False)
+            data = self._build_api_request(prompt, language, batch=False, parts=parts, n_questions=1)
             url = self._get_api_url()
 
             # Vérifier le cache
@@ -292,6 +344,7 @@ class ModelEvaluator:
                 model_answer=model_answer,
                 hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
                 finish_reason=finish_reason,
+                thinking_level=self.thinking_level,
                 provider=result.get('provider') if isinstance(result, dict) else None,
                 is_correct=is_correct,
                 is_exact_match=is_exact_match,
@@ -394,23 +447,18 @@ class ModelEvaluator:
         use_cache: bool = True) -> List[EvaluationResult]:
         """Évalue un batch de questions en une seule requête - une seule tentative."""
 
-        # Construire le prompt pour plusieurs questions
-        prompt = self.prompt_builder.build_batch_prompt(tree_description, questions, language)
+        # Construire le prompt pour plusieurs questions (préfixe stable = arbre)
+        parts = self.prompt_builder.batch_prompt_parts(tree_description, questions, language)
+        prompt = "\n\n".join(parts)
 
         # Mesurer le temps de réponse
         start_time = time.time()
 
         try:
             # Faire l'appel API
-            headers = {
-                "Content-Type": "application/json",
-            }
-
-            if self.api_key != "none":
-                headers["Authorization"] = f"Bearer {self.api_key}"
-
+            headers = self._headers()
             # Adapter le format selon le type d'API
-            data = self._build_api_request(prompt, language, batch=True)
+            data = self._build_api_request(prompt, language, batch=True, parts=parts, n_questions=len(questions))
             url = self._get_api_url()
 
             # Vérifier le cache
@@ -497,6 +545,7 @@ class ModelEvaluator:
                     model_answer=model_answer,
                     hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
                     finish_reason=finish_reason,
+                    thinking_level=self.thinking_level,
                     provider=result.get('provider') if isinstance(result, dict) else None,
                     is_correct=is_correct,
                     is_exact_match=is_exact_match,
@@ -548,60 +597,124 @@ class ModelEvaluator:
         return None
 
     def _uses_streaming(self) -> bool:
-        if not self.stream or "anthropic" in self.api_base:
-            return False
-        if self.reasoning_config and "openai" in self.api_base:
-            return False  # API Responses : format différent
-        return True
+        return bool(self.stream)
+
+    @staticmethod
+    def _anthropic_usage(usage: Dict[str, Any]) -> Dict[str, Any]:
+        cached = int(usage.get("cache_read_input_tokens") or 0)
+        created = int(usage.get("cache_creation_input_tokens") or 0)
+        return {
+            "prompt_tokens": int(usage.get("input_tokens") or 0) + cached + created,
+            "completion_tokens": int(usage.get("output_tokens") or 0),
+            "prompt_tokens_details": {"cached_tokens": cached, "cache_creation_tokens": created},
+        }
+
+    @staticmethod
+    def _anthropic_stop(stop_reason: Optional[str]) -> Optional[str]:
+        return {"end_turn": "stop", "max_tokens": "length", "stop_sequence": "stop"}.get(stop_reason, stop_reason)
+
+    @staticmethod
+    def _chat_shape(content: str, reasoning: str, usage: Dict[str, Any], finish_reason: Optional[str],
+                    provider: Optional[str] = None, streamed: bool = False) -> Dict[str, Any]:
+        message: Dict[str, Any] = {"role": "assistant", "content": content}
+        if reasoning:
+            message["reasoning"] = reasoning
+        return {
+            "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
+            "usage": usage,
+            "provider": provider,
+            "streamed": streamed,
+        }
+
+    @classmethod
+    def _normalize_anthropic(cls, raw: Dict[str, Any]) -> Dict[str, Any]:
+        """Réponse Messages (non streamée) -> forme chat/completions."""
+        text_parts, thinking_parts = [], []
+        for block in raw.get("content") or []:
+            if block.get("type") == "text":
+                text_parts.append(block.get("text") or "")
+            elif block.get("type") == "thinking":
+                thinking_parts.append(block.get("thinking") or "")
+        return cls._chat_shape("".join(text_parts), "".join(thinking_parts),
+                               cls._anthropic_usage(raw.get("usage") or {}),
+                               cls._anthropic_stop(raw.get("stop_reason")), provider="anthropic")
+
+    @classmethod
+    def _normalize_responses(cls, raw: Dict[str, Any]) -> Dict[str, Any]:
+        """Réponse de l'API Responses (non streamée ou événement completed) -> forme chat/completions."""
+        text_parts, reasoning_parts = [], []
+        for item in raw.get("output") or []:
+            if item.get("type") == "message":
+                for part in item.get("content") or []:
+                    if part.get("type") == "output_text":
+                        text_parts.append(part.get("text") or "")
+            elif item.get("type") == "reasoning":
+                for part in item.get("summary") or []:
+                    reasoning_parts.append(part.get("text") or "")
+        usage = raw.get("usage") or {}
+        incomplete = (raw.get("incomplete_details") or {}).get("reason")
+        status = raw.get("status")
+        finish = "length" if incomplete == "max_output_tokens" else ("stop" if status in (None, "completed") else status)
+        return cls._chat_shape(
+            raw.get("output_text") or "".join(text_parts), "".join(reasoning_parts),
+            {
+                "prompt_tokens": int(usage.get("input_tokens") or 0),
+                "completion_tokens": int(usage.get("output_tokens") or 0),
+                "prompt_tokens_details": {"cached_tokens": int((usage.get("input_tokens_details") or {}).get("cached_tokens") or 0)},
+                "completion_tokens_details": {"reasoning_tokens": int((usage.get("output_tokens_details") or {}).get("reasoning_tokens") or 0)},
+            },
+            finish, provider="openai",
+        )
+
+    def _normalize_raw(self, raw: Dict[str, Any]) -> Dict[str, Any]:
+        if self.api == "anthropic":
+            return self._normalize_anthropic(raw)
+        if self.api == "openai_responses":
+            return self._normalize_responses(raw)
+        return raw
 
     async def _call_api(self, session: aiohttp.ClientSession, url: str, data: Dict[str, Any],
                         headers: Dict[str, str], timeout: int, label: str) -> tuple[int, Any]:
         """POST l'appel API. Retourne (status, result_dict) ou (status, error_text).
 
-        En streaming, les chunks SSE sont ré-assemblés en une réponse au format
-        non-streamé (choices[0].message.content / .reasoning, usage) pour que le
-        reste du pipeline et le cache restent identiques.
+        En streaming, les événements SSE de chaque famille d'API (chat/completions,
+        Anthropic Messages, OpenAI Responses) sont ré-assemblés en une réponse au
+        format chat/completions pour que scoring et cache restent identiques.
         """
         client_timeout = aiohttp.ClientTimeout(total=timeout)
         if not self._uses_streaming():
             async with session.post(url, json=data, headers=headers, timeout=client_timeout) as response:
                 if response.status != 200:
                     return response.status, await response.text()
-                return response.status, await response.json()
+                return 200, self._normalize_raw(await response.json())
 
         payload = dict(data)
         payload["stream"] = True
-        if self.stream_options:
+        if self.api == "openai_chat" and self.stream_options:
             payload["stream_options"] = {"include_usage": True}
-        content_parts: List[str] = []
-        reasoning_parts: List[str] = []
-        usage: Dict[str, Any] = {}
-        finish_reason = None
-        provider = None
-        role = "assistant"
+        acc: Dict[str, Any] = {
+            "content": [], "reasoning": [], "usage": {}, "finish_reason": None,
+            "provider": None, "role": "assistant", "error": None,
+        }
         started = time.time()
         last_log = started
-        last_chunk = started      # dernier octet reçu (keep-alive compris)
-        last_progress = started   # dernier token de contenu/raisonnement reçu
+        last_progress = started
         stream_timeout = aiohttp.ClientTimeout(total=timeout, sock_read=self.idle_timeout)
         async with session.post(url, json=payload, headers=headers, timeout=stream_timeout) as response:
             if response.status != 200:
                 return response.status, await response.text()
             if "json" in (response.headers.get("Content-Type") or "").lower():
                 # Le serveur a ignoré `stream` (proxy, serveur local minimal) : réponse classique
-                return response.status, await response.json()
+                return 200, self._normalize_raw(await response.json())
             buffer = b""
             try:
                 async for chunk in response.content.iter_any():
-                    last_chunk = time.time()
                     buffer += chunk
                     while b"\n" in buffer:
                         line, buffer = buffer.split(b"\n", 1)
                         line = line.strip()
-                        if not line or line.startswith(b":"):
-                            continue  # keep-alive / commentaire SSE
-                        if not line.startswith(b"data:"):
-                            continue
+                        if not line or line.startswith(b":") or not line.startswith(b"data:"):
+                            continue  # keep-alive, commentaire SSE ou ligne "event:"
                         body = line[5:].strip()
                         if body == b"[DONE]":
                             continue
@@ -610,60 +723,104 @@ class ModelEvaluator:
                         except ValueError:
                             logger.debug(f"Unparseable SSE line for {self.name}: {body[:200]!r}")
                             continue
-                        if event.get("usage"):
-                            usage = event["usage"]
-                        if event.get("provider"):
-                            provider = event["provider"]
-                        if event.get("error"):
-                            return 500, json.dumps(event["error"])
-                        for choice in event.get("choices") or []:
-                            delta = choice.get("delta") or {}
-                            if delta.get("role"):
-                                role = delta["role"]
-                            text = delta.get("content")
-                            if isinstance(text, str) and text:
-                                content_parts.append(text)
-                                last_progress = time.time()
-                            for key in ("reasoning", "reasoning_content"):
-                                rt = delta.get(key)
-                                if isinstance(rt, str) and rt:
-                                    reasoning_parts.append(rt)
-                                    last_progress = time.time()
-                            if choice.get("finish_reason"):
-                                finish_reason = choice["finish_reason"]
+                        if self._consume_event(event, acc):
+                            last_progress = time.time()
+                        if acc["error"] is not None:
+                            return 500, json.dumps(acc["error"])
                     now = time.time()
-                    # OpenRouter envoie des keep-alive (": OPENROUTER PROCESSING") quand le
-                    # fournisseur est bloqué : sans token pendant idle_timeout, on coupe.
+                    # Les keep-alive (": OPENROUTER PROCESSING", ping Anthropic) ne sont
+                    # pas une progression : sans token pendant idle_timeout, on coupe.
                     if now - last_progress >= self.idle_timeout:
                         raise StalledStreamError(
                             f"no tokens for {int(now - last_progress)}s (keep-alives only) after "
-                            f"{sum(map(len, reasoning_parts))} reasoning chars and {sum(map(len, content_parts))} answer chars"
+                            f"{sum(map(len, acc['reasoning']))} reasoning chars and {sum(map(len, acc['content']))} answer chars"
                         )
                     if now - last_log >= 60:
                         last_log = now
                         logger.info(
                             f"Streaming {label} for {self.name}: {int(now - started)}s, "
-                            f"{sum(map(len, reasoning_parts))} reasoning chars, {sum(map(len, content_parts))} answer chars"
+                            f"{sum(map(len, acc['reasoning']))} reasoning chars, {sum(map(len, acc['content']))} answer chars"
                         )
             except asyncio.TimeoutError:
-                idle = time.time() - last_chunk
+                idle = time.time() - last_progress
                 if idle >= self.idle_timeout - 1 and time.time() - started < timeout - 1:
                     raise StalledStreamError(
-                        f"no data for {int(idle)}s after {sum(map(len, reasoning_parts))} reasoning chars "
-                        f"and {sum(map(len, content_parts))} answer chars"
+                        f"no data for {int(idle)}s after {sum(map(len, acc['reasoning']))} reasoning chars "
+                        f"and {sum(map(len, acc['content']))} answer chars"
                     )
                 raise
-        if finish_reason == "length":
+        if acc["finish_reason"] == "length":
             logger.warning(f"{self.name} {label}: generation stopped by max_tokens (finish_reason=length)")
-        message: Dict[str, Any] = {"role": role, "content": "".join(content_parts)}
-        if reasoning_parts:
-            message["reasoning"] = "".join(reasoning_parts)
-        return 200, {
-            "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
-            "usage": usage,
-            "provider": provider,
-            "streamed": True,
-        }
+        return 200, self._chat_shape(
+            "".join(acc["content"]), "".join(acc["reasoning"]), acc["usage"], acc["finish_reason"],
+            provider=acc["provider"] or ("anthropic" if self.api == "anthropic" else None), streamed=True,
+        )
+
+    def _consume_event(self, event: Dict[str, Any], acc: Dict[str, Any]) -> bool:
+        """Intègre un événement SSE dans l'accumulateur. Retourne True si des tokens sont arrivés."""
+        progressed = False
+        if self.api == "anthropic":
+            etype = event.get("type")
+            if etype == "error":
+                acc["error"] = event.get("error") or {"message": "unknown error"}
+            elif etype == "message_start":
+                acc["usage"] = self._anthropic_usage((event.get("message") or {}).get("usage") or {})
+            elif etype == "content_block_delta":
+                delta = event.get("delta") or {}
+                if delta.get("type") == "text_delta" and delta.get("text"):
+                    acc["content"].append(delta["text"]); progressed = True
+                elif delta.get("type") == "thinking_delta" and delta.get("thinking"):
+                    acc["reasoning"].append(delta["thinking"]); progressed = True
+            elif etype == "message_delta":
+                delta = event.get("delta") or {}
+                if delta.get("stop_reason"):
+                    acc["finish_reason"] = self._anthropic_stop(delta["stop_reason"])
+                usage = event.get("usage") or {}
+                if usage:
+                    merged = dict(acc["usage"] or {})
+                    if any(k in usage for k in ("input_tokens", "cache_read_input_tokens", "cache_creation_input_tokens")):
+                        base = {"input_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+                        base.update({k: v for k, v in usage.items() if v is not None})
+                        merged.update(self._anthropic_usage(base))
+                    if usage.get("output_tokens") is not None:
+                        merged["completion_tokens"] = int(usage["output_tokens"])
+                    acc["usage"] = merged
+            return progressed
+        if self.api == "openai_responses":
+            etype = event.get("type") or ""
+            if etype in ("error", "response.failed"):
+                acc["error"] = event.get("error") or (event.get("response") or {}).get("error") or {"message": "response failed"}
+            elif etype == "response.output_text.delta" and event.get("delta"):
+                acc["content"].append(event["delta"]); progressed = True
+            elif etype == "response.reasoning_summary_text.delta" and event.get("delta"):
+                acc["reasoning"].append(event["delta"]); progressed = True
+            elif etype in ("response.completed", "response.incomplete"):
+                norm = self._normalize_responses(event.get("response") or {})
+                acc["usage"] = norm["usage"]
+                acc["finish_reason"] = norm["choices"][0]["finish_reason"]
+                acc["provider"] = "openai"
+            return progressed
+        # openai_chat (OpenAI, OpenRouter, DeepSeek, Qwen, Moonshot, Z.ai, Gemini compat, local)
+        if event.get("usage"):
+            acc["usage"] = event["usage"]
+        if event.get("provider"):
+            acc["provider"] = event["provider"]
+        if event.get("error"):
+            acc["error"] = event["error"]
+        for choice in event.get("choices") or []:
+            delta = choice.get("delta") or {}
+            if delta.get("role"):
+                acc["role"] = delta["role"]
+            text = delta.get("content")
+            if isinstance(text, str) and text:
+                acc["content"].append(text); progressed = True
+            for key in ("reasoning", "reasoning_content"):
+                rt = delta.get(key)
+                if isinstance(rt, str) and rt:
+                    acc["reasoning"].append(rt); progressed = True
+            if choice.get("finish_reason"):
+                acc["finish_reason"] = choice["finish_reason"]
+        return progressed
 
     @staticmethod
     def _to_text(value: Any) -> str:
@@ -732,72 +889,91 @@ class ModelEvaluator:
                 answers[idx] = m.group(2).strip().strip('"\'')
         return answers
 
-    def _build_api_request(self, prompt: str, language: str, batch: bool = False) -> Dict[str, Any]:
-        """Construit la requête API selon le type d'API."""
-        if "anthropic" in self.api_base:
-            # Format Anthropic
-            return {
+    def _build_api_request(self, prompt: str, language: str, batch: bool = False,
+                           parts: Optional[tuple] = None, n_questions: int = 1) -> Dict[str, Any]:
+        """Construit la requête selon la famille d'API.
+
+        `parts` = (préfixe stable, suffixe variable) ; sinon `prompt` entier.
+        """
+        prefix, suffix = parts if parts else (None, prompt)
+        system_prompt = self.prompt_builder.get_system_prompt(language, batch)
+        max_tokens = self._effective_max_tokens(n_questions)
+
+        if self.api == "anthropic":
+            # Arbre dans un bloc système marqué cache_control (préfixe stable),
+            # question dans le message utilisateur. Thinking adaptatif, effort via
+            # output_config ; ni température ni budget en tokens.
+            system_blocks: List[Dict[str, Any]] = [{"type": "text", "text": system_prompt}]
+            if prefix:
+                system_blocks.append({"type": "text", "text": prefix, "cache_control": {"type": "ephemeral"}})
+            else:
+                system_blocks[0]["cache_control"] = {"type": "ephemeral"}
+            data: Dict[str, Any] = {
                 "model": self.model,
-                "messages": [{"role": "user", "content": prompt}],
-                "temperature": self.temperature,
-                "max_completion_tokens": self.max_completion_tokens if self.max_completion_tokens is not None else (self.max_tokens if self.max_tokens is not None else 2000)
+                "max_tokens": max_tokens,
+                "system": system_blocks,
+                "messages": [{"role": "user", "content": suffix if prefix else prompt}],
+                "thinking": {"type": "adaptive"},
             }
-        elif self.reasoning_config and "openai" in self.api_base:
-            # Format OpenAI Responses API (pour les modèles avec reasoning comme gpt-5.1)
+            if self.effort:
+                data["output_config"] = {"effort": self.effort}
+            data.update(self.extra_body)
+            return data
+
+        if self.api == "openai_responses":
             data = {
                 "model": self.model,
                 "input": [
-                    {"role": "system", "content": self.prompt_builder.get_system_prompt(language, batch)},
-                    {"role": "user", "content": prompt}
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": prompt},
                 ],
-                # Note: temperature might not be supported or works differently in Responses API,
-                # but keeping it if not explicitly forbidden.
-                # "temperature": self.temperature,
+                "max_output_tokens": max_tokens,
             }
+            reasoning = dict(self.reasoning_config or {})
+            if self.effort and "effort" not in reasoning:
+                reasoning["effort"] = self.effort
+            if reasoning:
+                data["reasoning"] = reasoning
+            data.update(self.extra_body)
+            return data
 
+        # openai_chat
+        data = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        if self.temperature is not None:
+            data["temperature"] = self.temperature
+        if self.max_completion_tokens and not self.max_tokens_per_question:
+            data["max_completion_tokens"] = max_tokens
+        else:
+            data["max_tokens"] = max_tokens
+        if "openrouter" in self.api_base:
+            reasoning = dict(self.reasoning_config or {})
+            if self.effort and "effort" not in reasoning and "max_tokens" not in reasoning:
+                reasoning["effort"] = self.effort
+            if reasoning:
+                data["reasoning"] = reasoning
+            if self.provider_config:
+                data["provider"] = self.provider_config
+        else:
+            if self.effort:
+                data["reasoning_effort"] = self.effort
             if self.reasoning_config:
                 data["reasoning"] = self.reasoning_config
-
-            # Responses API uses max_output_tokens
-            if self.max_completion_tokens:
-                data["max_output_tokens"] = self.max_completion_tokens
-            elif self.max_tokens:
-                 data["max_output_tokens"] = self.max_tokens
-
-            return data
-        else:
-            # Format OpenAI Standard
-            data = {
-                "model": self.model,
-                "messages": [
-                    {"role": "system", "content": self.prompt_builder.get_system_prompt(language, batch)},
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": self.temperature,
-            }
-
-            if self.max_completion_tokens:
-                data["max_completion_tokens"] = self.max_completion_tokens
-            else:
-                data["max_tokens"] = self.max_tokens if self.max_tokens is not None else 2000
-
-            # Ajouter la configuration de reasoning si présente (pour OpenRouter etc)
-            if self.reasoning_config and "openrouter" in self.api_base:
-                data["reasoning"] = self.reasoning_config
-
-            if self.provider_config and "openrouter" in self.api_base:
-                data["provider"] = self.provider_config
-
-            return data
+        data.update(self.extra_body)
+        return data
 
     def _get_api_url(self) -> str:
-        """Retourne l'URL de l'API selon le type."""
-        if "anthropic" in self.api_base:
+        """Retourne l'URL de l'API selon la famille."""
+        if self.api == "anthropic":
             return f"{self.api_base}/messages"
-        elif self.reasoning_config and "openai" in self.api_base:
+        if self.api == "openai_responses":
             return f"{self.api_base}/responses"
-        else:
-            return f"{self.api_base}/chat/completions"
+        return f"{self.api_base}/chat/completions"
 
     def _extract_api_response(
         self, result: Dict[str, Any]
@@ -840,7 +1016,7 @@ class ModelEvaluator:
                 logger.warning(f"Empty output in Responses API result for {self.name} - Full response: {json.dumps(result, indent=2)}")
             return model_answer, tokens_used, reasoning_tokens, reasoning_text, prompt_tokens, cached_tokens
 
-        if "anthropic" in self.api_base:
+        if "content" in result and "choices" not in result:  # Messages brut (non normalisé)
             content = result.get('content', [{}])
             if content and len(content) > 0:
                 model_answer = content[0].get('text') or ''
@@ -904,7 +1080,12 @@ class ModelEvaluator:
                 or usage.get('output_tokens_details')
                 or {}
             )
-            cached_tokens = int((in_details or {}).get('cached_tokens', 0) or 0)
+            cached_tokens = int(
+                (in_details or {}).get('cached_tokens')          # OpenAI, Qwen, Z.ai, OpenRouter, Anthropic (normalisé)
+                or usage.get('prompt_cache_hit_tokens')           # DeepSeek
+                or usage.get('cached_tokens')                     # Moonshot
+                or 0
+            )
             reasoning_from_details = int((out_details or {}).get('reasoning_tokens', 0) or 0)
             if reasoning_from_details:
                 reasoning_tokens = reasoning_from_details
@@ -949,6 +1130,7 @@ class ModelEvaluator:
             reasoning_text=None,
             question_type=question.get('type'),
             difficulty=question.get('difficulty'),
+            thinking_level=self.thinking_level,
             is_enigma=question.get('type') == 'enigme',
             enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
         )

@@ -118,7 +118,7 @@ Answers are names sorted alphabetically and comma-separated, a number, or `None`
 
 The evaluation framework (`tree_evaluator/evaluation/`) includes:
 - **Async API calls** with a concurrency semaphore (`max_concurrent_requests`), timeout and retries; SSE streaming by default (`stream: false` to disable; `idle_timeout` seconds without a chunk = stalled stream, counted as no-response and retried); empty or `finish_reason=length` responses are never cached and retries bypass the cache
-- **Three request formats**: OpenAI chat completions (default, incl. OpenRouter `reasoning`/`provider`), OpenAI Responses API (when `reasoning` is set and `api_base` is OpenAI), Anthropic messages
+- **Three API families** (`api`: `openai_chat` | `openai_responses` | `anthropic`, auto-detected from `api_base`), all streamed and normalised to the chat/completions shape; `effort` maps to each vendor's parameter, `extra_body` passes vendor-specific params, `max_tokens_per_question` × batch size is the request cap; entries are (model, thinking level) pairs (`thinking_level` on results, `entries` in summaries); no temperature unless set
 - **Answer cleaning** to normalize LLM responses (handles JSON arrays, numbered lists, tags, etc.)
 - **Scoring**: `is_correct` = exact set match OR Jaccard >= `ModelEvaluator.CORRECT_PARTIAL_THRESHOLD` (0.9); `hallucinated_names` counts names absent from the tree (only when the expected answer is a name list)
 - **Stats**: accuracy, exact match, per-type, per-difficulty, enigma by complexity, hallucination rate, tokens, cost (if `pricing` given)

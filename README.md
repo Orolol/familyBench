@@ -157,7 +157,24 @@ evaluation:
   output_formats: [csv, json]
 ```
 
-Optional per-model keys: `max_tokens` / `max_completion_tokens`, `reasoning` (forwarded to OpenRouter, or routed to the OpenAI Responses API when `api_base` is OpenAI), `provider` (OpenRouter routing), `request_delay_ms`, and `pricing` (`input_per_mtok`, `output_per_mtok`, `cached_input_per_mtok`) to get `cost_usd` in the results. Use `api_key: "none"` for a local server without authentication.
+#### Leaderboard entries are (model, thinking level) pairs
+
+Thinking effort is not comparable across vendors, so the benchmark does not pretend it is: an entry is a model **and** a thinking level, named like `claude-opus-5@high`, and both are reported (`thinking_level` on every result row, `entries` in every summary). Per-entry keys:
+
+| Key | Meaning |
+|---|---|
+| `api` | `anthropic` (Messages API), `openai_responses`, or `openai_chat` (any OpenAI-compatible endpoint: OpenAI chat, OpenRouter, DeepSeek, Qwen/DashScope, Moonshot, Z.ai, Gemini's compat endpoint, local servers). Auto-detected from `api_base` when omitted. |
+| `effort` | Generic effort label, translated into the vendor parameter: `output_config.effort` (Anthropic, with adaptive thinking), `reasoning.effort` (OpenAI Responses), `reasoning_effort` (OpenAI-compatible vendors), `reasoning: {effort}` (OpenRouter). |
+| `thinking_level` | Label shown in the leaderboard (defaults to `effort`). |
+| `max_tokens_per_question` | Output cap (reasoning + answer) per question; the request cap is this times the batch size. The only budget notion that is portable across vendors. |
+| `extra_body` | Vendor-specific parameters merged into the request, e.g. `thinking: {type: enabled}` for DeepSeek, Moonshot K2.6 and GLM, or Gemini's `google.thinking_config`. |
+| `reasoning`, `provider` | OpenRouter-style reasoning object and provider routing (`order`, `allow_fallbacks`). |
+| `pricing` | `input_per_mtok`, `output_per_mtok`, `cached_input_per_mtok` to get `cost_usd`. |
+| `stream`, `idle_timeout` | Streaming is on for every API family; a stream without tokens for `idle_timeout` seconds is cut and retried. |
+
+No temperature is sent unless `temperature` is set explicitly (Anthropic rejects it with thinking, reasoning models ignore it). On Anthropic the tree description goes into a system block marked `cache_control`, so the prefix is served from cache across questions; OpenAI-compatible vendors cache the identical prefix automatically. Per-vendor cache fields (`cached_tokens`, DeepSeek's `prompt_cache_hit_tokens`, Moonshot's `usage.cached_tokens`, Anthropic's `cache_read_input_tokens`) all land in `cached_tokens`. Use `api_key: "none"` for a local server without authentication.
+
+`evaluation_config_hard_v4.yaml` is the reference protocol: hard tier only, 60 questions, batch 5, 16k output tokens per question, one entry per vendor with the exact parameter names each official API expects.
 
 #### Running Evaluation
 ```bash

@@ -7,14 +7,18 @@ class PromptBuilder:
     """Construit les prompts pour l'évaluation des modèles."""
     
     @staticmethod
-    def build_single_question_prompt(tree_description: str, question: str, language: str = 'fr') -> str:
-        """Construit le prompt pour une question unique."""
+    def single_question_parts(tree_description: str, question: str, language: str = 'fr') -> tuple[str, str]:
+        """(préfixe stable, suffixe variable) pour une question unique.
+
+        Le préfixe (description de l'arbre) est identique pour toutes les
+        questions d'un benchmark : c'est lui que les caches de prompt
+        réutilisent (et que l'adaptateur Anthropic marque `cache_control`).
+        """
         if language == 'en':
-            return f"""Here is a family description:
+            prefix = f"""Here is a family description:
 
-{tree_description}
-
-Question: {question}
+{tree_description}"""
+            suffix = f"""Question: {question}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
@@ -24,11 +28,10 @@ Response format:
 - If no one matches, respond "None".
 - Do NOT add any explanation, just the answer."""
         else:
-            return f"""Voici la description d'une famille:
+            prefix = f"""Voici la description d'une famille:
 
-{tree_description}
-
-Question: {question}
+{tree_description}"""
+            suffix = f"""Question: {question}
 
 Please think carefully, as the quality of your response is of the highest priority. You have unlimited thinking tokens for this. Reasoning: high
 
@@ -37,10 +40,21 @@ Format de réponse :
 - Si la question demande des personnes/noms, réponds avec les PRÉNOMS uniquement, séparés par des virgules sans espaces (ex: Alice,Bob,Claire).
 - Si personne ne correspond, réponds "Aucun".
 - N'ajoute AUCUNE explication, juste la réponse."""
-    
+        return prefix, suffix
+
+    @classmethod
+    def build_single_question_prompt(cls, tree_description: str, question: str, language: str = 'fr') -> str:
+        """Construit le prompt pour une question unique."""
+        return "\n\n".join(cls.single_question_parts(tree_description, question, language))
+
+    @classmethod
+    def build_batch_prompt(cls, tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> str:
+        """Construit le prompt pour un batch de questions."""
+        return "\n\n".join(cls.batch_prompt_parts(tree_description, questions, language))
+
     @staticmethod
-    def build_batch_prompt(tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> str:
-        """Construit le prompt pour un batch de questions.
+    def batch_prompt_parts(tree_description: str, questions: List[Dict[str, Any]], language: str = 'fr') -> tuple[str, str]:
+        """(préfixe stable, suffixe variable) pour un batch de questions.
 
         Les réponses sont demandées sous forme d'objet JSON indexé par numéro
         de question ({"1": ..., "2": ...}) : contrairement à un tableau, une
@@ -53,11 +67,10 @@ Format de réponse :
             example += f', ..., "{n}": "..."'
 
         if language == 'en':
-            return f"""Here is a family description:
+            prefix = f"""Here is a family description:
 
-{tree_description}
-
-Answer the following {n} questions based on this family description.
+{tree_description}"""
+            return prefix, f"""Answer the following {n} questions based on this family description.
 
 Questions:
 {questions_text}
@@ -71,11 +84,10 @@ Response format:
 - Answer every question, using its number as the key.
 - Respond ONLY with one JSON object like: {{{example}}} and no other text."""
         else:
-            return f"""Voici la description d'une famille:
+            prefix = f"""Voici la description d'une famille:
 
-{tree_description}
-
-Réponds aux {n} questions suivantes en te basant sur cette description familiale.
+{tree_description}"""
+            return prefix, f"""Réponds aux {n} questions suivantes en te basant sur cette description familiale.
 
 Questions:
 {questions_text}

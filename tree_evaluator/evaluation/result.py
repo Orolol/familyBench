@@ -38,3 +38,5 @@ class EvaluationResult:
     finish_reason: Optional[str] = None
     # Fournisseur réel (OpenRouter renvoie `provider`) : utile pour le cache de prompt
     provider: Optional[str] = None
+    # Niveau de thinking de l'entrée du leaderboard (paire modèle + niveau)
+    thinking_level: Optional[str] = None

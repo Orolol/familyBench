@@ -190,10 +190,12 @@ async def main():
     summary_stats = {}
     detailed_runs: List[Dict] = []
     benchmark_meta: Dict[str, Dict] = {}
+    entries_meta: Dict[str, Dict] = {}
 
     try:
         for model_config in models_to_eval:
             model = ModelEvaluator(model_config)
+            entries_meta[model_config["name"]] = model.entry_metadata()
             model_results = []
             progress.begin_model(model_config["name"])
 
@@ -277,6 +279,7 @@ async def main():
                 "models_evaluated": [m["name"] for m in models_to_eval],
                 "benchmarks_run": [b["name"] for b in benchmarks_to_run],
                 "benchmarks": benchmark_meta,
+                "entries": entries_meta,
                 "summary_stats": summary_stats,
             },
             f,
