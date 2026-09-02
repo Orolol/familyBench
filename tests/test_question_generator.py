@@ -38,7 +38,7 @@ def test_requested_count_is_delivered(tree):
 
 def test_every_question_has_a_valid_answer(tree):
     known = {p.first_name for p in tree.values()}
-    qs = generate_questions(tree, 200, language="en", enigma_percentage=20)
+    qs = generate_questions(tree, 200, language="en", enigma_percentage=20, max_answer_names=0)
     for q in qs:
         assert q["answer"], q
         if q["type"] in NON_NAME_ANSWER_TYPES:
@@ -80,7 +80,7 @@ def test_expert_mode(tree):
     assert len(qs) == 60
     enigmas = [q for q in qs if q["type"] == "enigme"]
     assert enigmas and all(q["complexity"] in EXPERT_ENIGMA_COMPLEXITIES for q in enigmas)
-    assert len([q for q in enigmas if q["complexity"] >= 5]) >= 0.4 * 60 * 0.5  # au moins une part de niveaux 5/6
+    assert len([q for q in enigmas if q["complexity"] >= 7]) >= 0.4 * 60 * 0.5  # au moins une part de niveaux 7-9
     normal_types = {q["type"] for q in qs if q["type"] != "enigme"}
     assert normal_types <= DIFFICULTY_TIERS["hard"]
 

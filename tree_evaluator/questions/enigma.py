@@ -1,5 +1,6 @@
 """Questions énigmes : descriptions relationnelles indirectes, réponse unique garantie."""
 
+import re
 import random
 from typing import Dict, List, Any, Tuple
 
@@ -73,6 +74,35 @@ def _grandchildren(person: Person, people: Dict[str, Person]) -> List[Person]:
     return _dedupe(out)
 
 
+def _predicate(attr: str, value: str, language: str) -> str:
+    key = {"hair_color": "pred_hair", "eye_color": "pred_eyes", "hat_color": "pred_hat"}[attr]
+    return get_translation(key, language).format(color=value)
+
+
+def _make_disc(chain_text: str, attr: str, value: str, answer: str, complexity: int, language: str) -> Dict[str, Any]:
+    """Énigme "chaîne + attribut discriminant", formulée pour que l'attribut porte
+    sans ambiguïté sur la personne cherchée :
+      EN  "Which son of Harrison has black hair?"
+      FR  "Quel fils de Harrison a les cheveux noirs ?"
+    (et non "Who is the son of Harrison with black hair?", où l'attribut peut
+    être lu comme portant sur Harrison)."""
+    chain_text = chain_text.strip()
+    if language == "en":
+        rest = chain_text[4:] if chain_text.lower().startswith("the ") else chain_text
+        question = f"Which {rest} {_predicate(attr, value, language)}?"
+    else:
+        if chain_text.startswith("la "):
+            which, rest = "Quelle", chain_text[3:]
+        elif chain_text.startswith("le "):
+            which, rest = "Quel", chain_text[3:]
+        elif chain_text.startswith("l'"):
+            which, rest = "Quel", chain_text[2:]
+        else:
+            which, rest = "Quel", chain_text
+        question = f"{which} {rest} {_predicate(attr, value, language)} ?"
+    return {"question": question, "answer": answer, "type": "enigme", "complexity": complexity}
+
+
 def _make(relation: str, answer: str, complexity: int, language: str) -> Dict[str, Any]:
     return {
         "question": get_translation("q_enigma_base", language).format(relation_chain=relation),
@@ -97,11 +127,8 @@ def _gen_level_1(people: Dict[str, Person], person_list: List[Person], language:
             continue
         attr, value = disc
         rel_key = "the_son_of" if target.gender == "M" else "the_daughter_of"
-        relation = (
-            f"{get_translation(rel_key, language)} {parent.first_name} "
-            f"{_attr_phrase(attr, value, language)}"
-        )
-        out.append(_make(relation, target.first_name, 1, language))
+        relation = f"{get_translation(rel_key, language)} {parent.first_name}"
+        out.append(_make_disc(relation, attr, value, target.first_name, 1, language))
     return out
 
 
@@ -132,11 +159,8 @@ def _gen_level_2(people: Dict[str, Person], person_list: List[Person], language:
             continue
         attr, value = disc
         rel_key = "the_child_of_the_son_of" if intermediate.gender == "M" else "the_child_of_the_daughter_of"
-        relation = (
-            f"{get_translation(rel_key, language)} {gp.first_name} "
-            f"{_attr_phrase(attr, value, language)}"
-        )
-        out.append(_make(relation, target.first_name, 2, language))
+        relation = f"{get_translation(rel_key, language)} {gp.first_name}"
+        out.append(_make_disc(relation, attr, value, target.first_name, 2, language))
     return out
 
 
@@ -167,11 +191,8 @@ def _gen_level_3(people: Dict[str, Person], person_list: List[Person], language:
                 if intermediate.gender == "M"
                 else "the_female_cousin_of_the_daughter_of"
             )
-        relation = (
-            f"{get_translation(rel_key, language)} {grandparent.first_name} "
-            f"{_attr_phrase(attr, value, language)}"
-        )
-        out.append(_make(relation, target.first_name, 3, language))
+        relation = f"{get_translation(rel_key, language)} {grandparent.first_name}"
+        out.append(_make_disc(relation, attr, value, target.first_name, 3, language))
     return out
 
 
@@ -203,11 +224,8 @@ def _gen_level_4(people: Dict[str, Person], person_list: List[Person], language:
             if sibling.gender == "M"
             else "the_grandchild_of_the_sister_of"
         )
-        relation = (
-            f"{get_translation(rel_key, language)} {ref.first_name} "
-            f"{_attr_phrase(attr, value, language)}"
-        )
-        out.append(_make(relation, target.first_name, 4, language))
+        relation = f"{get_translation(rel_key, language)} {ref.first_name}"
+        out.append(_make_disc(relation, attr, value, target.first_name, 4, language))
     return out
 
 
@@ -235,11 +253,8 @@ def _gen_level_5(people: Dict[str, Person], person_list: List[Person], language:
             rel_key = "the_brother_of_the_father_of" if sibling.gender == "M" else "the_sister_of_the_father_of"
         else:
             rel_key = "the_brother_of_the_mother_of" if sibling.gender == "M" else "the_sister_of_the_mother_of"
-        relation = (
-            f"{get_translation(rel_key, language)} {ref.first_name} "
-            f"{_attr_phrase(attr, value, language)}"
-        )
-        out.append(_make(relation, sibling.first_name, 5, language))
+        relation = f"{get_translation(rel_key, language)} {ref.first_name}"
+        out.append(_make_disc(relation, attr, value, sibling.first_name, 5, language))
     return out
 
 
@@ -263,8 +278,177 @@ def _gen_level_6(people: Dict[str, Person], person_list: List[Person], language:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Moteur de chaînes de relations génériques (niveaux 7 à 9)
+# ---------------------------------------------------------------------------
+
+def _parents(p: Person, people: Dict[str, Person]) -> List[Person]:
+    return [people[pid] for pid in p.parent_ids]
+
+
+def _children(p: Person, people: Dict[str, Person]) -> List[Person]:
+    return [people[cid] for cid in p.children_ids]
+
+
+def _by_gender(persons: List[Person], gender: str) -> List[Person]:
+    return [x for x in persons if x.gender == gender]
+
+
+# clé de traduction -> fonction Person -> liste de personnes
+CHAIN_RELATIONS = {
+    "chain_father": lambda p, ppl: _by_gender(_parents(p, ppl), "M"),
+    "chain_mother": lambda p, ppl: _by_gender(_parents(p, ppl), "F"),
+    "chain_son": lambda p, ppl: _by_gender(_children(p, ppl), "M"),
+    "chain_daughter": lambda p, ppl: _by_gender(_children(p, ppl), "F"),
+    "chain_child": lambda p, ppl: _children(p, ppl),
+    "chain_brother": lambda p, ppl: _by_gender(_siblings(p, ppl), "M"),
+    "chain_sister": lambda p, ppl: _by_gender(_siblings(p, ppl), "F"),
+    "chain_male_cousin": lambda p, ppl: _by_gender(_cousins(p, ppl), "M"),
+    "chain_female_cousin": lambda p, ppl: _by_gender(_cousins(p, ppl), "F"),
+    "chain_uncle": lambda p, ppl: _by_gender(_dedupe([s for par in _parents(p, ppl) for s in _siblings(par, ppl)]), "M"),
+    "chain_aunt": lambda p, ppl: _by_gender(_dedupe([s for par in _parents(p, ppl) for s in _siblings(par, ppl)]), "F"),
+    "chain_grandfather": lambda p, ppl: _by_gender(_dedupe([gp for par in _parents(p, ppl) for gp in _parents(par, ppl)]), "M"),
+    "chain_grandmother": lambda p, ppl: _by_gender(_dedupe([gp for par in _parents(p, ppl) for gp in _parents(par, ppl)]), "F"),
+    "chain_grandchild": lambda p, ppl: _grandchildren(p, ppl),
+}
+CHAIN_KEYS = list(CHAIN_RELATIONS)
+SAME_ATTR_KEYS = {
+    "hair_color": "chain_same_hair_color",
+    "eye_color": "chain_same_eye_color",
+    "hat_color": "chain_same_hat_color",
+    "profession": "chain_same_profession",
+}
+CHAIN_ATTEMPTS = 120
+
+
+def _apply_chain(start: Person, chain: List[str], people: Dict[str, Person]) -> List[Person]:
+    """Applique chain[0] à start, puis chain[1] au résultat, etc. (union)."""
+    current = [start]
+    for key in chain:
+        current = _dedupe([r for p in current for r in CHAIN_RELATIONS[key](p, people)])
+        if not current:
+            return []
+    return current
+
+
+def _fr_contract(text: str) -> str:
+    """Contractions françaises : "de le" -> "du", "de les" -> "des"."""
+    text = re.sub(r"\bde le\b", "du", text)
+    text = re.sub(r"\bde les\b", "des", text)
+    return text
+
+
+def _render_chain(chain: List[str], start_text: str, language: str) -> str:
+    """"the child of the sister of the father of X" pour chain=[father, sister, child]."""
+    words = [get_translation(key, language) for key in reversed(chain)]
+    text = " ".join(words + [start_text])
+    return _fr_contract(text) if language == "fr" else text
+
+
+def _random_chain(length: int) -> List[str]:
+    chain = [random.choice(CHAIN_KEYS)]
+    while len(chain) < length:
+        nxt = random.choice(CHAIN_KEYS)
+        # éviter les aller-retours triviaux (père de l'enfant de ...)
+        if {chain[-1], nxt} in ({"chain_father", "chain_child"}, {"chain_mother", "chain_child"},
+                                 {"chain_father", "chain_son"}, {"chain_father", "chain_daughter"},
+                                 {"chain_mother", "chain_son"}, {"chain_mother", "chain_daughter"}):
+            continue
+        chain.append(nxt)
+    return chain
+
+
+def _chain_question(people: Dict[str, Person], start: Person, start_text: str, chain_len: int,
+                    complexity: int, language: str) -> Dict[str, Any] | None:
+    """Construit une énigme "chaîne de `chain_len` relations + discriminant" à réponse unique."""
+    chain = _random_chain(chain_len)
+    pool = _apply_chain(start, chain, people)
+    if not pool or start in pool:
+        return None
+    target = random.choice(pool)
+    relation = _render_chain(chain, start_text, language)
+    if len(pool) == 1:
+        # Déjà unique : on ajoute quand même un attribut pour ne pas révéler l'unicité
+        attr = random.choice(DISCRIMINATOR_ATTRS)
+        value = getattr(target, attr)
+    else:
+        disc = _unique_discriminator(target, pool)
+        if disc is None:
+            return None
+        attr, value = disc
+    return _make_disc(relation, attr, value, target.first_name, complexity, language)
+
+
+def _gen_level_7(people: Dict[str, Person], person_list: List[Person], language: str) -> List[Dict[str, Any]]:
+    """Chaîne de 3 relations depuis une personne nommée + attribut discriminant."""
+    out: List[Dict[str, Any]] = []
+    for _ in range(CHAIN_ATTEMPTS):
+        start = random.choice(person_list)
+        q = _chain_question(people, start, start.first_name, 3, 7, language)
+        if q:
+            out.append(q)
+    return out
+
+
+def _gen_level_8(people: Dict[str, Person], person_list: List[Person], language: str) -> List[Dict[str, Any]]:
+    """Chaîne de 3 relations depuis une personne désignée par ses attributs (pas de prénom)."""
+    out: List[Dict[str, Any]] = []
+    for _ in range(CHAIN_ATTEMPTS):
+        start = random.choice(person_list)
+        start_text = get_translation("person_with_all_attrs", language).format(
+            hair=start.hair_color, eyes=start.eye_color, hat=start.hat_color
+        )
+        q = _chain_question(people, start, start_text, 3, 8, language)
+        if q:
+            out.append(q)
+    return out
+
+
+PLURAL_CHAIN_KEYS = [
+    "chain_son", "chain_daughter", "chain_child", "chain_brother", "chain_sister",
+    "chain_male_cousin", "chain_female_cousin", "chain_uncle", "chain_aunt", "chain_grandchild",
+]
+
+
+def _gen_level_9(people: Dict[str, Person], person_list: List[Person], language: str) -> List[Dict[str, Any]]:
+    """Deux chaînes jointes par une égalité d'attribut :
+    "<chaîne A> X qui a la même profession que <chaîne B> Y" — unique dans le résultat de A."""
+    out: List[Dict[str, Any]] = []
+    for _ in range(CHAIN_ATTEMPTS * 3):
+        x = random.choice(person_list)
+        y = random.choice(person_list)
+        # la chaîne A doit produire plusieurs candidats : sa dernière relation est plurielle
+        chain_a = _random_chain(random.choice((1, 2)))
+        chain_a[-1] = random.choice(PLURAL_CHAIN_KEYS)
+        chain_b = _random_chain(random.choice((1, 2)))
+        pool_a = _apply_chain(x, chain_a, people)
+        if len(pool_a) < 2:
+            continue
+        pool_b = _apply_chain(y, chain_b, people)
+        if len(pool_b) != 1:
+            continue
+        ref = pool_b[0]
+        options = []
+        for attr in SAME_ATTR_KEYS:
+            matching = [p for p in pool_a if getattr(p, attr) == getattr(ref, attr) and p.id != ref.id]
+            if len(matching) == 1:
+                options.append((attr, matching[0]))
+        if not options:
+            continue
+        attr, target = random.choice(options)
+        relation = (
+            f"{_render_chain(chain_a, x.first_name, language)} "
+            f"{get_translation(SAME_ATTR_KEYS[attr], language)} "
+            f"{_render_chain(chain_b, y.first_name, language)}"
+        )
+        out.append(_make(relation, target.first_name, 9, language))
+        if len(out) >= ATTEMPTS_PER_LEVEL:
+            break
+    return out
+
+
 def generate_enigma_questions(people: Dict[str, Person], language: str = "fr") -> List[Dict[str, Any]]:
-    """Génère des énigmes à réponse unique, réparties sur 6 niveaux de complexité."""
+    """Génère des énigmes à réponse unique, réparties sur 9 niveaux de complexité."""
     person_list = list(people.values())
     generators = (
         _gen_level_1,
@@ -273,6 +457,9 @@ def generate_enigma_questions(people: Dict[str, Person], language: str = "fr") -
         _gen_level_4,
         _gen_level_5,
         _gen_level_6,
+        _gen_level_7,
+        _gen_level_8,
+        _gen_level_9,
     )
     questions: List[Dict[str, Any]] = []
     for gen in generators:

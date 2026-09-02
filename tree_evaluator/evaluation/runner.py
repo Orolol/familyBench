@@ -62,13 +62,24 @@ async def run_benchmark_evaluation(
         language=language
     )
 
-    tree_description = convert_tree_to_text(tree, shuffle=False, language=language)
+    # Description : mélangée par défaut (l'ordre trié révèle la génération),
+    # un seul sens de lien par défaut ("X est l'enfant de A et B"). Le mélange
+    # est seedé pour que la description soit identique d'un run à l'autre.
+    tree_description = convert_tree_to_text(
+        tree,
+        shuffle=benchmark_config.get('shuffle', True),
+        language=language,
+        relations=benchmark_config.get('relations', 'parents'),
+        seed=benchmark_config.get('seed'),
+    )
     enigma_percentage = benchmark_config.get('enigma_percentage', 10)
     difficulty = benchmark_config.get('difficulty', 'all')
     questions = generate_questions(
         tree, benchmark_config['questions'],
         language=language, enigma_percentage=enigma_percentage,
         difficulty=difficulty,
+        max_answer_names=benchmark_config.get('max_answer_names', 10),
+        anonymize_percentage=benchmark_config.get('anonymize_percentage', 50),
     )
 
     system_prompt = model.prompt_builder.get_system_prompt(language, batch_size > 1)

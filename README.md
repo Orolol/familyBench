@@ -15,7 +15,8 @@ FamilyBench enables systematic and reproducible evaluation of LLMs' ability to:
 
 - **Dynamic generation**: Creation of random family trees with configurable constraints
 - **Multi-language**: Support for French and English
-- **Varied question types**: 21 question types grouped in 4 difficulty tiers (easy, medium, hard, enigma) plus an `expert` mode
+- **Varied question types**: 21 question types grouped in 4 difficulty tiers (easy, medium, hard, enigma), 9 enigma levels, plus an `expert` mode
+- **Difficulty levers**: shuffled one-directional descriptions, attribute-based references instead of names, long answers turned into counts
 - **Scoring you can audit**: exact match, Jaccard partial match, hallucination detection (invented names), per-type and per-tier accuracy
 - **Reproducible**: seeds plus a benchmark fingerprint (generator version + data files + parameters) written in every output
 - **Automatic evaluation**: Interface with OpenAI-compatible APIs to test multiple models
@@ -80,6 +81,26 @@ python generate_benchmark.py --people 300 --depth 6 --questions 100 --root-coupl
 python generate_benchmark.py --people 300 --depth 6 --questions 100 --root-couples 4 --difficulty expert --output expert.json
 ```
 
+#### Difficulty levers (generator ≥ 3.0)
+
+These options apply both to `generate_benchmark.py` flags and to `benchmarks:` entries in the evaluation config. The defaults are the hard settings.
+
+| Lever | Flag / config key | Default | Effect |
+|---|---|---|---|
+| Shuffled description | `--no-shuffle` / `shuffle: false` | shuffled | Sorted output (by generation, then name) leaks everyone's generation and keeps parents next to children. The shuffle is seeded from the benchmark seed, so the description is byte-identical across runs and provider prompt caches keep hitting. |
+| One-directional links | `--relations parents\|children\|both` / `relations:` | `parents` | With `parents`, only "X is the child of A and B" is written. Finding someone's children, siblings or descendants requires scanning the whole text. `both` restores the redundant, easier description. |
+| Long answers become counts | `--max-answer-names N` / `max_answer_names:` | 10 | A question whose answer would list more than N names is rewritten as *"How many people answer the following question: …"* with a numeric answer. Enumeration stamina is no longer rewarded, and partial credit cannot inflate the score. `0` disables. |
+| Attribute references | `--anonymize-percentage P` / `anonymize_percentage:` | 50 | In P % of questions, every first name is replaced by the person's unique attribute description (*"the person with red hair, blue eyes and a green hat"*), so the model must locate the person before reasoning. Enigmas are never anonymized (their own phrasing already does this at levels 6 and 8). |
+| Enigma levels 7-9 | via `difficulty: expert` or `enigma` | | 7: 3-relation chain from a named person + discriminating attribute. 8: same chain from an attribute-described person. 9: two chains joined by an attribute equality (*"the female cousin of X who has the same eye color as the grandmother of Y"*). `expert` now draws enigmas from levels 4-9 with at least 40 % from 7-9. |
+
+Every generated question records `difficulty`, `answer_format` (`names`, `count`, `label`, `none`), `anonymized` and `converted_to_count`, so results can be sliced by lever.
+
+```bash
+# Easier, closer to the 2025 protocol
+python generate_benchmark.py --people 400 --depth 6 --questions 200 --seed 43 --language en \
+    --no-shuffle --relations both --max-answer-names 0 --anonymize-percentage 0 --output easy.json
+```
+
 > **Depth**: the requested depth is an upper bound. Each couple has 1 to `--max-children` children, so the pool of people is often exhausted before the requested depth (400 people with 10 root couples give 4 generations). The CLI prints a warning and writes `tree_depth_actual` in the metadata.
 
 ### Model Evaluation
@@ -112,6 +133,11 @@ benchmarks:
     language: "en"
     seed: 1
     difficulty: expert      # all | easy | medium | hard | enigma | expert
+    # Difficulty levers (defaults shown, see "Difficulty levers" above)
+    shuffle: true
+    relations: parents      # parents | children | both
+    max_answer_names: 10
+    anonymize_percentage: 50
 
 evaluation:
   runs_per_benchmark: 1
@@ -190,18 +216,20 @@ For each question the model answer is normalised (JSON arrays, numbered lists, `
 | `no_response` | Empty answer, refusal, or a sentence instead of an answer |
 | `hallucinated_names` | Names in the answer that do not exist in the tree (only computed when the expected answer is a list of names) |
 
+Since generator 3.0, answers longer than `max_answer_names` are asked as counts, so partial credit only ever applies to lists of at most 10 names.
+
 `accuracy` in the summaries is the share of `is_correct` answers over all questions, errors and no-responses included.
 
 ## 🧠 Question Types
 
-FamilyBench generates 21 question types, grouped in difficulty tiers. `--difficulty all` (default) samples questions **evenly across types** with `--enigma-percentage` enigmas; `easy`, `medium`, `hard` and `enigma` restrict to one tier; `expert` mixes the hard tier (minus compound attributes and relational paths) with enigmas of complexity 4 to 6, at least 40 % of them being complexity 5 or 6.
+FamilyBench generates 21 question types, grouped in difficulty tiers. `--difficulty all` (default) samples questions **evenly across types** with `--enigma-percentage` enigmas; `easy`, `medium`, `hard` and `enigma` restrict to one tier; `expert` mixes the hard tier (minus compound attributes and relational paths) with enigmas of complexity 4 to 9, at least 40 % of them being complexity 7 to 9.
 
 | Tier | Types | Example |
 |---|---|---|
 | **easy** | `relation_directe`, `relation_inverse`, `recherche_attributs`, `comptage` | "Who are Marie's children?", "How many children does Pierre have?" |
 | **medium** | `recherche_multi_criteres`, `relation_complexe`, `transversale_generation`, `verticale_ancetre`, `verticale_racine`, `verticale_feuille`, `verticale_descendant`, `comptage_complexe` | "Who are Sophie's cousins?", "Who is in the same generation as Luc and works as a doctor?" |
 | **hard** | `relation_attribut_composee`, `multihop`, `conditional`, `negation`, `comparative`, `relational_path`, `recherche_inversee_complexe`, `verticale_descendant_critere`, `verticale_racine_critere` | "Which of Paul's children work as engineers?", "Who has more grandsons than granddaughters?" |
-| **enigma** | `enigme` (complexity 1 to 6) | "Who is the child of the son of Ken?" |
+| **enigma** | `enigme` (complexity 1 to 9) | "Which child of the son of Ken has red hair?", "Who is the female cousin of X who has the same eye color as the grandmother of Y?" |
 
 Every generated question carries `type`, `difficulty` and, for enigmas, `complexity`. Answers are a single name, an alphabetically sorted comma-separated list, a number, or `None` / `Aucun`.
 
@@ -264,7 +292,7 @@ familybench/
 │   ├── tree_generator.py     # Tree generation (+ actual_depth)
 │   ├── text_converter.py     # Tree -> text description
 │   ├── question_generator.py # Difficulty tiers, stratified sampling
-│   ├── questions/            # One module per question family (+ enigma.py)
+│   ├── questions/            # One module per question family, enigma.py (9 levels), rewrite.py (anonymisation, counts)
 │   ├── translations.py       # fr / en strings
 │   ├── versioning.py         # Generator version + benchmark fingerprint
 │   ├── cache_manager.py      # Optional diskcache of API responses

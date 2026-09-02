@@ -91,7 +91,14 @@ def main():
     parser.add_argument("--md-output", type=str, help="Fichier de sortie optionnel pour le prompt Markdown.")
     parser.add_argument("--seed", type=int, help="Graine pour la reproductibilité.")
     parser.add_argument("--max-children", type=int, default=3, help="Nombre maximum d'enfants par personne.")
-    parser.add_argument("--shuffle", action="store_true", help="Mélanger l'ordre des personnes dans la description.")
+    parser.add_argument("--no-shuffle", dest="shuffle", action="store_false",
+                        help="Ne pas mélanger la description (par défaut elle est mélangée, de façon seedée ; l'ordre trié révèle la génération).")
+    parser.add_argument("--relations", type=str, default="parents", choices=["parents", "children", "both"],
+                        help="Phrases de lien écrites dans la description : parents (défaut, 'X est l'enfant de A et B'), children ('A a N enfants'), both (redondant, plus facile).")
+    parser.add_argument("--max-answer-names", type=int, default=10,
+                        help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
+    parser.add_argument("--anonymize-percentage", type=int, default=50,
+                        help="Part des questions (0-100) dont les prénoms sont remplacés par une description par attributs (défaut 50).")
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
     parser.add_argument("--language", type=str, default="fr", choices=["fr", "en"], help="Langue du benchmark (fr ou en).")
     parser.add_argument("--visualize", action="store_true", help="Générer une visualisation de l'arbre (PNG).")
@@ -123,7 +130,8 @@ def main():
               f"(augmentez --people ou réduisez --max-children / --root-couples).")
 
     print("Conversion de l'arbre en texte...")
-    description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language)
+    description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language,
+                                       relations=args.relations, seed=args.seed)
 
     if args.difficulty == "all":
         print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
@@ -135,6 +143,8 @@ def main():
         language=args.language,
         enigma_percentage=args.enigma_percentage,
         difficulty=args.difficulty,
+        max_answer_names=args.max_answer_names,
+        anonymize_percentage=args.anonymize_percentage,
     )
 
     if args.language == "en":
@@ -157,6 +167,10 @@ def main():
             "language": args.language,
             "difficulty": args.difficulty,
             "enigma_percentage": args.enigma_percentage,
+            "shuffle": args.shuffle,
+            "relations": args.relations,
+            "max_answer_names": args.max_answer_names,
+            "anonymize_percentage": args.anonymize_percentage,
             "questions_requested": args.questions,
             "questions_generated": len(questions),
             "generator_version": GENERATOR_VERSION,
@@ -170,6 +184,10 @@ def main():
                 "root_couples": args.root_couples,
                 "enigma_percentage": args.enigma_percentage,
                 "difficulty": args.difficulty,
+                "shuffle": args.shuffle,
+                "relations": args.relations,
+                "max_answer_names": args.max_answer_names,
+                "anonymize_percentage": args.anonymize_percentage,
             }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }

@@ -144,6 +144,32 @@ TRANSLATIONS = {
         "working_as": "qui travaille comme {profession}",
         "wearing_hat": "au chapeau {color}",
         
+        # Chaînes de relations génériques (énigmes niveaux 7-9)
+        "chain_father": "le père de",
+        "chain_mother": "la mère de",
+        "chain_son": "le fils de",
+        "chain_daughter": "la fille de",
+        "chain_child": "l'enfant de",
+        "chain_brother": "le frère de",
+        "chain_sister": "la sœur de",
+        "chain_male_cousin": "le cousin de",
+        "chain_female_cousin": "la cousine de",
+        "chain_uncle": "l'oncle de",
+        "chain_aunt": "la tante de",
+        "chain_grandfather": "le grand-père de",
+        "chain_grandmother": "la grand-mère de",
+        "chain_grandchild": "le petit-enfant de",
+        "chain_same_hair_color": "qui a la même couleur de cheveux que",
+        "chain_same_eye_color": "qui a la même couleur d'yeux que",
+        "chain_same_hat_color": "qui a la même couleur de chapeau que",
+        "chain_same_profession": "qui a la même profession que",
+        # Énigmes : "Quel(le) <chaîne> <prédicat> ?" (l'attribut porte sans ambiguïté sur la personne cherchée)
+        "pred_hair": "a les cheveux {color}",
+        "pred_eyes": "a les yeux {color}",
+        "pred_hat": "porte un chapeau {color}",
+        # Conversion des réponses longues en dénombrement
+        "q_count_wrapper": "Combien de personnes répondent à la question suivante (réponds par un nombre) : « {question} »",
+
         # Pronoms
         "pronoun_m": "il",
         "pronoun_f": "elle",
@@ -295,6 +321,32 @@ TRANSLATIONS = {
         "working_as": "who works as a {profession}",
         "wearing_hat": "wearing a {color} hat",
         
+        # Generic relation chains (enigma levels 7-9)
+        "chain_father": "the father of",
+        "chain_mother": "the mother of",
+        "chain_son": "the son of",
+        "chain_daughter": "the daughter of",
+        "chain_child": "the child of",
+        "chain_brother": "the brother of",
+        "chain_sister": "the sister of",
+        "chain_male_cousin": "the male cousin of",
+        "chain_female_cousin": "the female cousin of",
+        "chain_uncle": "the uncle of",
+        "chain_aunt": "the aunt of",
+        "chain_grandfather": "the grandfather of",
+        "chain_grandmother": "the grandmother of",
+        "chain_grandchild": "the grandchild of",
+        "chain_same_hair_color": "who has the same hair color as",
+        "chain_same_eye_color": "who has the same eye color as",
+        "chain_same_hat_color": "who has the same hat color as",
+        "chain_same_profession": "who has the same profession as",
+        # Enigmas: "Which <chain> <predicate>?" (the attribute unambiguously qualifies the person asked for)
+        "pred_hair": "has {color} hair",
+        "pred_eyes": "has {color} eyes",
+        "pred_hat": "wears a {color} hat",
+        # Long answers converted to counting
+        "q_count_wrapper": "How many people answer the following question (answer with a number): \"{question}\"",
+
         # Pronouns
         "pronoun_m": "he",
         "pronoun_f": "she",

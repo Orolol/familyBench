@@ -37,8 +37,12 @@ DIFFICULTY_TIERS: Dict[str, set[str]] = {
     },
     "enigma": {"enigme"},
 }
-EXPERT_ENIGMA_COMPLEXITIES = {4, 5, 6}
-EXPERT_ENIGMA_HIGH_COMPLEXITIES = {5, 6}
+EXPERT_ENIGMA_COMPLEXITIES = {4, 5, 6, 7, 8, 9}
+EXPERT_ENIGMA_HIGH_COMPLEXITIES = {7, 8, 9}
+# Réponses de plus de N prénoms converties en dénombrement (0 = désactivé)
+DEFAULT_MAX_ANSWER_NAMES = 10
+# Part des questions dont les prénoms sont remplacés par une description par attributs
+DEFAULT_ANONYMIZE_PERCENTAGE = 50
 EXPERT_HARD_EXCLUDED_TYPES = {"relation_attribut_composee", "relational_path"}
 EXPERT_MIN_HIGH_ENIGMA_RATIO = 0.4
 VALID_DIFFICULTIES = {"all", "expert", *DIFFICULTY_TIERS.keys()}
@@ -67,6 +71,9 @@ from tree_evaluator.questions.advanced import (
     generate_relational_path_questions
 )
 from tree_evaluator.questions.enigma import generate_enigma_questions
+from tree_evaluator.questions.rewrite import (
+    anonymize_names, convert_long_answers_to_counts, answer_format, fix_english_articles,
+)
 
 
 def _dedupe(questions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -128,6 +135,8 @@ def generate_questions(
     language: str = "fr",
     enigma_percentage: int = 10,
     difficulty: str = "all",
+    max_answer_names: int = DEFAULT_MAX_ANSWER_NAMES,
+    anonymize_percentage: int = DEFAULT_ANONYMIZE_PERCENTAGE,
 ) -> List[Dict[str, Any]]:
     """Génère une liste de questions de différents types.
 
@@ -135,7 +144,11 @@ def generate_questions(
         difficulty: "all" (mix par défaut pondéré par enigma_percentage),
             "easy", "medium", "hard" (uniquement questions normales du tier),
             "enigma" (uniquement des énigmes),
-            ou "expert" (questions normales 'hard' + énigmes de complexité 4/5/6).
+            ou "expert" (questions normales 'hard' + énigmes de complexité 4 à 9).
+        max_answer_names: au-delà de ce nombre de prénoms, la question devient
+            un dénombrement ("Combien de personnes répondent à ..."). 0 = désactivé.
+        anonymize_percentage: part (0-100) des questions dont les prénoms cités
+            sont remplacés par une description par attributs.
     """
     if difficulty not in VALID_DIFFICULTIES:
         raise ValueError(
@@ -208,8 +221,19 @@ def generate_questions(
         selected = _stratified_sample(unique_normal_questions, num_normal) + selected_enigmas
         random.shuffle(selected)
 
+    # Réécritures de difficulté (après sélection, sur des copies)
+    selected = [dict(q) for q in selected]
+    convert_long_answers_to_counts(selected, people, language, max_answer_names)
+    anonymize_names(selected, people, language, random, anonymize_percentage)
+
+    known_names = {p.first_name for p in people.values()}
     for i, q in enumerate(selected):
         q["id"] = i + 1
+        q.setdefault("anonymized", False)
+        q.setdefault("converted_to_count", False)
+        q["answer_format"] = answer_format(q["answer"], known_names, language)
+        if language == "en":
+            q["question"] = fix_english_articles(q["question"])
 
     return selected
 

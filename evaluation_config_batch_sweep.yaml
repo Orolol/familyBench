@@ -24,6 +24,11 @@ benchmarks:
     seed: 1
     language: "en"
     difficulty: all
+    # Leviers de difficulté (valeurs par défaut ; voir README "Difficulty levers")
+    shuffle: true
+    relations: parents        # parents | children | both
+    max_answer_names: 10
+    anonymize_percentage: 50
 
 evaluation:
   runs_per_benchmark: 1

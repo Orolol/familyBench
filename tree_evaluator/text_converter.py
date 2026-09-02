@@ -1,27 +1,46 @@
 import random
-from typing import Dict, List
+from typing import Dict, List, Optional
 from tree_evaluator.models import Person
 from tree_evaluator.translations import get_translation
 
-def convert_tree_to_text(people: Dict[str, Person], shuffle: bool = False, language: str = "fr") -> str:
+RELATION_MODES = ("both", "parents", "children")
+
+
+def convert_tree_to_text(
+    people: Dict[str, Person],
+    shuffle: bool = False,
+    language: str = "fr",
+    relations: str = "both",
+    seed: Optional[int] = None,
+) -> str:
     """Convertit le dictionnaire de personnes en une description textuelle.
-    
+
     Args:
         people: Dictionnaire des personnes
-        shuffle: Si True, mélange l'ordre des personnes et des informations
+        shuffle: Si True, mélange l'ordre des personnes (et l'ordre des phrases
+            de relation de chaque personne). Sans mélange, l'ordre est trié par
+            génération puis prénom, ce qui révèle la génération de chacun.
+        language: "fr" ou "en"
+        relations: quelles phrases de lien écrire :
+            - "both": "X est l'enfant de A et B" ET "A a N enfants : ..." (redondant)
+            - "parents": seulement "X est l'enfant de A et B" : retrouver les
+              enfants ou la fratrie de quelqu'un demande de balayer tout le texte
+            - "children": seulement "A a N enfants : ..."
+        seed: graine du mélange. Avec la même seed la description est identique
+            d'un run à l'autre (important pour le cache de prompt côté API),
+            indépendamment de l'état du générateur aléatoire global.
     """
     if not people:
         return ""
+    if relations not in RELATION_MODES:
+        raise ValueError(f"relations must be one of {RELATION_MODES}, got {relations!r}")
+
+    rng = random.Random(f"description-{seed}") if seed is not None else random
 
     # Obtenir la liste des personnes
-    people_list = list(people.values())
-    
+    people_list = sorted(people.values(), key=lambda p: (p.generation, p.first_name))
     if shuffle:
-        # Mélanger complètement l'ordre des personnes
-        random.shuffle(people_list)
-    else:
-        # Ordre par défaut : par génération puis par prénom
-        people_list = sorted(people_list, key=lambda p: (p.generation, p.first_name))
+        rng.shuffle(people_list)
 
     description_parts = []
     
@@ -48,7 +67,7 @@ def convert_tree_to_text(people: Dict[str, Person], shuffle: bool = False, langu
         person_parts.append(attr_part)
 
         # Description des parents
-        if person.parent_ids:
+        if person.parent_ids and relations in ("both", "parents"):
             parent_names = sorted([f'{people[pid].first_name} ({people[pid].gender})' for pid in person.parent_ids])
             parent_part = get_translation('is_child_of', language).format(
                 name=f'{person.first_name} ({person.gender})',
@@ -58,7 +77,7 @@ def convert_tree_to_text(people: Dict[str, Person], shuffle: bool = False, langu
             person_parts.append(parent_part)
 
         # Description des enfants
-        if person.children_ids:
+        if person.children_ids and relations in ("both", "children"):
             children_names = sorted([f'{people[cid].first_name} ({people[cid].gender})' for cid in person.children_ids])
             num_children = len(children_names)
             if num_children == 1:
@@ -74,13 +93,12 @@ def convert_tree_to_text(people: Dict[str, Person], shuffle: bool = False, langu
                 ) + "."
             person_parts.append(child_part)
         
-        if shuffle:
-            # Mélanger l'ordre des informations pour chaque personne
-            # Mais toujours garder les attributs en premier
-            if len(person_parts) > 1:
-                other_parts = person_parts[1:]
-                random.shuffle(other_parts)
-                person_parts = [person_parts[0]] + other_parts
+        if shuffle and len(person_parts) > 1:
+            # Mélanger l'ordre des informations pour chaque personne,
+            # mais toujours garder les attributs en premier
+            other_parts = person_parts[1:]
+            rng.shuffle(other_parts)
+            person_parts = [person_parts[0]] + other_parts
         
         description_parts.extend(person_parts)
 

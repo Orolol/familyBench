@@ -10,7 +10,7 @@ TreeEval is a multi-language LLM evaluation tool that generates dynamic benchmar
 
 The system follows a pipeline architecture:
 1. **Tree Generation** (`tree_generator.py`): Creates random family trees with configurable constraints
-2. **Text Conversion** (`text_converter.py`): Converts trees to structured descriptions (French/English)
+2. **Text Conversion** (`text_converter.py`): Converts trees to structured descriptions (French/English). Options: `shuffle` (seeded from the benchmark seed, default on), `relations` = parents|children|both (default `parents`: only "X is the child of A and B")
 3. **Question Generation** (`question_generator.py`): 21 question types in 4 difficulty tiers (easy/medium/hard/enigma), stratified sampling across types, `expert` mode; every question carries `type` and `difficulty`
 4. **Model Evaluation** (`evaluate.py`): Async evaluation system for testing LLMs via OpenAI-compatible APIs
 5. **CLI Scripts**: `generate_benchmark.py`, `evaluate.py`, `analyze_results.py` (placeholder)
@@ -21,7 +21,8 @@ Key modules:
 - `versioning.py`: `GENERATOR_VERSION` and `benchmark_fingerprint()` (bump the version whenever a change alters the tree or questions produced for a given seed)
 - `cache_manager.py`: optional `diskcache` cache of API responses (in-memory fallback)
 - `evaluation/`: Complete async evaluation framework with answer cleaning, stats, and result formatting
-- `questions/`: Modular question generation system with 21 question types including 6 enigma complexity levels
+- `questions/`: Modular question generation system with 21 question types including 9 enigma complexity levels (7-9 use the generic chain engine in `enigma.py`)
+- `questions/rewrite.py`: post-selection difficulty rewrites: `anonymize_names` (names -> unique attribute description, never on enigmas), `convert_long_answers_to_counts` (> `max_answer_names` names -> counting question), `fix_english_articles`
 
 ## Common Commands
 
@@ -32,6 +33,9 @@ python generate_benchmark.py --people 30 --depth 3 --questions 50 --output bench
 
 # English benchmark
 python generate_benchmark.py --people 50 --depth 4 --questions 100 --language en --output benchmark_en.json
+
+# Easier description / no rewrites (closer to the 2025 protocol)
+python generate_benchmark.py --people 400 --depth 6 --questions 200 --seed 43 --language en --no-shuffle --relations both --max-answer-names 0 --anonymize-percentage 0 --output easy.json
 
 # Generate with Markdown output for direct LLM prompting
 python generate_benchmark.py --people 5 --depth 2 --questions 10 --md-output prompt.md
@@ -102,9 +106,11 @@ The system generates multiple output formats:
 - **easy**: direct/inverse relations, attribute search, counting
 - **medium**: multi-criteria search, complex relations (grandparents, cousins...), cross-sectional, vertical (ancestors/descendants), complex counting
 - **hard**: compound relation+attribute, multihop, conditional, negation, comparative, relational path, inverse complex search, vertical with criteria
-- **enigma**: riddles of complexity 1 to 6 (`complexity` field)
+- **enigma**: riddles of complexity 1 to 9 (`complexity` field). Levels with a discriminating attribute are phrased "Which son of X has black hair?" / "Quel fils de X a les cheveux noirs ?" so the attribute cannot be read as qualifying X
 
-`--difficulty all` samples evenly across types (round-robin) with `enigma_percentage` enigmas; `expert` = hard tier (minus compound attributes and relational paths) + enigmas of complexity 4-6.
+`--difficulty all` samples evenly across types (round-robin) with `enigma_percentage` enigmas; `expert` = hard tier (minus compound attributes and relational paths) + enigmas of complexity 4-9 (>= 40 % from 7-9).
+
+Difficulty levers (generator 3.0, hard defaults): `shuffle` (default true), `relations` (default `parents`), `max_answer_names` (default 10, 0 disables), `anonymize_percentage` (default 50). All are CLI flags of `generate_benchmark.py` and keys of `benchmarks:` entries, and all are part of the benchmark fingerprint. Questions carry `answer_format`, `anonymized`, `converted_to_count`.
 
 Answers are names sorted alphabetically and comma-separated, a number, or `None`/`Aucun`. `multihop` and `relational_path` are the only types whose answer can be an attribute value or a relation label instead of names.
 
