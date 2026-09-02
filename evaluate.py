@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import json
 import logging
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -159,6 +160,24 @@ async def main():
     max_concurrent = config["evaluation"].get("max_concurrent_requests", 10)
     batch_size = config["evaluation"].get("batch_size", 1)
 
+    # --- Résultats incrémentaux : une ligne JSON par question dès qu'elle est
+    # évaluée, pour ne rien perdre si le processus meurt avant la fin ---
+    partial_path = output_dir / f"partial_{timestamp}.jsonl"
+    partial_file = open(partial_path, "a", encoding="utf-8")
+
+    def _append_partial(result):
+        partial_file.write(json.dumps(asdict(result), ensure_ascii=False) + "\n")
+        partial_file.flush()
+
+    def _on_question_done(result):
+        _append_partial(result)
+        progress.update_question(result)
+
+    def _on_batch_done(results):
+        for r in results:
+            _append_partial(r)
+        progress.update_questions_batch(results)
+
     # --- Rich progress ---
     progress = EvalProgress(
         models=[m["name"] for m in models_to_eval],
@@ -192,8 +211,8 @@ async def main():
                         config["evaluation"].get("timeout", 60),
                         batch_size,
                         max_concurrent=max_concurrent,
-                        on_question_done=progress.update_question,
-                        on_batch_done=progress.update_questions_batch,
+                        on_question_done=_on_question_done,
+                        on_batch_done=_on_batch_done,
                     )
 
                     results = benchmark_run.results
@@ -227,6 +246,7 @@ async def main():
 
     finally:
         progress.stop()
+        partial_file.close()
 
     # --- Sauvegarde des résultats ---
     output_paths: Dict[str, str] = {}
@@ -264,6 +284,7 @@ async def main():
             indent=2,
         )
     output_paths["Résumé"] = str(summary_path)
+    output_paths["JSONL incrémental"] = str(partial_path)
 
     # Affichage final
     print_final_summary(summary_stats, output_paths)

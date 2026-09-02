@@ -36,6 +36,8 @@ def load_results(file_paths: List[Path], exclude_failed_runs: bool = False) -> p
     for fp in file_paths:
         if fp.suffix.lower() == ".csv":
             frame = pd.read_csv(fp)
+        elif fp.suffix.lower() == ".jsonl":
+            frame = pd.read_json(fp, lines=True)
         elif fp.suffix.lower() == ".json":
             with open(fp, "r", encoding="utf-8") as f:
                 data = json.load(f)

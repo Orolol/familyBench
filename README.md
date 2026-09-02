@@ -195,7 +195,7 @@ python scripts/batch_sweep.py --report-only evaluation_results/batch_sweep   # r
 
 The report shows, per batch size: accuracy, exact match, no-response and error rates, hallucination rate, prompt / completion / reasoning tokens, cost, accuracy per difficulty tier, and the question-by-question agreement with the smallest batch size (questions lost and gained). In batch mode `response_time`, `tokens_used` and `reasoning_tokens` are averaged over the questions of the batch, and `reasoning_text` is shared. Every result row carries `batch_size`, and `analyze_results.py` groups by it automatically when several sizes are mixed.
 
-Each run writes `results_<ts>.csv/json` (one row per question), `detailed_<ts>.json` (system prompt, tree description and every Q&A, enough to replay the run) and `summary_<ts>.json` (per-model stats, per-type and per-tier accuracy, hallucination rate, benchmark fingerprint and actual tree depth). API responses are cached in `.cache/` when `diskcache` is installed, so re-running an identical request costs nothing.
+Each run writes `partial_<ts>.jsonl` incrementally (one line per question as soon as it is scored, so a killed run loses nothing; `analyze_results.py` reads it), then `results_<ts>.csv/json` (one row per question), `detailed_<ts>.json` (system prompt, tree description and every Q&A, enough to replay the run) and `summary_<ts>.json` (per-model stats, per-type and per-tier accuracy, hallucination rate, benchmark fingerprint and actual tree depth). API responses are cached in `.cache/` when `diskcache` is installed, so re-running an identical request costs nothing.
 
 ### Results Analysis
 
