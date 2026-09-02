@@ -125,6 +125,7 @@ def test_empty_or_truncated_responses_are_not_cached_and_retries_bypass_cache():
     hit = asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
                                                           language="en", total_start_time=0.0, use_cache=True))
     assert hit.no_response and hit.finish_reason == "length"
-    with pytest.raises(Exception):  # use_cache=False -> tente le réseau (session None)
-        asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
-                                                        language="en", total_start_time=0.0, use_cache=False))
+    # use_cache=False -> tente le réseau (session None => erreur capturée, pas de relecture du cache)
+    miss = asyncio.run(m._evaluate_question_single_attempt("tree", QUESTION, session=None, timeout=5,
+                                                           language="en", total_start_time=0.0, use_cache=False))
+    assert miss.error and "NoneType" in miss.error
