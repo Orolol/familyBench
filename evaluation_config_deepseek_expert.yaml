@@ -11,7 +11,7 @@ models:
       # Un seul fournisseur : le cache de prompt est par fournisseur, et OpenRouter
       # en propose 12 pour ce modèle ; sans pin, le préfixe commun (arbre) ne
       # sert presque jamais (4 % de tokens cachés observés).
-      order: ["DeepInfra"]
+      order: ["baidu/fp8", "coreweave/fp8"]
       allow_fallbacks: false
       data_collection: "allow"
     pricing:                   # USD / Mtok, indicatif
