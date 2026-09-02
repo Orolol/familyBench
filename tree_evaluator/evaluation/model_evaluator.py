@@ -29,7 +29,8 @@ class ModelEvaluator:
         self.api_key = self._resolve_api_key(config['api_key'])
         self.model = config['model']
         self.temperature = config.get('temperature', 0.0)
-        self.max_tokens = config.get('max_tokens', 2000)
+        self.max_tokens = config.get('max_tokens')
+        self.max_completion_tokens = config.get('max_completion_tokens')
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
@@ -422,10 +423,33 @@ class ModelEvaluator:
                 "model": self.model,
                 "messages": [{"role": "user", "content": prompt}],
                 "temperature": self.temperature,
-                "max_completion_tokens": self.max_tokens
+                "max_completion_tokens": self.max_completion_tokens if self.max_completion_tokens is not None else (self.max_tokens if self.max_tokens is not None else 2000)
             }
+        elif self.reasoning_config and "openai" in self.api_base:
+            # Format OpenAI Responses API (pour les modèles avec reasoning comme gpt-5.1)
+            data = {
+                "model": self.model,
+                "input": [
+                    {"role": "system", "content": self.prompt_builder.get_system_prompt(language, batch)},
+                    {"role": "user", "content": prompt}
+                ],
+                # Note: temperature might not be supported or works differently in Responses API, 
+                # but keeping it if not explicitly forbidden.
+                # "temperature": self.temperature, 
+            }
+            
+            if self.reasoning_config:
+                data["reasoning"] = self.reasoning_config
+                
+            # Responses API uses max_output_tokens
+            if self.max_completion_tokens:
+                data["max_output_tokens"] = self.max_completion_tokens
+            elif self.max_tokens:
+                 data["max_output_tokens"] = self.max_tokens
+                
+            return data
         else:
-            # Format OpenAI
+            # Format OpenAI Standard
             data = {
                 "model": self.model,
                 "messages": [
@@ -433,10 +457,14 @@ class ModelEvaluator:
                     {"role": "user", "content": prompt}
                 ],
                 "temperature": self.temperature,
-                "max_tokens": self.max_tokens
             }
             
-            # Ajouter la configuration de reasoning si présente
+            if self.max_completion_tokens:
+                data["max_completion_tokens"] = self.max_completion_tokens
+            else:
+                data["max_tokens"] = self.max_tokens if self.max_tokens is not None else 2000
+            
+            # Ajouter la configuration de reasoning si présente (pour OpenRouter etc)
             if self.reasoning_config and "openrouter" in self.api_base:
                 data["reasoning"] = self.reasoning_config
             
@@ -446,6 +474,8 @@ class ModelEvaluator:
         """Retourne l'URL de l'API selon le type."""
         if "anthropic" in self.api_base:
             return f"{self.api_base}/messages"
+        elif self.reasoning_config and "openai" in self.api_base:
+            return f"{self.api_base}/responses"
         else:
             return f"{self.api_base}/chat/completions"
     
@@ -454,6 +484,15 @@ class ModelEvaluator:
         reasoning_tokens = 0
         reasoning_text = None
         
+        # Format Responses API (OpenAI)
+        if "output_text" in result:
+            model_answer = result.get("output_text", "")
+            model_answer = model_answer.strip()
+            # Usage info might be different or absent in this specific response format example
+            # Assuming standard usage if present
+            tokens_used = result.get('usage', {}).get('total_tokens', 0)
+            return model_answer, tokens_used, 0, None
+
         if "anthropic" in self.api_base:
             content = result.get('content', [{}])
             if content and len(content) > 0:

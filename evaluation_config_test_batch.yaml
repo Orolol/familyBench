@@ -1,0 +1,47 @@
+# Configuration pour l'évaluation automatique des modèles (test avec batching)
+
+# Modèles à évaluer
+models:
+  - name: "mistral-medium-3.1"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "mistralai/mistral-medium-3.1"
+    temperature: 0.3
+
+# Configurations de benchmarks à exécuter
+benchmarks:
+  - name: "small_tree_en"
+    people: 20
+    depth: 3
+    questions: 5
+    root_couples: 1
+    seed: 42
+    language: "en"
+
+# Paramètres d'évaluation
+evaluation:
+  # Nombre de tentatives par modèle/benchmark
+  runs_per_benchmark: 1
+  
+  # Timeout pour chaque requête API (en secondes)
+  timeout: 60
+  
+  # Taille du batch pour grouper les questions (1 = pas de batching)
+  # Augmenter cette valeur peut améliorer les performances pour certains modèles
+  batch_size: 5
+  
+  # Dossier de sortie pour les résultats
+  output_dir: "evaluation_results"
+  
+  # Format de sortie
+  output_formats:
+    - csv
+    - json
+  
+  # Métriques à calculer
+  metrics:
+    - accuracy  # Nombre de bonnes réponses / total
+    - exact_match  # Match exact de la réponse
+    - partial_match  # Match partiel (pour les listes)
+    - response_time  # Temps de réponse
+    - token_count  # Nombre de tokens utilisés

@@ -1,0 +1,35 @@
+{
+  "timestamp": "20250815_105730",
+  "config": "evaluation_config_test_batch.yaml",
+  "models_evaluated": [
+    "mistral-medium-3.1"
+  ],
+  "benchmarks_run": [
+    "small_tree_en"
+  ],
+  "summary_stats": {
+    "mistral-medium-3.1": {
+      "total_questions": 5,
+      "correct_answers": 1,
+      "accuracy": 0.2,
+      "exact_matches": 1,
+      "exact_match_rate": 0.2,
+      "avg_partial_score": 0.4333333333333333,
+      "avg_response_time": 0.23644387245178225,
+      "total_tokens": 35,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 2,
+      "no_response_rate": 0.4,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 5,
+        "correct": 1,
+        "accuracy": 0.2
+      }
+    }
+  }
+}

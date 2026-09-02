@@ -1,0 +1,146 @@
+{
+  "timestamp": "20251006_100217",
+  "config": "evaluation_config_kimi.yaml",
+  "models_evaluated": [
+    "z-ai/glm-4.6",
+    "deepseek/deepseek-v3.2-exp",
+    "anthropic/claude-sonnet-4.5"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en"
+  ],
+  "summary_stats": {
+    "z-ai/glm-4.6": {
+      "total_questions": 189,
+      "correct_answers": 90,
+      "accuracy": 0.47619047619047616,
+      "exact_matches": 86,
+      "exact_match_rate": 0.455026455026455,
+      "avg_partial_score": 0.5283598789425522,
+      "avg_response_time": 52.17330325343622,
+      "total_tokens": 134057,
+      "errors": 3,
+      "error_rate": 0.015873015873015872,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 149232,
+      "questions_with_reasoning": 82,
+      "avg_reasoning_tokens": 1819.9024390243903,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 4,
+        "accuracy": 0.4444444444444444,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 1,
+            "accuracy": 0.3333333333333333
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 1,
+            "accuracy": 1.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 86,
+        "accuracy": 0.4777777777777778
+      }
+    },
+    "deepseek/deepseek-v3.2-exp": {
+      "total_questions": 189,
+      "correct_answers": 126,
+      "accuracy": 0.6666666666666666,
+      "exact_matches": 126,
+      "exact_match_rate": 0.6666666666666666,
+      "avg_partial_score": 0.6890411559148619,
+      "avg_response_time": 258.7559722971033,
+      "total_tokens": 312298,
+      "errors": 22,
+      "error_rate": 0.1164021164021164,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 427396,
+      "questions_with_reasoning": 167,
+      "avg_reasoning_tokens": 2559.25748502994,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 2,
+        "accuracy": 0.2222222222222222,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 2,
+            "accuracy": 0.4
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 124,
+        "accuracy": 0.6888888888888889
+      }
+    },
+    "anthropic/claude-sonnet-4.5": {
+      "total_questions": 189,
+      "correct_answers": 147,
+      "accuracy": 0.7777777777777778,
+      "exact_matches": 143,
+      "exact_match_rate": 0.7566137566137566,
+      "avg_partial_score": 0.819142922439025,
+      "avg_response_time": 25.876708188384928,
+      "total_tokens": 211249,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 128844,
+      "questions_with_reasoning": 189,
+      "avg_reasoning_tokens": 681.7142857142857,
+      "enigma_stats": {
+        "total": 9,
+        "correct": 3,
+        "accuracy": 0.3333333333333333,
+        "by_complexity": {
+          "1": {
+            "total": 3,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "2": {
+            "total": 5,
+            "correct": 3,
+            "accuracy": 0.6
+          },
+          "3": {
+            "total": 1,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 180,
+        "correct": 144,
+        "accuracy": 0.8
+      }
+    }
+  }
+}

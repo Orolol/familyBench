@@ -220,22 +220,68 @@ models:
   #     max_tokens: 8000
 
   - name: "gpt-5.1"
-    api_base: "https://api.openai.com/v1"
+    api_base: "https://eu.api.openai.com/v1"
     api_key: "${OPENAI_API_KEY}"
     model: "gpt-5.1"
     temperature: 0.3
-    max_tokens: 16000
+    max_completion_tokens: 16000
     reasoning:
       effort: "low" 
 
-  - name: "google/gemini-3.0-pro"
+  - name: "google/gemini-3-pro-preview"
     api_base: "https://openrouter.ai/api/v1"
     api_key: "${OPENROUTER_API_KEY}"
-    model: "google/gemini-3.0-pro"
+    model: "google/gemini-3-pro-preview"
     temperature: 0.3
     max_tokens: 16000
     reasoning:
       max_tokens: 8000
+
+  # - name: "z-ai/glm-4.6"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "z-ai/glm-4.6"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "deepseek/deepseek-v3.2-exp"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "deepseek/deepseek-v3.2-exp"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "anthropic/claude-sonnet-4.5"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "anthropic/claude-sonnet-4.5"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "moonshotai/kimi-k2-0905"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "moonshotai/kimi-k2-0905"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
+  # - name: "moonshotai/kimi-k2-thinking"
+  #   api_base: "https://openrouter.ai/api/v1"
+  #   api_key: "${OPENROUTER_API_KEY}"
+  #   model: "moonshotai/kimi-k2-thinking"
+  #   temperature: 0.7
+  #   max_tokens: 16000
+  #   reasoning:
+  #     max_tokens: 8000
+
 
 
 # Configurations de benchmarks à exécuter
