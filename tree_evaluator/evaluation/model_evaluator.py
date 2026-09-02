@@ -40,6 +40,12 @@ class ModelEvaluator:
         self.language = 'fr'  # Will be set per benchmark
         self.reasoning_config = config.get('reasoning', None)
         self.provider_config = config.get('provider', None)
+        # Streaming SSE pour les API chat/completions (défaut: activé). Évite les
+        # coupures des réponses longues non streamées et permet de suivre la
+        # progression dans les logs. Désactivé automatiquement pour Anthropic et
+        # l'API Responses d'OpenAI.
+        self.stream = bool(config.get('stream', True))
+        self.stream_options = bool(config.get('stream_options', True))
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
         # Pricing (USD per million tokens). Optional; absent => no cost computed.
         # Expected keys: input_per_mtok, output_per_mtok, cached_input_per_mtok (optional).
@@ -204,21 +210,19 @@ class ModelEvaluator:
                 logger.debug(f"Sending request to {url} for {self.name}")
                 logger.debug(f"Request data: {json.dumps(data, indent=2)}")
                 
-                async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
-                    response_time = time.time() - start_time
-                    
-                    if response.status != 200:
-                        error_text = await response.text()
-                        logger.error(f"API Error {response.status} for {self.name}: {error_text}")
-                        return self._create_error_result(
-                            question, f"API Error {response.status}: {error_text}", response_time
-                        )
-                    
-                    result = await response.json()
-                    
-                    # Sauvegarder dans le cache si succès
-                    if result:
-                        self.cache_manager.set(cache_key, result)
+                status, result = await self._call_api(
+                    session, url, data, headers, timeout, f"question {question['id']}"
+                )
+                response_time = time.time() - start_time
+                if status != 200:
+                    logger.error(f"API Error {status} for {self.name}: {result}")
+                    return self._create_error_result(
+                        question, f"API Error {status}: {result}", response_time
+                    )
+
+                # Sauvegarder dans le cache si succès
+                if result:
+                    self.cache_manager.set(cache_key, result)
                 
             # Log de debug pour les réponses API
             logger.debug(f"API Response for {self.name} - Question {question['id']}: {json.dumps(result, indent=2) if result else 'None'}")
@@ -397,22 +401,21 @@ class ModelEvaluator:
                 logger.debug(f"Sending request to {url} for {self.name}")
                 logger.debug(f"Request data: {json.dumps(data, indent=2)}")
                 
-                async with session.post(url, json=data, headers=headers, timeout=timeout) as response:
-                    response_time = time.time() - start_time
-                    
-                    if response.status != 200:
-                        error_text = await response.text()
-                        # Retourner des erreurs pour toutes les questions du batch
-                        return [self._create_error_result(
-                            q, f"API Error {response.status}: {error_text}", 
-                            (time.time() - total_start_time) / len(questions)
-                        ) for q in questions]
-                    
-                    result = await response.json()
-                    
-                    # Sauvegarder dans le cache si succès
-                    if result:
-                        self.cache_manager.set(cache_key, result)
+                status, result = await self._call_api(
+                    session, url, data, headers, timeout, f"batch of {len(questions)}"
+                )
+                response_time = time.time() - start_time
+                if status != 200:
+                    logger.error(f"API Error {status} for {self.name}: {result}")
+                    # Retourner des erreurs pour toutes les questions du batch
+                    return [self._create_error_result(
+                        q, f"API Error {status}: {result}",
+                        (time.time() - total_start_time) / len(questions)
+                    ) for q in questions]
+
+                # Sauvegarder dans le cache si succès
+                if result:
+                    self.cache_manager.set(cache_key, result)
                 
             # Vérifier que result n'est pas None
             if result is None:
@@ -494,6 +497,98 @@ class ModelEvaluator:
                 q, str(e), (time.time() - total_start_time) / len(questions)
             ) for q in questions]
     
+    def _uses_streaming(self) -> bool:
+        if not self.stream or "anthropic" in self.api_base:
+            return False
+        if self.reasoning_config and "openai" in self.api_base:
+            return False  # API Responses : format différent
+        return True
+
+    async def _call_api(self, session: aiohttp.ClientSession, url: str, data: Dict[str, Any],
+                        headers: Dict[str, str], timeout: int, label: str) -> tuple[int, Any]:
+        """POST l'appel API. Retourne (status, result_dict) ou (status, error_text).
+
+        En streaming, les chunks SSE sont ré-assemblés en une réponse au format
+        non-streamé (choices[0].message.content / .reasoning, usage) pour que le
+        reste du pipeline et le cache restent identiques.
+        """
+        client_timeout = aiohttp.ClientTimeout(total=timeout)
+        if not self._uses_streaming():
+            async with session.post(url, json=data, headers=headers, timeout=client_timeout) as response:
+                if response.status != 200:
+                    return response.status, await response.text()
+                return response.status, await response.json()
+
+        payload = dict(data)
+        payload["stream"] = True
+        if self.stream_options:
+            payload["stream_options"] = {"include_usage": True}
+        content_parts: List[str] = []
+        reasoning_parts: List[str] = []
+        usage: Dict[str, Any] = {}
+        finish_reason = None
+        role = "assistant"
+        started = time.time()
+        last_log = started
+        async with session.post(url, json=payload, headers=headers, timeout=client_timeout) as response:
+            if response.status != 200:
+                return response.status, await response.text()
+            if "json" in (response.headers.get("Content-Type") or "").lower():
+                # Le serveur a ignoré `stream` (proxy, serveur local minimal) : réponse classique
+                return response.status, await response.json()
+            buffer = b""
+            async for chunk in response.content.iter_any():
+                buffer += chunk
+                while b"\n" in buffer:
+                    line, buffer = buffer.split(b"\n", 1)
+                    line = line.strip()
+                    if not line or line.startswith(b":"):
+                        continue  # keep-alive / commentaire SSE
+                    if not line.startswith(b"data:"):
+                        continue
+                    body = line[5:].strip()
+                    if body == b"[DONE]":
+                        continue
+                    try:
+                        event = json.loads(body)
+                    except ValueError:
+                        logger.debug(f"Unparseable SSE line for {self.name}: {body[:200]!r}")
+                        continue
+                    if event.get("usage"):
+                        usage = event["usage"]
+                    if event.get("error"):
+                        return 500, json.dumps(event["error"])
+                    for choice in event.get("choices") or []:
+                        delta = choice.get("delta") or {}
+                        if delta.get("role"):
+                            role = delta["role"]
+                        text = delta.get("content")
+                        if isinstance(text, str) and text:
+                            content_parts.append(text)
+                        for key in ("reasoning", "reasoning_content"):
+                            rt = delta.get(key)
+                            if isinstance(rt, str) and rt:
+                                reasoning_parts.append(rt)
+                        if choice.get("finish_reason"):
+                            finish_reason = choice["finish_reason"]
+                now = time.time()
+                if now - last_log >= 60:
+                    last_log = now
+                    logger.info(
+                        f"Streaming {label} for {self.name}: {int(now - started)}s, "
+                        f"{sum(map(len, reasoning_parts))} reasoning chars, {sum(map(len, content_parts))} answer chars"
+                    )
+        if finish_reason == "length":
+            logger.warning(f"{self.name} {label}: generation stopped by max_tokens (finish_reason=length)")
+        message: Dict[str, Any] = {"role": role, "content": "".join(content_parts)}
+        if reasoning_parts:
+            message["reasoning"] = "".join(reasoning_parts)
+        return 200, {
+            "choices": [{"index": 0, "message": message, "finish_reason": finish_reason}],
+            "usage": usage,
+            "streamed": True,
+        }
+
     @staticmethod
     def _to_text(value: Any) -> str:
         if value is None:

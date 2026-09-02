@@ -1,0 +1,33 @@
+# DeepSeek V4 Flash (0731) via OpenRouter, plus gros arbre, mode expert, batch de 20.
+models:
+  - name: "deepseek/deepseek-v4-flash-0731"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "deepseek/deepseek-v4-flash-0731"
+    temperature: 0.3
+    max_tokens: 64000          # pas de bride sur le raisonnement
+    provider:
+      data_collection: "allow"
+      allow_fallbacks: true
+    pricing:                   # USD / Mtok, indicatif
+      input_per_mtok: 0.14
+      output_per_mtok: 0.28
+
+benchmarks:
+  - name: "huge_tree_en_expert"
+    people: 1000
+    depth: 20
+    questions: 20
+    root_couples: 8
+    seed: 667
+    language: "en"
+    difficulty: expert
+    # leviers 3.0 par défaut : shuffle, relations parents, max_answer_names 10, anonymize 50
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 1
+  timeout: 3600
+  batch_size: 20
+  output_dir: "evaluation_results"
+  output_formats: [csv, json]
