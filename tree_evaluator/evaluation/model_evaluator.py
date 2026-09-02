@@ -581,7 +581,8 @@ class ModelEvaluator:
         role = "assistant"
         started = time.time()
         last_log = started
-        last_chunk = started
+        last_chunk = started      # dernier octet reçu (keep-alive compris)
+        last_progress = started   # dernier token de contenu/raisonnement reçu
         stream_timeout = aiohttp.ClientTimeout(total=timeout, sock_read=self.idle_timeout)
         async with session.post(url, json=payload, headers=headers, timeout=stream_timeout) as response:
             if response.status != 200:
@@ -622,13 +623,22 @@ class ModelEvaluator:
                             text = delta.get("content")
                             if isinstance(text, str) and text:
                                 content_parts.append(text)
+                                last_progress = time.time()
                             for key in ("reasoning", "reasoning_content"):
                                 rt = delta.get(key)
                                 if isinstance(rt, str) and rt:
                                     reasoning_parts.append(rt)
+                                    last_progress = time.time()
                             if choice.get("finish_reason"):
                                 finish_reason = choice["finish_reason"]
                     now = time.time()
+                    # OpenRouter envoie des keep-alive (": OPENROUTER PROCESSING") quand le
+                    # fournisseur est bloqué : sans token pendant idle_timeout, on coupe.
+                    if now - last_progress >= self.idle_timeout:
+                        raise StalledStreamError(
+                            f"no tokens for {int(now - last_progress)}s (keep-alives only) after "
+                            f"{sum(map(len, reasoning_parts))} reasoning chars and {sum(map(len, content_parts))} answer chars"
+                        )
                     if now - last_log >= 60:
                         last_log = now
                         logger.info(

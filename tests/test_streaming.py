@@ -119,3 +119,29 @@ async def test_connection_reset_is_retried():
         m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m", "stream": False})
         r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
     assert calls["n"] >= 2 and r.error is None and r.model_answer == "Bob"
+
+
+@pytest.mark.asyncio
+async def test_keepalives_without_tokens_count_as_stalled():
+    import asyncio
+    calls = {"n": 0}
+
+    async def chat(request):
+        calls["n"] += 1
+        resp = web.StreamResponse(headers={"Content-Type": "text/event-stream"})
+        await resp.prepare(request)
+        if calls["n"] == 1:
+            for _ in range(8):  # keep-alives réguliers, aucun token
+                await resp.write(b": OPENROUTER PROCESSING\n\n")
+                await asyncio.sleep(0.4)
+            return resp
+        await resp.write(sse({"choices": [{"delta": {"content": "Bob"}, "finish_reason": "stop"}]}))
+        await resp.write(b"data: [DONE]\n\n")
+        return resp
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, __import__("aiohttp").ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none",
+                            "model": "m", "idle_timeout": 1})
+        r = await m.evaluate_question("tree", Q, session, timeout=30, language="en")
+    assert calls["n"] == 2 and r.model_answer == "Bob"
