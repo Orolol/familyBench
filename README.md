@@ -379,6 +379,14 @@ Generator 4.0 (second unions, mixed-direction links, derived links, 2 children p
 | Reasoning tokens / question (avg) | 5,000 | 24,000 |
 | Cost | $0.135 | $0.45 |
 
+Protocol `hard-v4` (`evaluation_config_hard_v4.yaml`): hard tier only, 60 questions, batch 5, 16k output tokens per question, official DeepSeek API, entry `deepseek-v4-flash@high` (`thinking.reasoning_effort: high`):
+
+| Entry | Accuracy | Truncated batches | Reasoning tokens / question | Cached prompt tokens | Cost | Wall time |
+|---|---|---|---|---|---|---|
+| deepseek-v4-flash@high | 48.3 % (29/60) | 1 of 12 | 13,100 | 62 % | $0.25 | 30 min |
+
+Per type: conditional 78 %, half-siblings 75 %, step-parents 75 %, roots-with-criterion 50 %, descendants-with-criterion 50 %, multihop 22 %, comparative 0 %. The comparative questions ("who has the same number of children as X") are whole-tree censuses even when the answer is short, and no answer in 16k tokens is realistic; they are candidates for exclusion from the protocol. Files in `evaluation_results/hard_v4/`.
+
 Files in `evaluation_results/v4_deepseek/`. The failure profile is recall on relatives (one name missing from a list, or "None" when the model does not find a link) and exhaustive comparisons ("who has the most children among X and their siblings") that exceed the token budget.
 
 ### Historical leaderboard (2025)
