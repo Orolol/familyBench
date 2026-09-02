@@ -42,3 +42,12 @@ def test_partial_match_is_jaccard():
     assert c.calculate_partial_match("Alice,Bob", "Alice,Bob,Carol") == pytest.approx(2 / 3)
     assert c.calculate_partial_match("Alice", "alice") == 1.0
     assert c.calculate_partial_match("Alice", "Bob") == 0.0
+
+
+def test_expected_answers_get_the_same_normalisation_as_model_answers():
+    # le nettoyage transforme "salt and pepper" en "salt,pepper" côté modèle
+    model = c.clean_answer("jet black, salt and pepper, black", "en")
+    assert model == "jet black,salt,pepper,black"
+    assert c.check_exact_match(model, "black,jet black,salt and pepper")
+    assert c.calculate_partial_match(model, "black,jet black,salt and pepper") == 1.0
+    assert c.check_exact_match("alice,BOB", "Bob,Alice")

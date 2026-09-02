@@ -96,3 +96,26 @@ async def test_stalled_stream_is_cut_after_idle_timeout_and_retried():
         r = await m.evaluate_question("tree", Q, session, timeout=30, language="en")
     assert calls["n"] == 2, "the stalled first attempt must be retried"
     assert r.error is None and r.model_answer == "Bob"
+
+
+@pytest.mark.asyncio
+async def test_connection_reset_is_retried():
+    import aiohttp
+    calls = {"n": 0}
+
+    async def chat(request):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            # réponse annoncée mais connexion coupée avant la fin
+            resp = web.StreamResponse(headers={"Content-Type": "text/event-stream", "Content-Length": "1000"})
+            await resp.prepare(request)
+            await resp.write(sse({"choices": [{"delta": {"content": "Bo"}}]}))
+            request.transport.close()
+            return resp
+        return web.json_response({"choices": [{"message": {"content": "Bob"}}], "usage": {}})
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, aiohttp.ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m", "stream": False})
+        r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
+    assert calls["n"] >= 2 and r.error is None and r.model_answer == "Bob"

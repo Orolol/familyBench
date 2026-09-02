@@ -314,6 +314,10 @@ class ModelEvaluator:
         except asyncio.TimeoutError:
             logger.error(f"Timeout after {timeout}s for {self.name} on question {question['id']}")
             return self._create_error_result(question, "Timeout", time.time() - total_start_time)
+        except (aiohttp.ClientError, ConnectionError, OSError) as e:
+            # Connexion coupée par le fournisseur : transitoire, donc réessayé (no_response=True)
+            logger.warning(f"Connection error for {self.name} on question {question['id']}: {e}")
+            return self._create_error_result(question, f"Connection error: {e}", time.time() - total_start_time, no_response=True)
         except Exception as e:
             logger.error(f"Exception for {self.name} on question {question['id']}: {str(e)}", exc_info=True)
             return self._create_error_result(question, str(e), time.time() - total_start_time)
@@ -517,6 +521,11 @@ class ModelEvaluator:
             logger.error(f"Timeout after {timeout}s for {self.name} on batch of {len(questions)}")
             return [self._create_error_result(
                 q, "Timeout", (time.time() - total_start_time) / len(questions)
+            ) for q in questions]
+        except (aiohttp.ClientError, ConnectionError, OSError) as e:
+            logger.warning(f"Connection error for {self.name} on batch of {len(questions)}: {e}")
+            return [self._create_error_result(
+                q, f"Connection error: {e}", (time.time() - total_start_time) / len(questions), no_response=True
             ) for q in questions]
 
         except Exception as e:

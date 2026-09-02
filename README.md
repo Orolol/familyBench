@@ -341,6 +341,15 @@ Benchmark `large_tree_en` (500 people, 4 root couples, depth 6, seed 1) unless s
 | DeepSeek V4 Flash | 200 | 80.5 % | expert | 83.8 % on enigmas, ~48k prompt tokens per question |
 | Qwen 3.6 35B A3B (local) | 300 (3 runs × 100) | 79.3 % | all | |
 
+Batch-size sweep, generator 3.1 (400 people, 4 root couples, depth 6, seed 43, `difficulty: expert`, 40 questions, DeepSeek V4 Flash 0731, unlimited reasoning):
+
+| Batch size | Accuracy | Enigmas (levels 4-9) | Hard tier | Reasoning tokens / question | Prompt tokens | Cost |
+|---|---|---|---|---|---|---|
+| 1 | 85.0 % (3 network errors counted wrong) | 100 % | 74 % | 5,000 | 541k | $0.135 |
+| 5 | 65.0 % | 71 % | 61 % | 3,000 | 118k | $0.051 |
+
+Batching 5 questions per request divides the cost by 2.7 and costs 20 points, mostly on enigmas: the model reasons less per question and loses the chain. Batches of 20 on a 1,000-person tree never produced an answer within 160k reasoning tokens. Files in `evaluation_results/batch_sweep_deepseek/`.
+
 ### Historical leaderboard (2025)
 
 Here are the evaluation results of several state-of-the-art models on FamilyBench:
