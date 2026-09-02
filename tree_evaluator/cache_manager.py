@@ -1,4 +1,8 @@
-"""Gestionnaire de cache pour les appels API."""
+"""Gestionnaire de cache pour les appels API.
+
+Utilise `diskcache` si disponible (cache persistant dans .cache/). Sinon,
+bascule sur un cache mémoire non persistant avec un avertissement.
+"""
 
 import hashlib
 import json
@@ -6,17 +10,31 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-import diskcache
+try:
+    import diskcache  # type: ignore
+    HAS_DISKCACHE = True
+except ImportError:  # pragma: no cover - dépend de l'environnement
+    diskcache = None
+    HAS_DISKCACHE = False
 
 logger = logging.getLogger(__name__)
+
 
 class CacheManager:
     """Gère le cache des réponses API sur le disque."""
     
     def __init__(self, cache_dir: str = ".cache"):
         self.cache_dir = Path(cache_dir)
-        self.cache = diskcache.Cache(str(self.cache_dir))
-        logger.info(f"Cache initialized at {self.cache_dir}")
+        self.persistent = HAS_DISKCACHE
+        if HAS_DISKCACHE:
+            self.cache = diskcache.Cache(str(self.cache_dir))
+            logger.info(f"Cache initialized at {self.cache_dir}")
+        else:
+            self.cache = {}
+            logger.warning(
+                "diskcache is not installed: API responses will only be cached in memory "
+                "for this run. Install it with `pip install diskcache` for a persistent cache."
+            )
         
     def get(self, key_data: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """Récupère une réponse du cache."""
@@ -43,4 +61,5 @@ class CacheManager:
         
     def close(self):
         """Ferme le cache."""
-        self.cache.close()
+        if self.persistent:
+            self.cache.close()

@@ -102,7 +102,9 @@ TRANSLATIONS = {
         "q_more_grandsons_than_granddaughters": "Qui a plus de petits-fils que de petites-filles ?",
         
         # Questions de chemins relationnels
-        "q_relationship_between": "Quel est le lien de parenté entre {name1} et {name2} ?",
+        "q_relationship_between": "Quel est le lien de parenté entre {name1} et {name2} ? (réponds par : parent-enfant, cousins ou non apparentés)",
+        "rel_parent_child": "parent-enfant",
+        "rel_cousins": "cousins",
         "q_generations_between": "Combien de générations séparent {name1} et {name2} ?",
         "q_common_ancestor": "{name1} et {name2} ont-ils un ancêtre commun ? Si oui, qui ?",
         "q_are_related": "{name1} et {name2} sont-ils apparentés ?",
@@ -251,7 +253,9 @@ TRANSLATIONS = {
         "q_more_grandsons_than_granddaughters": "Who has more grandsons than granddaughters?",
         
         # Relational path questions
-        "q_relationship_between": "What is the relationship between {name1} and {name2}?",
+        "q_relationship_between": "What is the family relationship between {name1} and {name2}? (answer with: parent-child, cousins or unrelated)",
+        "rel_parent_child": "parent-child",
+        "rel_cousins": "cousins",
         "q_generations_between": "How many generations separate {name1} and {name2}?",
         "q_common_ancestor": "Do {name1} and {name2} have a common ancestor? If so, who?",
         "q_are_related": "Are {name1} and {name2} related?",

@@ -7,9 +7,10 @@ from typing import Dict, List, Any, Optional, Callable
 
 import aiohttp
 
-from tree_evaluator.tree_generator import generate_tree
+from tree_evaluator.tree_generator import generate_tree, actual_depth
 from tree_evaluator.text_converter import convert_tree_to_text
 from tree_evaluator.question_generator import generate_questions
+from tree_evaluator.versioning import benchmark_fingerprint, benchmark_params_from_config, GENERATOR_VERSION
 from .model_evaluator import ModelEvaluator
 from .result import EvaluationResult
 
@@ -23,6 +24,13 @@ class BenchmarkRun:
     tree_description: str
     system_prompt: str
     questions: List[Dict[str, Any]]
+    # Métadonnées de reproductibilité
+    benchmark_fingerprint: str = ""
+    generator_version: str = GENERATOR_VERSION
+    tree_people: int = 0
+    tree_depth_requested: int = 0
+    tree_depth_actual: int = 0
+    difficulty: str = "all"
 
 
 async def run_benchmark_evaluation(
@@ -63,6 +71,14 @@ async def run_benchmark_evaluation(
     )
 
     system_prompt = model.prompt_builder.get_system_prompt(language, batch_size > 1)
+    model.set_known_names(p.first_name for p in tree.values())
+    fingerprint = benchmark_fingerprint(benchmark_params_from_config(benchmark_config))
+    depth_actual = actual_depth(tree)
+    if depth_actual < benchmark_config['depth']:
+        logger.warning(
+            "Benchmark %s: requested depth %d, actual depth %d",
+            benchmark_config['name'], benchmark_config['depth'], depth_actual,
+        )
 
     semaphore = asyncio.Semaphore(max_concurrent)
 
@@ -148,4 +164,9 @@ async def run_benchmark_evaluation(
         tree_description=tree_description,
         system_prompt=system_prompt,
         questions=questions,
+        benchmark_fingerprint=fingerprint,
+        tree_people=len(tree),
+        tree_depth_requested=benchmark_config['depth'],
+        tree_depth_actual=depth_actual,
+        difficulty=difficulty,
     )

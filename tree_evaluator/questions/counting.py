@@ -15,7 +15,8 @@ def generate_counting_questions(people: Dict[str, Person], language: str = "fr")
             "type": "comptage"
         })
 
-    eye_colors = {p.eye_color for p in people.values()}
+    # Triés : l'ordre d'un set dépend du hash Python (reproductibilité par seed)
+    eye_colors = sorted({p.eye_color for p in people.values()})
     for color in eye_colors:
         count = len([p for p in people.values() if p.eye_color == color])
         questions.append({
@@ -24,7 +25,7 @@ def generate_counting_questions(people: Dict[str, Person], language: str = "fr")
             "type": "comptage"
         })
 
-    professions = {p.profession for p in people.values()}
+    professions = sorted({p.profession for p in people.values()})
     for profession in professions:
         count = len([p for p in people.values() if p.profession == profession])
         questions.append({

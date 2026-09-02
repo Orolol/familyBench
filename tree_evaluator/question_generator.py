@@ -73,6 +73,55 @@ def _dedupe(questions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return list({json.dumps(q, sort_keys=True): q for q in questions}.values())
 
 
+_TYPE_TO_DIFFICULTY: Dict[str, str] = {
+    qtype: tier for tier, types in DIFFICULTY_TIERS.items() for qtype in types
+}
+
+
+def difficulty_for_type(question_type: str) -> str | None:
+    """Tier de difficulté (easy/medium/hard/enigma) d'un type de question."""
+    return _TYPE_TO_DIFFICULTY.get(question_type)
+
+
+def _stamp_difficulty(questions: List[Dict[str, Any]]) -> None:
+    for q in questions:
+        q["difficulty"] = difficulty_for_type(q["type"])
+
+
+def _stratified_sample(questions: List[Dict[str, Any]], n: int) -> List[Dict[str, Any]]:
+    """Tire `n` questions en équilibrant les types.
+
+    Les questions sont regroupées par type, chaque groupe est mélangé, puis on
+    pioche en tourniquet (round-robin) sur les types dans un ordre aléatoire.
+    Un type épuisé est simplement ignoré, ce qui remplit automatiquement avec
+    les autres types. Sans cela, les types qui produisent le plus de candidats
+    (relations complexes, attributs composés) écrasaient tous les autres.
+    """
+    if n <= 0 or not questions:
+        return []
+    groups: Dict[str, List[Dict[str, Any]]] = {}
+    for q in questions:
+        groups.setdefault(q["type"], []).append(q)
+    order = sorted(groups)  # ordre déterministe avant mélange
+    random.shuffle(order)
+    for qtype in order:
+        random.shuffle(groups[qtype])
+
+    selected: List[Dict[str, Any]] = []
+    while len(selected) < n:
+        progressed = False
+        for qtype in order:
+            bucket = groups[qtype]
+            if bucket:
+                selected.append(bucket.pop())
+                progressed = True
+                if len(selected) == n:
+                    break
+        if not progressed:
+            break
+    return selected
+
+
 def generate_questions(
     people: Dict[str, Person],
     num_questions: int,
@@ -111,6 +160,8 @@ def generate_questions(
 
     unique_normal_questions = _dedupe(normal_questions)
     unique_enigma_questions = _dedupe(generate_enigma_questions(people, language))
+    _stamp_difficulty(unique_normal_questions)
+    _stamp_difficulty(unique_enigma_questions)
 
     if difficulty == "enigma":
         pool = unique_enigma_questions
@@ -145,14 +196,16 @@ def generate_questions(
     elif difficulty in DIFFICULTY_TIERS:
         allowed = DIFFICULTY_TIERS[difficulty]
         pool = [q for q in unique_normal_questions if q["type"] in allowed]
-        random.shuffle(pool)
-        selected = pool[:num_questions]
+        selected = _stratified_sample(pool, num_questions)
+        random.shuffle(selected)
     else:
         num_enigmas = int(num_questions * enigma_percentage / 100)
         num_normal = num_questions - num_enigmas
-        random.shuffle(unique_normal_questions)
         random.shuffle(unique_enigma_questions)
-        selected = unique_normal_questions[:num_normal] + unique_enigma_questions[:num_enigmas]
+        selected_enigmas = unique_enigma_questions[:num_enigmas]
+        # Si le pool d'énigmes est trop petit, on complète avec des questions normales
+        num_normal += num_enigmas - len(selected_enigmas)
+        selected = _stratified_sample(unique_normal_questions, num_normal) + selected_enigmas
         random.shuffle(selected)
 
     for i, q in enumerate(selected):

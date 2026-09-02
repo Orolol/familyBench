@@ -30,7 +30,7 @@ class AnswerCleaner:
         # Chercher d'autres formats courants comme **Answer:** ou Answer:
         if not glm_match and not answer_match:
             # Format **Answer:** ou Answer:
-            answer_pattern = re.search(r'(?:\*\*)?Answer\s*:\s*(.+?)(?:\n|$)', answer, re.IGNORECASE)
+            answer_pattern = re.search(r'(?:\*\*)?Answer\s*:\**\s*(.+?)(?:\n|$)', answer, re.IGNORECASE)
             if answer_pattern:
                 answer = answer_pattern.group(1).strip()
             
@@ -59,10 +59,12 @@ class AnswerCleaner:
             if final_answer_pattern:
                 answer = final_answer_pattern.group(1).strip()
         
-        # Enlever les guillemets, points, espaces superflus
-        answer = answer.strip()
-        answer = answer.strip('"\'')
-        answer = answer.rstrip('.')
+        # Enlever les guillemets, points, astérisques, espaces superflus
+        # (en boucle : `"Alice,Bob".` -> `Alice,Bob`)
+        previous = None
+        while previous != answer:
+            previous = answer
+            answer = answer.strip().strip('"\'`*').rstrip('.').strip()
         
         # Si la réponse contient une explication après deux-points, essayer d'extraire juste les noms
         if ':' in answer and not any(char in answer.split(':')[0] for char in [',', ' ']):

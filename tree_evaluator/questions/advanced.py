@@ -626,7 +626,7 @@ def generate_relational_path_questions(people: Dict[str, Person], language: str 
                     questions.append({
                         "question": get_translation("q_relationship_between", language).format(
                             name1=person.first_name, name2=child.first_name),
-                        "answer": "parent-enfant",
+                        "answer": get_translation("rel_parent_child", language),
                         "type": "relational_path"
                     })
         
@@ -652,7 +652,7 @@ def generate_relational_path_questions(people: Dict[str, Person], language: str 
                     questions.append({
                         "question": get_translation("q_relationship_between", language).format(
                             name1=person.first_name, name2=cousin.first_name),
-                        "answer": "cousins",
+                        "answer": get_translation("rel_cousins", language),
                         "type": "relational_path"
                     })
                     

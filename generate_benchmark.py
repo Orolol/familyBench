@@ -6,12 +6,13 @@
 import argparse
 import json
 import datetime
+import logging
 from typing import Dict, List, Any
 
-from tree_evaluator.tree_generator import generate_tree
+from tree_evaluator.tree_generator import generate_tree, actual_depth
 from tree_evaluator.text_converter import convert_tree_to_text
 from tree_evaluator.question_generator import generate_questions, VALID_DIFFICULTIES
-from tree_evaluator.visualizer import visualize_tree
+from tree_evaluator.versioning import benchmark_fingerprint, GENERATOR_VERSION
 
 def generate_markdown_output(description: str, questions: List[Dict[str, Any]], language: str = "fr") -> str:
     """Génère le contenu du fichier Markdown pour le LLM."""
@@ -104,6 +105,7 @@ def main():
     )
 
     args = parser.parse_args()
+    logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     print(f"Génération de l'arbre avec {args.people} personnes, profondeur {args.depth}, {args.root_couples} couple(s) racine(s), langue: {args.language}...")
     tree = generate_tree(
@@ -114,6 +116,11 @@ def main():
         num_root_couples=args.root_couples,
         language=args.language
     )
+
+    depth_actual = actual_depth(tree)
+    if depth_actual < args.depth:
+        print(f"Attention : profondeur demandée {args.depth}, profondeur obtenue {depth_actual} "
+              f"(augmentez --people ou réduisez --max-children / --root-couples).")
 
     print("Conversion de l'arbre en texte...")
     description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language)
@@ -141,11 +148,29 @@ def main():
         "questions": questions,
         "metadata": {
             "total_people": args.people,
+            "people_in_tree": len(tree),
             "tree_depth": args.depth,
+            "tree_depth_actual": depth_actual,
             "max_children_per_person": args.max_children,
+            "root_couples": args.root_couples,
             "seed": args.seed,
             "language": args.language,
             "difficulty": args.difficulty,
+            "enigma_percentage": args.enigma_percentage,
+            "questions_requested": args.questions,
+            "questions_generated": len(questions),
+            "generator_version": GENERATOR_VERSION,
+            "benchmark_fingerprint": benchmark_fingerprint({
+                "people": args.people,
+                "depth": args.depth,
+                "questions": args.questions,
+                "seed": args.seed,
+                "language": args.language,
+                "max_children": args.max_children,
+                "root_couples": args.root_couples,
+                "enigma_percentage": args.enigma_percentage,
+                "difficulty": args.difficulty,
+            }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }
     }
@@ -161,6 +186,7 @@ def main():
             f.write(markdown_content)
 
     if args.visualize:
+        from tree_evaluator.visualizer import visualize_tree  # import paresseux : graphviz optionnel
         print("Génération de la visualisation...")
         viz_output = args.output.rsplit('.', 1)[0]
         visualize_tree(tree, viz_output)

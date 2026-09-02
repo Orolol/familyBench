@@ -15,9 +15,10 @@ FamilyBench enables systematic and reproducible evaluation of LLMs' ability to:
 
 - **Dynamic generation**: Creation of random family trees with configurable constraints
 - **Multi-language**: Support for French and English
-- **Varied question types**: 9 categories of questions with increasing difficulty
+- **Varied question types**: 21 question types grouped in 4 difficulty tiers (easy, medium, hard, enigma) plus an `expert` mode
+- **Scoring you can audit**: exact match, Jaccard partial match, hallucination detection (invented names), per-type and per-tier accuracy
+- **Reproducible**: seeds plus a benchmark fingerprint (generator version + data files + parameters) written in every output
 - **Automatic evaluation**: Interface with OpenAI-compatible APIs to test multiple models
-- **Reproducibility**: Use of seeds to generate identical benchmarks
 - **Flexible export**: JSON and Markdown formats for direct LLM integration
 
 ## 📋 Prerequisites
@@ -73,7 +74,13 @@ python generate_benchmark.py --people 60 --depth 4 --questions 100 --root-couple
 
 # Limit number of children per person
 python generate_benchmark.py --people 40 --depth 3 --questions 80 --max-children 2 --output limited_children.json
+
+# Only hard questions, or the expert mix (hard questions + complexity 4-6 enigmas)
+python generate_benchmark.py --people 300 --depth 6 --questions 100 --root-couples 4 --difficulty hard --output hard.json
+python generate_benchmark.py --people 300 --depth 6 --questions 100 --root-couples 4 --difficulty expert --output expert.json
 ```
+
+> **Depth**: the requested depth is an upper bound. Each couple has 1 to `--max-children` children, so the pool of people is often exhausted before the requested depth (400 people with 10 root couples give 4 generations). The CLI prints a warning and writes `tree_depth_actual` in the metadata.
 
 ### Model Evaluation
 
@@ -97,13 +104,25 @@ benchmarks:
     language: "fr"
     seed: 42
     
-  - name: "small_en"
-    people: 30
-    depth: 3
-    questions: 50
+  - name: "expert_en"
+    people: 500
+    depth: 6
+    questions: 100
+    root_couples: 4
     language: "en"
-    seed: 42
+    seed: 1
+    difficulty: expert      # all | easy | medium | hard | enigma | expert
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 10
+  timeout: 600
+  batch_size: 1
+  output_dir: "evaluation_results"
+  output_formats: [csv, json]
 ```
+
+Optional per-model keys: `max_tokens` / `max_completion_tokens`, `reasoning` (forwarded to OpenRouter, or routed to the OpenAI Responses API when `api_base` is OpenAI), `provider` (OpenRouter routing), `request_delay_ms`, and `pricing` (`input_per_mtok`, `output_per_mtok`, `cached_input_per_mtok`) to get `cost_usd` in the results. Use `api_key: "none"` for a local server without authentication.
 
 #### Running Evaluation
 ```bash
@@ -118,7 +137,12 @@ python evaluate.py --benchmarks small_fr large_en
 
 # With custom configuration
 python evaluate.py --config my_eval_config.yaml
+
+# Full request/response logging (large!) in evaluation_debug.log
+python evaluate.py --debug
 ```
+
+Each run writes `results_<ts>.csv/json` (one row per question), `detailed_<ts>.json` (system prompt, tree description and every Q&A, enough to replay the run) and `summary_<ts>.json` (per-model stats, per-type and per-tier accuracy, hallucination rate, benchmark fingerprint and actual tree depth). API responses are cached in `.cache/` when `diskcache` is installed, so re-running an identical request costs nothing.
 
 ### Results Analysis
 
@@ -131,21 +155,37 @@ python analyze_results.py evaluation_results/results_*.csv --plots
 
 # Export detailed report
 python analyze_results.py evaluation_results/results_*.csv --report report.html
+
+# Ignore files where every row is an error (API server down)
+python analyze_results.py evaluation_results/results_*.csv --exclude-failed-runs
 ```
+
+### Scoring
+
+For each question the model answer is normalised (JSON arrays, numbered lists, `<answer>` tags, "Final answer:" prefixes, spelled-out numbers, `None`/`Aucun` variants) and compared to the expected answer as a **set of names**:
+
+| Metric | Definition |
+|---|---|
+| `is_exact_match` | Same set of names (order ignored) |
+| `partial_match_score` | Jaccard index between the two sets (1.0 for single answers that match) |
+| `is_correct` | Exact match **or** Jaccard ≥ 0.9. On short lists this is equivalent to exact match; on lists of 10+ names it tolerates one missing or extra name |
+| `no_response` | Empty answer, refusal, or a sentence instead of an answer |
+| `hallucinated_names` | Names in the answer that do not exist in the tree (only computed when the expected answer is a list of names) |
+
+`accuracy` in the summaries is the share of `is_correct` answers over all questions, errors and no-responses included.
 
 ## 🧠 Question Types
 
-FamilyBench generates 9 types of questions:
+FamilyBench generates 21 question types, grouped in difficulty tiers. `--difficulty all` (default) samples questions **evenly across types** with `--enigma-percentage` enigmas; `easy`, `medium`, `hard` and `enigma` restrict to one tier; `expert` mixes the hard tier (minus compound attributes and relational paths) with enigmas of complexity 4 to 6, at least 40 % of them being complexity 5 or 6.
 
-1. **Direct relations**: "Who are Marie's children?"
-2. **Inverse relations**: "Whose child is Jean?"
-3. **Attribute search**: "Who has blonde hair?"
-4. **Multi-criteria search**: "Who has brown hair and blue eyes?"
-5. **Counting**: "How many children does Pierre have?"
-6. **Complex relations**: "Who are Sophie's cousins?"
-7. **Cross-sectional questions**: "Who is in the same generation as Luc and works as a doctor?"
-8. **Vertical questions**: "Who are Claire's oldest ancestors?"
-9. **Compound relations**: "Which of Paul's children work as engineers?"
+| Tier | Types | Example |
+|---|---|---|
+| **easy** | `relation_directe`, `relation_inverse`, `recherche_attributs`, `comptage` | "Who are Marie's children?", "How many children does Pierre have?" |
+| **medium** | `recherche_multi_criteres`, `relation_complexe`, `transversale_generation`, `verticale_ancetre`, `verticale_racine`, `verticale_feuille`, `verticale_descendant`, `comptage_complexe` | "Who are Sophie's cousins?", "Who is in the same generation as Luc and works as a doctor?" |
+| **hard** | `relation_attribut_composee`, `multihop`, `conditional`, `negation`, `comparative`, `relational_path`, `recherche_inversee_complexe`, `verticale_descendant_critere`, `verticale_racine_critere` | "Which of Paul's children work as engineers?", "Who has more grandsons than granddaughters?" |
+| **enigma** | `enigme` (complexity 1 to 6) | "Who is the child of the son of Ken?" |
+
+Every generated question carries `type`, `difficulty` and, for enigmas, `complexity`. Answers are a single name, an alphabetically sorted comma-separated list, a number, or `None` / `Aucun`.
 
 ## 📊 Data Structure
 
@@ -165,7 +205,14 @@ FamilyBench generates 9 types of questions:
   "metadata": {
     "total_people": 30,
     "tree_depth": 3,
+    "tree_depth_actual": 3,
+    "seed": 42,
     "language": "en",
+    "difficulty": "all",
+    "questions_requested": 50,
+    "questions_generated": 50,
+    "generator_version": "2.0",
+    "benchmark_fingerprint": "28d22d39d3b571b8",
     "generation_timestamp": "2024-01-15T10:30:00"
   }
 }
@@ -195,18 +242,27 @@ Translations include:
 ```
 familybench/
 ├── tree_evaluator/
-│   ├── __init__.py
-│   ├── models.py           # Data models (Person)
-│   ├── tree_generator.py   # Tree generation
-│   ├── text_converter.py   # Text conversion
-│   ├── question_generator.py # Question generation
-│   └── translations.py     # Translation system
-├── data/
-│   ├── fr/                # French data
-│   └── en/                # English data
-├── generate_benchmark.py   # CLI for generation
-├── evaluate.py            # Model evaluation
-└── analyze_results.py     # Results analysis
+│   ├── models.py             # Person dataclass
+│   ├── tree_generator.py     # Tree generation (+ actual_depth)
+│   ├── text_converter.py     # Tree -> text description
+│   ├── question_generator.py # Difficulty tiers, stratified sampling
+│   ├── questions/            # One module per question family (+ enigma.py)
+│   ├── translations.py       # fr / en strings
+│   ├── versioning.py         # Generator version + benchmark fingerprint
+│   ├── cache_manager.py      # Optional diskcache of API responses
+│   ├── visualizer.py         # Optional graphviz rendering
+│   └── evaluation/
+│       ├── model_evaluator.py  # API calls (OpenAI chat, OpenAI Responses, Anthropic), scoring
+│       ├── runner.py           # Runs one benchmark for one model (concurrency, callbacks)
+│       ├── answer_cleaner.py   # Answer normalisation
+│       ├── stats.py            # Summary statistics
+│       ├── display.py          # Rich progress UI
+│       └── io.py               # CSV / JSON writers
+├── data/{fr,en}/             # Names, professions, colours
+├── tests/                    # pytest suite (generation, scoring, API parsing, end-to-end)
+├── generate_benchmark.py     # CLI: generate a benchmark
+├── evaluate.py               # CLI: evaluate models
+└── analyze_results.py        # CLI: analyse results
 ```
 
 ## 📈 Performance
@@ -218,13 +274,27 @@ Typical generation times:
 
 ## 🏆 Benchmark Results
 
+> **Reproducibility note.** The leaderboard below was produced in August-November 2025 with an earlier version of the generator and of the name lists. The name lists have since been extended and the question sampling made even across types, so `seed 43` no longer regenerates that exact tree. Runs are only comparable when they share the same `benchmark_fingerprint` (written in every summary since generator version 2.0). The 2025 table is kept as a historical reference; new runs should be compared against each other on the same fingerprint.
+
+### Recent runs (2026, generator ≥ 2.0, not comparable with the 2025 table)
+
+Benchmark `large_tree_en` (500 people, 4 root couples, depth 6, seed 1) unless stated otherwise.
+
+| Model | Questions | Accuracy | Difficulty | Notes |
+|---|---|---|---|---|
+| Kimi K2.6 | 300 (3 runs × 100) | 81.7 % | all | 18 errors |
+| DeepSeek V4 Flash | 200 | 80.5 % | expert | 83.8 % on enigmas, ~48k prompt tokens per question |
+| Qwen 3.6 35B A3B (local) | 300 (3 runs × 100) | 79.3 % | all | |
+
+### Historical leaderboard (2025)
+
 Here are the evaluation results of several state-of-the-art models on FamilyBench:
 
 ### Evaluation Configuration
-- **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
+- **Benchmark**: `huge_tree_en` - 400 people, requested depth 10 (5 generations actually reached), 200 questions requested, 10 root couples
 - **Temperature**: 0.3 for all models
 - **Evaluation Date**: August 14, 2025
-- **Total Questions**: 189 per model (after filtering)
+- **Total Questions**: 189 per model (the enigma pool of that generator version only had 9 unique enigmas for the 20 requested, and nothing backfilled the difference; fixed since)
 
 ### Results Summary
 

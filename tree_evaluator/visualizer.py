@@ -1,12 +1,22 @@
 """Module de visualisation des arbres généalogiques."""
 
 from typing import Dict
-import graphviz
 from tree_evaluator.models import Person
 
 def visualize_tree(people: Dict[str, Person], output_path: str = "family_tree"):
-    """Génère une visualisation de l'arbre généalogique."""
-    
+    """Génère une visualisation de l'arbre généalogique.
+
+    Nécessite le paquet optionnel `graphviz` (pip install graphviz) ainsi que
+    le binaire Graphviz (`dot`) sur la machine.
+    """
+    try:
+        import graphviz
+    except ImportError as e:
+        raise ImportError(
+            "The optional dependency 'graphviz' is required for --visualize. "
+            "Install it with `pip install graphviz` (and the Graphviz binaries)."
+        ) from e
+
     dot = graphviz.Digraph(comment='Family Tree', format='png')
     dot.attr(rankdir='TB')
     

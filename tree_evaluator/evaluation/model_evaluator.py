@@ -22,7 +22,13 @@ logger = logging.getLogger(__name__)
 
 class ModelEvaluator:
     """Évaluateur pour un modèle via API OpenAI-compatible."""
-    
+
+    # Une réponse est comptée correcte si elle est un match exact (mêmes noms,
+    # ordre ignoré) OU si son score de Jaccard avec la réponse attendue est
+    # >= ce seuil. Sur des listes courtes cela revient à exiger l'exact match ;
+    # sur des listes longues (>= 10 noms) cela tolère un nom manquant/en trop.
+    CORRECT_PARTIAL_THRESHOLD = 0.9
+
     def __init__(self, config: Dict[str, Any]):
         self.name = config['name']
         self.api_base = config['api_base'].rstrip('/')
@@ -41,6 +47,43 @@ class ModelEvaluator:
         self.cleaner = AnswerCleaner()
         self.prompt_builder = PromptBuilder()
         self.cache_manager = CacheManager()
+        # Prénoms présents dans l'arbre courant (défini par le runner) pour
+        # détecter les noms inventés dans les réponses.
+        self.known_names: set = set()
+
+    def set_known_names(self, names) -> None:
+        """Définit les prénoms valides de l'arbre en cours d'évaluation."""
+        self.known_names = set(names)
+
+    _NONE_TOKENS = ('none', 'aucun', 'aucune')
+
+    def _is_name_list(self, answer: str, known_lower: set) -> bool:
+        """True si `answer` est une liste (non vide) de prénoms de l'arbre."""
+        tokens = [t.strip() for t in answer.split(',') if t.strip()]
+        return bool(tokens) and all(t.lower() in known_lower for t in tokens)
+
+    def count_hallucinated_names(self, model_answer: str, expected_answer: str = "") -> int:
+        """Nombre de prénoms de la réponse qui n'existent pas dans l'arbre.
+
+        Ne s'applique que si la réponse attendue est elle-même une liste de
+        prénoms : les questions dont la réponse est un nombre, "None"/"Aucun",
+        un attribut (couleur...) ou un libellé de relation renvoient 0.
+        """
+        if not self.known_names or not model_answer:
+            return 0
+        known_lower = {n.lower() for n in self.known_names}
+        if expected_answer and not self._is_name_list(expected_answer, known_lower):
+            return 0
+        if model_answer.strip().isdigit():
+            return 0
+        count = 0
+        for token in model_answer.split(','):
+            token = token.strip()
+            if not token or token.lower() in self._NONE_TOKENS:
+                continue
+            if token.lower() not in known_lower:
+                count += 1
+        return count
 
     def _compute_cost(
         self, prompt_tokens: int, completion_tokens: int, cached_tokens: int
@@ -177,72 +220,74 @@ class ModelEvaluator:
                     if result:
                         self.cache_manager.set(cache_key, result)
                 
-                # Log de debug pour les réponses API
-                logger.debug(f"API Response for {self.name} - Question {question['id']}: {json.dumps(result, indent=2) if result else 'None'}")
-                
-                # Vérifier que result n'est pas None
-                if result is None:
-                    return self._create_error_result(
-                        question, "Empty response from API", response_time, no_response=True
-                    )
-                
-                # Extraire la réponse selon le format
-                (
-                    model_answer,
-                    tokens_used,
-                    reasoning_tokens,
-                    reasoning_text,
-                    prompt_tokens,
-                    cached_tokens,
-                ) = self._extract_api_response(result)
-
-                # Nettoyer la réponse
-                model_answer = self.cleaner.clean_answer(model_answer, language)
-                
-                # Log si la réponse est vide ou très courte
-                if not model_answer or len(model_answer) < 2:
-                    logger.warning(f"Empty or very short answer from {self.name} for question {question['id']}: '{model_answer}'")
-                    if reasoning_text:
-                        logger.debug(f"Reasoning text was: {reasoning_text[:500]}...")
-                
-                # Détecter les non-réponses
-                no_response = self.cleaner.is_no_response(model_answer)
-                
-                # Évaluer la réponse
-                if no_response:
-                    is_exact_match = False
-                    partial_score = 0.0
-                    is_correct = False
-                else:
-                    is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
-                    partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
-                    is_correct = is_exact_match or partial_score >= 0.9
-                
-                # Calculer le temps total depuis le début (incluant les retries)
-                total_response_time = time.time() - total_start_time
-                
-                return EvaluationResult(
-                    model_name=self.name,
-                    benchmark_name="",
-                    question_id=question['id'],
-                    question=question['question'],
-                    expected_answer=question['answer'],
-                    model_answer=model_answer,
-                    is_correct=is_correct,
-                    is_exact_match=is_exact_match,
-                    partial_match_score=partial_score,
-                    response_time=total_response_time,
-                    tokens_used=tokens_used,
-                    no_response=no_response,
-                    reasoning_tokens=reasoning_tokens,
-                    reasoning_text=reasoning_text,
-                    prompt_tokens=prompt_tokens,
-                    cached_tokens=cached_tokens,
-                    cost_usd=self._compute_cost(prompt_tokens, tokens_used, cached_tokens),
-                    question_type=question.get('type'),
-                    is_enigma=question.get('type') == 'enigme',
-                    enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
+            # Log de debug pour les réponses API
+            logger.debug(f"API Response for {self.name} - Question {question['id']}: {json.dumps(result, indent=2) if result else 'None'}")
+            
+            # Vérifier que result n'est pas None
+            if result is None:
+                return self._create_error_result(
+                    question, "Empty response from API", response_time, no_response=True
                 )
+            
+            # Extraire la réponse selon le format
+            (
+                model_answer,
+                tokens_used,
+                reasoning_tokens,
+                reasoning_text,
+                prompt_tokens,
+                cached_tokens,
+            ) = self._extract_api_response(result)
+
+            # Nettoyer la réponse
+            model_answer = self.cleaner.clean_answer(model_answer, language)
+            
+            # Log si la réponse est vide ou très courte
+            if not model_answer or len(model_answer) < 2:
+                logger.warning(f"Empty or very short answer from {self.name} for question {question['id']}: '{model_answer}'")
+                if reasoning_text:
+                    logger.debug(f"Reasoning text was: {reasoning_text[:500]}...")
+            
+            # Détecter les non-réponses
+            no_response = self.cleaner.is_no_response(model_answer)
+            
+            # Évaluer la réponse
+            if no_response:
+                is_exact_match = False
+                partial_score = 0.0
+                is_correct = False
+            else:
+                is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
+                partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
+                is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
+            
+            # Calculer le temps total depuis le début (incluant les retries)
+            total_response_time = time.time() - total_start_time
+            
+            return EvaluationResult(
+                model_name=self.name,
+                benchmark_name="",
+                question_id=question['id'],
+                question=question['question'],
+                expected_answer=question['answer'],
+                model_answer=model_answer,
+                hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
+                is_correct=is_correct,
+                is_exact_match=is_exact_match,
+                partial_match_score=partial_score,
+                response_time=total_response_time,
+                tokens_used=tokens_used,
+                no_response=no_response,
+                reasoning_tokens=reasoning_tokens,
+                reasoning_text=reasoning_text,
+                prompt_tokens=prompt_tokens,
+                cached_tokens=cached_tokens,
+                cost_usd=self._compute_cost(prompt_tokens, tokens_used, cached_tokens),
+                question_type=question.get('type'),
+                difficulty=question.get('difficulty'),
+                is_enigma=question.get('type') == 'enigme',
+                enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
+            )
 
         except asyncio.TimeoutError:
             logger.error(f"Timeout after {timeout}s for {self.name} on question {question['id']}")
@@ -369,85 +414,87 @@ class ModelEvaluator:
                     if result:
                         self.cache_manager.set(cache_key, result)
                 
-                # Vérifier que result n'est pas None
-                if result is None:
-                    return [self._create_error_result(
-                        q, "Empty response from API", response_time, no_response=True
-                    ) for q in questions]
-                
-                # Extraire la réponse selon le format
-                (
-                    model_response,
-                    tokens_used,
-                    reasoning_tokens,
-                    reasoning_text,
-                    prompt_tokens,
-                    cached_tokens,
-                ) = self._extract_api_response(result)
+            # Vérifier que result n'est pas None
+            if result is None:
+                return [self._create_error_result(
+                    q, "Empty response from API", response_time, no_response=True
+                ) for q in questions]
+            
+            # Extraire la réponse selon le format
+            (
+                model_response,
+                tokens_used,
+                reasoning_tokens,
+                reasoning_text,
+                prompt_tokens,
+                cached_tokens,
+            ) = self._extract_api_response(result)
 
-                # Parser la réponse JSON
-                try:
-                    # Extraire le JSON de la réponse
-                    json_match = re.search(r'\[.*\]', model_response, re.DOTALL)
-                    if json_match:
-                        answers = json.loads(json_match.group())
-                    else:
-                        answers = json.loads(model_response)
-                    
-                    # S'assurer qu'on a le bon nombre de réponses
-                    if len(answers) != len(questions):
-                        answers = answers[:len(questions)] + [''] * (len(questions) - len(answers))
-                    
-                except:
-                    # Si le parsing échoue, retourner des non-réponses
-                    answers = [''] * len(questions)
+            # Parser la réponse JSON
+            try:
+                # Extraire le JSON de la réponse
+                json_match = re.search(r'\[.*\]', model_response, re.DOTALL)
+                if json_match:
+                    answers = json.loads(json_match.group())
+                else:
+                    answers = json.loads(model_response)
                 
-                # Créer les résultats pour chaque question
-                results = []
-                for i, (question, answer) in enumerate(zip(questions, answers)):
-                    # Nettoyer la réponse
-                    model_answer = self.cleaner.clean_answer(str(answer), language)
-                    
-                    # Détecter les non-réponses
-                    no_response = self.cleaner.is_no_response(model_answer)
-                    
-                    # Évaluer la réponse
-                    if no_response:
-                        is_exact_match = False
-                        partial_score = 0.0
-                        is_correct = False
-                    else:
-                        is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
-                        partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
-                        is_correct = is_exact_match or partial_score >= 0.9
-                    
-                    per_q_prompt = prompt_tokens // len(questions)
-                    per_q_completion = tokens_used // len(questions)
-                    per_q_cached = cached_tokens // len(questions)
-                    results.append(EvaluationResult(
-                        model_name=self.name,
-                        benchmark_name="",
-                        question_id=question['id'],
-                        question=question['question'],
-                        expected_answer=question['answer'],
-                        model_answer=model_answer,
-                        is_correct=is_correct,
-                        is_exact_match=is_exact_match,
-                        partial_match_score=partial_score,
-                        response_time=(time.time() - total_start_time) / len(questions),  # Temps moyen par question
-                        tokens_used=per_q_completion,
-                        no_response=no_response,
-                        reasoning_tokens=reasoning_tokens // len(questions) if reasoning_tokens > 0 else 0,
-                        reasoning_text=reasoning_text,  # Partagé entre toutes les questions du batch
-                        prompt_tokens=per_q_prompt,
-                        cached_tokens=per_q_cached,
-                        cost_usd=self._compute_cost(per_q_prompt, per_q_completion, per_q_cached),
-                        question_type=question.get('type'),
-                        is_enigma=question.get('type') == 'enigme',
-                        enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
-                    ))
+                # S'assurer qu'on a le bon nombre de réponses
+                if len(answers) != len(questions):
+                    answers = answers[:len(questions)] + [''] * (len(questions) - len(answers))
+                
+            except:
+                # Si le parsing échoue, retourner des non-réponses
+                answers = [''] * len(questions)
+            
+            # Créer les résultats pour chaque question
+            results = []
+            for i, (question, answer) in enumerate(zip(questions, answers)):
+                # Nettoyer la réponse
+                model_answer = self.cleaner.clean_answer(str(answer), language)
+                
+                # Détecter les non-réponses
+                no_response = self.cleaner.is_no_response(model_answer)
+                
+                # Évaluer la réponse
+                if no_response:
+                    is_exact_match = False
+                    partial_score = 0.0
+                    is_correct = False
+                else:
+                    is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
+                    partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
+                    is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
+                
+                per_q_prompt = prompt_tokens // len(questions)
+                per_q_completion = tokens_used // len(questions)
+                per_q_cached = cached_tokens // len(questions)
+                results.append(EvaluationResult(
+                    model_name=self.name,
+                    benchmark_name="",
+                    question_id=question['id'],
+                    question=question['question'],
+                    expected_answer=question['answer'],
+                    model_answer=model_answer,
+                    hallucinated_names=self.count_hallucinated_names(model_answer, question['answer']),
+                    is_correct=is_correct,
+                    is_exact_match=is_exact_match,
+                    partial_match_score=partial_score,
+                    response_time=(time.time() - total_start_time) / len(questions),  # Temps moyen par question
+                    tokens_used=per_q_completion,
+                    no_response=no_response,
+                    reasoning_tokens=reasoning_tokens // len(questions) if reasoning_tokens > 0 else 0,
+                    reasoning_text=reasoning_text,  # Partagé entre toutes les questions du batch
+                    prompt_tokens=per_q_prompt,
+                    cached_tokens=per_q_cached,
+                    cost_usd=self._compute_cost(per_q_prompt, per_q_completion, per_q_cached),
+                    question_type=question.get('type'),
+                    difficulty=question.get('difficulty'),
+                    is_enigma=question.get('type') == 'enigme',
+                    enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
+                ))
 
-                return results
+            return results
                 
         except asyncio.TimeoutError:
             return [self._create_error_result(
@@ -675,6 +722,7 @@ class ModelEvaluator:
             reasoning_tokens=0,
             reasoning_text=None,
             question_type=question.get('type'),
+            difficulty=question.get('difficulty'),
             is_enigma=question.get('type') == 'enigme',
             enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
         )

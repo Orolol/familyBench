@@ -22,13 +22,27 @@ from tree_evaluator.evaluation.display import EvalProgress, print_final_summary,
 
 load_dotenv()
 
-# Logging fichier uniquement (rich gère la console)
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.FileHandler('evaluation_debug.log')],
-)
 logger = logging.getLogger(__name__)
+
+
+def setup_logging(debug: bool, log_file: str = "evaluation_debug.log") -> None:
+    """Logging fichier uniquement (rich gère la console), avec rotation.
+
+    INFO par défaut ; --debug active DEBUG (requêtes et réponses complètes,
+    très volumineux : chaque requête contient l'arbre entier).
+    """
+    from logging.handlers import RotatingFileHandler
+
+    handler = RotatingFileHandler(
+        log_file, maxBytes=20 * 1024 * 1024, backupCount=3, encoding="utf-8"
+    )
+    handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    )
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    root.setLevel(logging.DEBUG if debug else logging.INFO)
 
 
 def _build_detailed_json(
@@ -70,6 +84,12 @@ def _build_detailed_json(
         "benchmark": benchmark_config["name"],
         "language": benchmark_config.get("language", "fr"),
         "timestamp": datetime.now().isoformat(),
+        "benchmark_fingerprint": benchmark_run.benchmark_fingerprint,
+        "generator_version": benchmark_run.generator_version,
+        "difficulty": benchmark_run.difficulty,
+        "tree_people": benchmark_run.tree_people,
+        "tree_depth_requested": benchmark_run.tree_depth_requested,
+        "tree_depth_actual": benchmark_run.tree_depth_actual,
         "system_prompt": benchmark_run.system_prompt,
         "tree_description": benchmark_run.tree_description,
         "questions_answers": qa_list,
@@ -94,7 +114,12 @@ async def main():
         help="Liste des benchmarks à exécuter (override la config)",
     )
 
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Active le logging DEBUG (requêtes/réponses complètes) dans evaluation_debug.log",
+    )
     args = parser.parse_args()
+    setup_logging(args.debug)
 
     # Charger la configuration
     with open(args.config, "r", encoding="utf-8") as f:
@@ -131,6 +156,7 @@ async def main():
     all_results = []
     summary_stats = {}
     detailed_runs: List[Dict] = []
+    benchmark_meta: Dict[str, Dict] = {}
 
     try:
         for model_config in models_to_eval:
@@ -164,6 +190,15 @@ async def main():
                         stats["accuracy"], stats["avg_response_time"]
                     )
 
+                    benchmark_meta[benchmark["name"]] = {
+                        "fingerprint": benchmark_run.benchmark_fingerprint,
+                        "generator_version": benchmark_run.generator_version,
+                        "difficulty": benchmark_run.difficulty,
+                        "people": benchmark_run.tree_people,
+                        "depth_requested": benchmark_run.tree_depth_requested,
+                        "depth_actual": benchmark_run.tree_depth_actual,
+                        "questions": len(benchmark_run.questions),
+                    }
                     # Collecter le JSON détaillé
                     detailed_runs.append(
                         _build_detailed_json(
@@ -206,6 +241,7 @@ async def main():
                 "config": args.config,
                 "models_evaluated": [m["name"] for m in models_to_eval],
                 "benchmarks_run": [b["name"] for b in benchmarks_to_run],
+                "benchmarks": benchmark_meta,
                 "summary_stats": summary_stats,
             },
             f,

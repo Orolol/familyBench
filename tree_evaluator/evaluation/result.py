@@ -26,5 +26,9 @@ class EvaluationResult:
     cost_usd: Optional[float] = None
     reasoning_text: Optional[str] = None
     question_type: Optional[str] = None
+    # Tier de difficulté de la question (easy / medium / hard / enigma)
+    difficulty: Optional[str] = None
+    # Nombre de prénoms de la réponse qui n'existent pas dans l'arbre
+    hallucinated_names: int = 0
     is_enigma: bool = False
     enigma_complexity: Optional[int] = None

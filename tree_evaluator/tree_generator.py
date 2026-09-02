@@ -1,9 +1,23 @@
+import logging
 import random
 import uuid
 from itertools import product
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from tree_evaluator.models import Person
+
+logger = logging.getLogger(__name__)
+
+# Dossier des données, indépendant du répertoire courant
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+def actual_depth(people: Dict[str, Person]) -> int:
+    """Nombre de générations réellement présentes dans l'arbre."""
+    if not people:
+        return 0
+    return max(p.generation for p in people.values()) + 1
 
 def _load_data(file_path: str) -> List[Tuple[str, str]]:
     """Charge les lignes d'un fichier texte (prénom,sexe)."""
@@ -65,7 +79,7 @@ def generate_tree(
         random.seed(seed)
 
     # Charger les données selon la langue
-    data_dir = f"data/{language}"
+    data_dir = DATA_DIR / language
     first_names_genders = _load_data(f"{data_dir}/first_names.txt")
     professions = _load_professions(f"{data_dir}/professions.txt")
     hair_colors = _load_professions(f"{data_dir}/hair_colors.txt")
@@ -134,7 +148,9 @@ def generate_tree(
         random.shuffle(people_to_marry)
         
         for person in people_to_marry:
-            if not person_pool:
+            # Il faut au moins un conjoint ET un enfant, sinon le conjoint
+            # entrerait dans l'arbre sans aucun lien de parenté.
+            if len(person_pool) < 2:
                 break
                 
             # Chercher un partenaire de sexe opposé dans le pool
@@ -180,6 +196,46 @@ def generate_tree(
         current_generation = next_generation
         gen += 1
 
+    # Rattacher les personnes restantes (pool non vide à cause de la limite de
+    # profondeur ou d'un reste impair) comme enfants de couples existants qui
+    # ont encore de la place, pour que l'arbre contienne bien total_people.
+    if person_pool:
+        random.shuffle(person_pool)
+        for leftover in list(person_pool):
+            candidates = [
+                p for p in people.values()
+                if p.id in people_in_tree_ids
+                and p.children_ids
+                and len(p.children_ids) < max_children_per_person
+                and p.generation <= max_depth - 2
+            ]
+            if not candidates:
+                break
+            parent = random.choice(candidates)
+            first_child = people[parent.children_ids[0]]
+            co_parent_id = next(pid for pid in first_child.parent_ids if pid != parent.id)
+            co_parent = people[co_parent_id]
+            leftover.generation = parent.generation + 1
+            leftover.parent_ids = [parent.id, co_parent_id] if parent.gender == 'M' else [co_parent_id, parent.id]
+            parent.children_ids.append(leftover.id)
+            co_parent.children_ids.append(leftover.id)
+            people_in_tree_ids.add(leftover.id)
+            person_pool.remove(leftover)
+        if person_pool:
+            logger.warning(
+                "%d of %d people could not be placed in the tree (depth %d, max %d children per couple) "
+                "and were dropped.", len(person_pool), total_people, max_depth, max_children_per_person,
+            )
+
     final_tree = {pid: p for pid, p in people.items() if pid in people_in_tree_ids}
-    
+
+    depth_reached = actual_depth(final_tree)
+    if depth_reached < max_depth:
+        logger.warning(
+            "Requested depth %d but the tree only has %d generation(s): the pool of %d people "
+            "is exhausted before reaching it (each couple has 1-%d children). Increase "
+            "total_people or lower max_children_per_person / num_root_couples to go deeper.",
+            max_depth, depth_reached, total_people, max_children_per_person,
+        )
+
     return final_tree
