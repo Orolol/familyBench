@@ -117,7 +117,7 @@ Answers are names sorted alphabetically and comma-separated, a number, or `None`
 ## Evaluation System
 
 The evaluation framework (`tree_evaluator/evaluation/`) includes:
-- **Async API calls** with a concurrency semaphore (`max_concurrent_requests`), timeout and retries; SSE streaming by default (`stream: false` to disable); empty or `finish_reason=length` responses are never cached and retries bypass the cache
+- **Async API calls** with a concurrency semaphore (`max_concurrent_requests`), timeout and retries; SSE streaming by default (`stream: false` to disable; `idle_timeout` seconds without a chunk = stalled stream, counted as no-response and retried); empty or `finish_reason=length` responses are never cached and retries bypass the cache
 - **Three request formats**: OpenAI chat completions (default, incl. OpenRouter `reasoning`/`provider`), OpenAI Responses API (when `reasoning` is set and `api_base` is OpenAI), Anthropic messages
 - **Answer cleaning** to normalize LLM responses (handles JSON arrays, numbered lists, tags, etc.)
 - **Scoring**: `is_correct` = exact set match OR Jaccard >= `ModelEvaluator.CORRECT_PARTIAL_THRESHOLD` (0.9); `hallucinated_names` counts names absent from the tree (only when the expected answer is a name list)

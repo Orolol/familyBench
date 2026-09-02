@@ -70,3 +70,29 @@ def test_streaming_not_used_for_anthropic_or_responses_api():
     assert not ModelEvaluator({"name": "a", "api_base": "https://api.anthropic.com/v1", "api_key": "k", "model": "m"})._uses_streaming()
     assert not ModelEvaluator({"name": "o", "api_base": "https://api.openai.com/v1", "api_key": "k", "model": "m", "reasoning": {"effort": "low"}})._uses_streaming()
     assert ModelEvaluator({"name": "r", "api_base": "https://openrouter.ai/api/v1", "api_key": "k", "model": "m"})._uses_streaming()
+
+
+@pytest.mark.asyncio
+async def test_stalled_stream_is_cut_after_idle_timeout_and_retried():
+    import asyncio
+    calls = {"n": 0}
+
+    async def chat(request):
+        calls["n"] += 1
+        resp = web.StreamResponse(headers={"Content-Type": "text/event-stream"})
+        await resp.prepare(request)
+        await resp.write(sse({"choices": [{"delta": {"reasoning": "thinking..."}}]}))
+        if calls["n"] == 1:
+            await asyncio.sleep(5)  # flux figé : rien pendant > idle_timeout
+            return resp
+        await resp.write(sse({"choices": [{"delta": {"content": "Bob"}, "finish_reason": "stop"}]}))
+        await resp.write(b"data: [DONE]\n\n")
+        return resp
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, __import__("aiohttp").ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none",
+                            "model": "m", "idle_timeout": 1})
+        r = await m.evaluate_question("tree", Q, session, timeout=30, language="en")
+    assert calls["n"] == 2, "the stalled first attempt must be retried"
+    assert r.error is None and r.model_answer == "Bob"

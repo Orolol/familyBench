@@ -20,6 +20,10 @@ from ..cache_manager import CacheManager
 logger = logging.getLogger(__name__)
 
 
+class StalledStreamError(Exception):
+    """Aucun chunk reçu pendant idle_timeout secondes sur un flux SSE."""
+
+
 class ModelEvaluator:
     """Évaluateur pour un modèle via API OpenAI-compatible."""
 
@@ -46,6 +50,10 @@ class ModelEvaluator:
         # l'API Responses d'OpenAI.
         self.stream = bool(config.get('stream', True))
         self.stream_options = bool(config.get('stream_options', True))
+        # Délai max sans aucun chunk reçu en streaming (secondes). Un flux figé
+        # (fournisseur mort côté OpenRouter) est coupé et compté comme une
+        # non-réponse, donc réessayé, au lieu d'attendre le timeout global.
+        self.idle_timeout = int(config.get('idle_timeout', 300))
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
         # Pricing (USD per million tokens). Optional; absent => no cost computed.
         # Expected keys: input_per_mtok, output_per_mtok, cached_input_per_mtok (optional).
@@ -300,6 +308,9 @@ class ModelEvaluator:
                 enigma_complexity=question.get('complexity') if question.get('type') == 'enigme' else None
             )
 
+        except StalledStreamError as e:
+            logger.warning(f"Stalled stream for {self.name} on question {question['id']}: {e}")
+            return self._create_error_result(question, f"Stalled stream: {e}", time.time() - total_start_time, no_response=True)
         except asyncio.TimeoutError:
             logger.error(f"Timeout after {timeout}s for {self.name} on question {question['id']}")
             return self._create_error_result(question, "Timeout", time.time() - total_start_time)
@@ -497,7 +508,13 @@ class ModelEvaluator:
 
             return results
 
+        except StalledStreamError as e:
+            logger.warning(f"Stalled stream for {self.name} on batch of {len(questions)}: {e}")
+            return [self._create_error_result(
+                q, f"Stalled stream: {e}", (time.time() - total_start_time) / len(questions), no_response=True
+            ) for q in questions]
         except asyncio.TimeoutError:
+            logger.error(f"Timeout after {timeout}s for {self.name} on batch of {len(questions)}")
             return [self._create_error_result(
                 q, "Timeout", (time.time() - total_start_time) / len(questions)
             ) for q in questions]
@@ -549,54 +566,66 @@ class ModelEvaluator:
         role = "assistant"
         started = time.time()
         last_log = started
-        async with session.post(url, json=payload, headers=headers, timeout=client_timeout) as response:
+        last_chunk = started
+        stream_timeout = aiohttp.ClientTimeout(total=timeout, sock_read=self.idle_timeout)
+        async with session.post(url, json=payload, headers=headers, timeout=stream_timeout) as response:
             if response.status != 200:
                 return response.status, await response.text()
             if "json" in (response.headers.get("Content-Type") or "").lower():
                 # Le serveur a ignoré `stream` (proxy, serveur local minimal) : réponse classique
                 return response.status, await response.json()
             buffer = b""
-            async for chunk in response.content.iter_any():
-                buffer += chunk
-                while b"\n" in buffer:
-                    line, buffer = buffer.split(b"\n", 1)
-                    line = line.strip()
-                    if not line or line.startswith(b":"):
-                        continue  # keep-alive / commentaire SSE
-                    if not line.startswith(b"data:"):
-                        continue
-                    body = line[5:].strip()
-                    if body == b"[DONE]":
-                        continue
-                    try:
-                        event = json.loads(body)
-                    except ValueError:
-                        logger.debug(f"Unparseable SSE line for {self.name}: {body[:200]!r}")
-                        continue
-                    if event.get("usage"):
-                        usage = event["usage"]
-                    if event.get("error"):
-                        return 500, json.dumps(event["error"])
-                    for choice in event.get("choices") or []:
-                        delta = choice.get("delta") or {}
-                        if delta.get("role"):
-                            role = delta["role"]
-                        text = delta.get("content")
-                        if isinstance(text, str) and text:
-                            content_parts.append(text)
-                        for key in ("reasoning", "reasoning_content"):
-                            rt = delta.get(key)
-                            if isinstance(rt, str) and rt:
-                                reasoning_parts.append(rt)
-                        if choice.get("finish_reason"):
-                            finish_reason = choice["finish_reason"]
-                now = time.time()
-                if now - last_log >= 60:
-                    last_log = now
-                    logger.info(
-                        f"Streaming {label} for {self.name}: {int(now - started)}s, "
-                        f"{sum(map(len, reasoning_parts))} reasoning chars, {sum(map(len, content_parts))} answer chars"
+            try:
+                async for chunk in response.content.iter_any():
+                    last_chunk = time.time()
+                    buffer += chunk
+                    while b"\n" in buffer:
+                        line, buffer = buffer.split(b"\n", 1)
+                        line = line.strip()
+                        if not line or line.startswith(b":"):
+                            continue  # keep-alive / commentaire SSE
+                        if not line.startswith(b"data:"):
+                            continue
+                        body = line[5:].strip()
+                        if body == b"[DONE]":
+                            continue
+                        try:
+                            event = json.loads(body)
+                        except ValueError:
+                            logger.debug(f"Unparseable SSE line for {self.name}: {body[:200]!r}")
+                            continue
+                        if event.get("usage"):
+                            usage = event["usage"]
+                        if event.get("error"):
+                            return 500, json.dumps(event["error"])
+                        for choice in event.get("choices") or []:
+                            delta = choice.get("delta") or {}
+                            if delta.get("role"):
+                                role = delta["role"]
+                            text = delta.get("content")
+                            if isinstance(text, str) and text:
+                                content_parts.append(text)
+                            for key in ("reasoning", "reasoning_content"):
+                                rt = delta.get(key)
+                                if isinstance(rt, str) and rt:
+                                    reasoning_parts.append(rt)
+                            if choice.get("finish_reason"):
+                                finish_reason = choice["finish_reason"]
+                    now = time.time()
+                    if now - last_log >= 60:
+                        last_log = now
+                        logger.info(
+                            f"Streaming {label} for {self.name}: {int(now - started)}s, "
+                            f"{sum(map(len, reasoning_parts))} reasoning chars, {sum(map(len, content_parts))} answer chars"
+                        )
+            except asyncio.TimeoutError:
+                idle = time.time() - last_chunk
+                if idle >= self.idle_timeout - 1 and time.time() - started < timeout - 1:
+                    raise StalledStreamError(
+                        f"no data for {int(idle)}s after {sum(map(len, reasoning_parts))} reasoning chars "
+                        f"and {sum(map(len, content_parts))} answer chars"
                     )
+                raise
         if finish_reason == "length":
             logger.warning(f"{self.name} {label}: generation stopped by max_tokens (finish_reason=length)")
         message: Dict[str, Any] = {"role": role, "content": "".join(content_parts)}

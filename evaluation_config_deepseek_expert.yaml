@@ -5,6 +5,7 @@ models:
     api_key: "${OPENROUTER_API_KEY}"
     model: "deepseek/deepseek-v4-flash-0731"
     temperature: 0.3
+    idle_timeout: 300         # flux figé > 5 min => coupé et réessayé
     max_tokens: 160000         # OpenRouter autorise jusqu'à 943k ; 64k a été insuffisant pour 20 questions
     provider:
       data_collection: "allow"
