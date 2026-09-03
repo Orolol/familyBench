@@ -195,6 +195,11 @@ async def main():
     try:
         for model_config in models_to_eval:
             model = ModelEvaluator(model_config)
+            if model.api_key == "none" and not any(h in model.api_base for h in ("127.0.0.1", "localhost")):
+                key_ref = model_config.get("api_key", "")
+                logger.warning(f"Skipping {model_config['name']}: API key {key_ref} is not set")
+                console.print(f"[yellow]⚠ {model_config['name']} ignoré : clé {key_ref} absente de l'environnement[/yellow]")
+                continue
             entries_meta[model_config["name"]] = model.entry_metadata()
             model_results = []
             progress.begin_model(model_config["name"])

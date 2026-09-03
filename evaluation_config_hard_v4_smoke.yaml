@@ -1,0 +1,91 @@
+# Test de coût du protocole hard-v4 : mêmes réglages (arbre, tier hard, plafond
+# 16k par question, API officielles), mais 2 questions en une requête de 2.
+# Le résumé donne les tokens par question ; scripts/estimate_cost.py extrapole
+# le coût des 60 questions du protocole complet pour chaque entrée.
+#
+# Les entrées dont la clé d'API est absente de .env sont ignorées avec un
+# avertissement (pas d'erreurs en cascade). Tarifs en USD / million de tokens,
+# à jour au moment de l'écriture pour Anthropic et DeepSeek ; à vérifier sur la
+# page de prix de chaque autre vendeur avant de lire la colonne coût.
+
+models:
+  - name: "deepseek-v4-flash@high"
+    api_base: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
+    model: "deepseek-v4-flash"
+    effort: "high"
+    effort_param: thinking
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 0.14, output_per_mtok: 0.28, cached_input_per_mtok: 0.014}
+
+  - name: "claude-opus-5@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-opus-5"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
+
+  - name: "gpt-5.5@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.5"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    # pricing: {input_per_mtok: ?, output_per_mtok: ?, cached_input_per_mtok: ?}
+
+  - name: "gemini-3.1-pro@high"
+    api_base: "https://generativelanguage.googleapis.com/v1beta/openai"
+    api_key: "${GEMINI_API_KEY}"
+    model: "gemini-3.1-pro-preview"
+    effort: "high"
+    max_tokens_per_question: 16000
+    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+
+  - name: "qwen3.8-max@xhigh"
+    api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"   # ou https://{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+    api_key: "${DASHSCOPE_API_KEY}"
+    model: "qwen3.8-max"
+    effort: "xhigh"
+    max_tokens_per_question: 16000   # chez Qwen, max_tokens ne couvre pas la chaîne de pensée
+    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+
+  - name: "kimi-k3@high"
+    api_base: "https://api.moonshot.ai/v1"
+    api_key: "${MOONSHOT_API_KEY}"
+    model: "kimi-k3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+
+  - name: "glm-5.3@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+
+benchmarks:
+  - name: "hard_v4_smoke_en"
+    people: 400
+    depth: 8
+    questions: 2
+    root_couples: 4
+    seed: 4040
+    language: "en"
+    difficulty: hard
+    exclude_types: [relational_path, relation_attribut_composee]
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 2
+  timeout: 3600
+  batch_size: 2
+  output_dir: "evaluation_results/hard_v4_smoke"
+  output_formats: [csv, json]

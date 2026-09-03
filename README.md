@@ -175,6 +175,8 @@ Thinking effort is not comparable across vendors, so the benchmark does not pret
 
 No temperature is sent unless `temperature` is set explicitly (Anthropic rejects it with thinking, reasoning models ignore it). On Anthropic the tree description goes into a system block marked `cache_control`, so the prefix is served from cache across questions; OpenAI-compatible vendors cache the identical prefix automatically. Per-vendor cache fields (`cached_tokens`, DeepSeek's `prompt_cache_hit_tokens`, Moonshot's `usage.cached_tokens`, Anthropic's `cache_read_input_tokens`) all land in `cached_tokens`. Use `api_key: "none"` for a local server without authentication.
 
+Entries whose API key is missing from the environment are skipped with a warning. `evaluation_config_hard_v4_smoke.yaml` runs the same protocol on 2 questions per entry; `scripts/estimate_cost.py <summary>` extrapolates the cost of the full 60 questions from it.
+
 `evaluation_config_hard_v4.yaml` is the reference protocol: hard tier only, 60 questions, batch 5, 16k output tokens per question, one entry per vendor with the exact parameter names each official API expects.
 
 #### Running Evaluation
