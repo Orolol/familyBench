@@ -78,6 +78,8 @@ models:
     model: "kimi-k3"
     effort: "high"
     max_tokens_per_question: 16000
+    http_retries: 10            # limite de concurrence organisation chez Moonshot : 429 fréquents
+    http_retry_max_wait: 120
     pricing: {input_per_mtok: 3, output_per_mtok: 15, cached_input_per_mtok: 0.3}
 
   - name: "glm-5.3@high"

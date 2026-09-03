@@ -349,6 +349,28 @@ Typical generation times:
 
 ## 🏆 Benchmark Results
 
+### Leaderboard, protocol hard-v4 (2026-09-03)
+
+Generator 4.0, 400 people (seed 4040), hard tier only (no relational paths, compound attributes, comparatives or negations), 100 questions in 20 batches of 5, **16,000 output tokens per question** (80k per request), official vendor APIs (OpenRouter for Muse Spark and Gemini 3.8 Flash). Entries are (model, thinking level) pairs; levels are vendor-specific and not equivalent. One run per entry: treat differences under ~7 points as noise.
+
+| Entry | Accuracy | Truncated | Output tokens / question | Output tokens / correct answer | Cached prompt | Cost |
+|---|---|---|---|---|---|---|
+| gpt-5.6@high | 90% | 0 | 1,217 | 1,352 | 0% | $3.66 |
+| claude-opus-5@high | 89% | 0 | 1,756 | 1,973 | 79% | $5.07 |
+| qwen3.8-max@budget16k | 88% | 0 | 6,873 | 7,810 | 85% | $3.54 |
+| gemini-3.8-flash@high | 87% | 0 | 7,881 | 9,059 | 4% | $3.19 |
+| deepseek-v4-pro@high | 81% | 0 | 7,190 | 8,877 | 88% | $2.91 |
+| claude-fable-5.1@high | 80% | 0 | 951 | 1,189 | 79% | $5.85 |
+| muse-spark-1.3-contributor@high | 79% | 0 | 2,453 | 3,105 | 10% | $0.08 |
+| kimi-k3@high | 75% | 0 | 2,482 | 3,309 | 25% | $4.45 |
+| glm-5.3@high | 64% | 5 | 3,378 | 5,278 | 64% | $1.70 |
+| gpt-5.6-terra@high | 62% | 0 | 866 | 1,397 | 0% | $1.65 |
+| gpt-5.6-luna@high | 58% | 0 | 2,763 | 4,764 | 0% | $0.39 |
+| glm-5.3-flash@high | 43% | 10 | 3,302 | 7,680 | 0% | $0.21 |
+
+Per type (correct / total): beaux-parents 17, conditional 17, half-siblings 16, descendants-with-criterion 16, roots-with-criterion 17, multihop 17. Multihop ("children of the siblings of the grandparents of X") and roots-with-criterion ("people without parents who work as X") are the discriminating types; step-parents and half-siblings are solved by every model above 75 %. Total cost of the pass: $32.7. Files: `evaluation_results/hard_v4/` (`_orphan_partials/` holds incremental files of processes that were restarted; the DeepSeek Pro entry was rebuilt from the response cache, so its response times are zero there).
+
+
 > **Reproducibility note.** The leaderboard below was produced in August-November 2025 with an earlier version of the generator and of the name lists. The name lists have since been extended and the question sampling made even across types, so `seed 43` no longer regenerates that exact tree. Runs are only comparable when they share the same `benchmark_fingerprint` (written in every summary since generator version 2.0). The 2025 table is kept as a historical reference; new runs should be compared against each other on the same fingerprint.
 
 ### Recent runs (2026, generator ≥ 2.0, not comparable with the 2025 table)
