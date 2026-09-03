@@ -1,0 +1,297 @@
+{
+  "timestamp": "20260903_120939",
+  "config": "evaluation_config_hard_v4_smoke.yaml",
+  "models_evaluated": [
+    "glm-5.3-flash@high",
+    "gpt-5.6-terra@high",
+    "gpt-5.6-luna@high",
+    "claude-fable-5.1@high"
+  ],
+  "benchmarks_run": [
+    "hard_v4_smoke_en"
+  ],
+  "benchmarks": {
+    "hard_v4_smoke_en": {
+      "fingerprint": "e05e5ff54bc3cc22",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 2,
+      "batch_size": 2
+    }
+  },
+  "entries": {
+    "glm-5.3-flash@high": {
+      "model": "glm-5.3-flash",
+      "api": "openai_chat",
+      "api_base": "https://api.z.ai/api/paas/v4",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": {
+        "thinking": {
+          "type": "enabled"
+        }
+      },
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    },
+    "gpt-5.6-terra@high": {
+      "model": "gpt-5.6-terra",
+      "api": "openai_responses",
+      "api_base": "https://api.openai.com/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    },
+    "gpt-5.6-luna@high": {
+      "model": "gpt-5.6-luna",
+      "api": "openai_responses",
+      "api_base": "https://api.openai.com/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    },
+    "claude-fable-5.1@high": {
+      "model": "claude-fable-5-1",
+      "api": "anthropic",
+      "api_base": "https://api.anthropic.com/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    }
+  },
+  "summary_stats": {
+    "glm-5.3-flash@high": {
+      "total_questions": 2,
+      "correct_answers": 1,
+      "accuracy": 0.5,
+      "exact_matches": 1,
+      "exact_match_rate": 0.5,
+      "avg_partial_score": 0.75,
+      "avg_response_time": 25.885374307632446,
+      "total_tokens": 2030,
+      "total_prompt_tokens": 15528,
+      "total_completion_tokens": 2030,
+      "avg_completion_tokens": 1015.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": null,
+      "avg_cost_usd": null,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 2016,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 1008.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 1,
+          "accuracy": 0.5
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      }
+    },
+    "gpt-5.6-terra@high": {
+      "total_questions": 2,
+      "correct_answers": 1,
+      "accuracy": 0.5,
+      "exact_matches": 1,
+      "exact_match_rate": 0.5,
+      "avg_partial_score": 0.75,
+      "avg_response_time": 6.416151523590088,
+      "total_tokens": 530,
+      "total_prompt_tokens": 15330,
+      "total_completion_tokens": 530,
+      "avg_completion_tokens": 265.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": null,
+      "avg_cost_usd": null,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 516,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 258.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 1,
+          "accuracy": 0.5
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      }
+    },
+    "gpt-5.6-luna@high": {
+      "total_questions": 2,
+      "correct_answers": 1,
+      "accuracy": 0.5,
+      "exact_matches": 1,
+      "exact_match_rate": 0.5,
+      "avg_partial_score": 0.75,
+      "avg_response_time": 16.225791692733765,
+      "total_tokens": 2602,
+      "total_prompt_tokens": 15330,
+      "total_completion_tokens": 2602,
+      "avg_completion_tokens": 1301.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": null,
+      "avg_cost_usd": null,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 2588,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 1294.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 1,
+          "accuracy": 0.5
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      }
+    },
+    "claude-fable-5.1@high": {
+      "total_questions": 2,
+      "correct_answers": 2,
+      "accuracy": 1.0,
+      "exact_matches": 2,
+      "exact_match_rate": 1.0,
+      "avg_partial_score": 1.0,
+      "avg_response_time": 8.240862846374512,
+      "total_tokens": 1294,
+      "total_prompt_tokens": 23336,
+      "total_completion_tokens": 1294,
+      "avg_completion_tokens": 647.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": 0.29806,
+      "avg_cost_usd": 0.14903,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 0,
+      "questions_with_reasoning": 0,
+      "avg_reasoning_tokens": 0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 2,
+          "accuracy": 1.0
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    }
+  }
+}

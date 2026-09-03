@@ -70,6 +70,44 @@ models:
       thinking: {type: "enabled"}
     pricing: {input_per_mtok: 1.4, output_per_mtok: 4.4, cached_input_per_mtok: 0.26}
 
+  - name: "glm-5.3-flash@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 0.15, output_per_mtok: 0.5, cached_input_per_mtok: 0.03}   # tarif catalogue (promo -50 % jusqu'au 9 sept. 2026)
+
+  - name: "gpt-5.6-terra@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-terra"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 2, output_per_mtok: 12, cached_input_per_mtok: 0.2}
+
+  - name: "gpt-5.6-luna@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-luna"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 0.2, output_per_mtok: 1.2, cached_input_per_mtok: 0.02}
+
+  # Fable 5.1 : thinking toujours actif (adaptatif), effort low..max, 30 jours de rétention requis
+  - name: "claude-fable-5.1@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-fable-5-1"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 10, output_per_mtok: 50, cached_input_per_mtok: 0.25}
+
 benchmarks:
   - name: "hard_v4_smoke_en"
     people: 400
