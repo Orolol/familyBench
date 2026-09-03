@@ -108,6 +108,25 @@ models:
     max_tokens_per_question: 16000
     pricing: {input_per_mtok: 10, output_per_mtok: 50, cached_input_per_mtok: 0.25}
 
+  # --- Via OpenRouter (pas d'API officielle exploitable) : reasoning: {effort}, fournisseur épinglé
+  - name: "muse-spark-1.3-contributor@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "meta/muse-spark-1.3-contributor"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["meta"], allow_fallbacks: false, data_collection: "allow"}
+    pricing: {input_per_mtok: 0.1, output_per_mtok: 0.2, cached_input_per_mtok: 0.002}   # tarif OpenRouter "contributor"
+
+  - name: "gemini-3.8-flash@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-3.8-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["google-ai-studio"], allow_fallbacks: false}
+    pricing: {input_per_mtok: 0.75, output_per_mtok: 3.75, cached_input_per_mtok: 0.075}
+
 benchmarks:
   - name: "hard_v4_smoke_en"
     people: 400
