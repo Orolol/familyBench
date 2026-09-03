@@ -177,7 +177,7 @@ No temperature is sent unless `temperature` is set explicitly (Anthropic rejects
 
 Entries whose API key is missing from the environment are skipped with a warning. `evaluation_config_hard_v4_smoke.yaml` runs the same protocol on 2 questions per entry; `scripts/estimate_cost.py <summary>` extrapolates the cost of the full 60 questions from it.
 
-`evaluation_config_hard_v4.yaml` is the reference protocol: hard tier only, 60 questions, batch 5, 16k output tokens per question, one entry per vendor with the exact parameter names each official API expects.
+`evaluation_config_hard_v4.yaml` is the reference protocol: hard tier only (minus relational paths, compound attributes, comparatives and negations, which are whole-tree censuses), 100 questions, batch 5, 16k output tokens per question, twelve (model, thinking level) entries validated on the official APIs. HTTP 429/5xx are retried with backoff (`http_retries`, `retry-after` honoured).
 
 #### Running Evaluation
 ```bash
@@ -381,7 +381,7 @@ Generator 4.0 (second unions, mixed-direction links, derived links, 2 children p
 | Reasoning tokens / question (avg) | 5,000 | 24,000 |
 | Cost | $0.135 | $0.45 |
 
-Protocol `hard-v4` (`evaluation_config_hard_v4.yaml`): hard tier only, 60 questions, batch 5, 16k output tokens per question, official DeepSeek API, entry `deepseek-v4-flash@high` (`thinking.reasoning_effort: high`):
+Pre-protocol test runs (hard tier, 60 questions, batch 5, 16k output tokens per question, official DeepSeek API, files in `evaluation_results/hard_v4_deepseek_flash_tests/`; the final `hard-v4` protocol has 100 questions and also excludes `comparative` and `negation`), entry `deepseek-v4-flash@high` (`thinking.reasoning_effort: high`):
 
 | Entry | Accuracy | Truncated batches | Reasoning tokens / question | Cached prompt tokens | Cost | Wall time |
 |---|---|---|---|---|---|---|

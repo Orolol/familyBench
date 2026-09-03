@@ -147,3 +147,40 @@ async def test_keepalives_without_tokens_count_as_stalled():
                             "model": "m", "idle_timeout": 1})
         r = await m.evaluate_question("tree", Q, session, timeout=30, language="en")
     assert calls["n"] == 2 and r.model_answer == "Bob"
+
+
+@pytest.mark.asyncio
+async def test_http_429_and_5xx_are_retried_with_backoff():
+    import time
+    calls = {"n": 0, "t": []}
+
+    async def chat(request):
+        calls["n"] += 1; calls["t"].append(time.time())
+        if calls["n"] == 1:
+            return web.Response(status=429, text='{"error": "rate limited"}', headers={"retry-after": "1"})
+        if calls["n"] == 2:
+            return web.Response(status=503, text="overloaded")
+        return web.json_response({"choices": [{"message": {"content": "Bob"}}], "usage": {}})
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, __import__("aiohttp").ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m",
+                            "stream": False, "http_retries": 3})
+        r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
+    assert calls["n"] == 3 and r.model_answer == "Bob" and r.error is None
+    assert calls["t"][1] - calls["t"][0] >= 1.0, "retry-after honoured"
+
+
+@pytest.mark.asyncio
+async def test_http_4xx_other_than_retryable_is_not_retried():
+    calls = {"n": 0}
+
+    async def chat(request):
+        calls["n"] += 1
+        return web.Response(status=400, text="bad request")
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, __import__("aiohttp").ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m", "stream": False})
+        r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
+    assert calls["n"] == 1 and r.error and "400" in r.error

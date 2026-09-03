@@ -136,7 +136,7 @@ benchmarks:
     seed: 4040
     language: "en"
     difficulty: hard
-    exclude_types: [relational_path, relation_attribut_composee]
+    exclude_types: [relational_path, relation_attribut_composee, comparative, negation]
 
 evaluation:
   runs_per_benchmark: 1

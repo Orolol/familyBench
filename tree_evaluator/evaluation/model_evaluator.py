@@ -81,6 +81,10 @@ class ModelEvaluator:
         # (fournisseur mort côté OpenRouter) est coupé et compté comme une
         # non-réponse, donc réessayé, au lieu d'attendre le timeout global.
         self.idle_timeout = int(config.get('idle_timeout', 300))
+        # Nouvelles tentatives HTTP sur 429 / 5xx / 408 / 409 (rate limit, surcharge),
+        # avec backoff exponentiel et respect de l'en-tête retry-after.
+        self.http_retries = int(config.get('http_retries', 4))
+        self.http_retry_max_wait = float(config.get('http_retry_max_wait', 90))
         self.request_delay_ms = config.get('request_delay_ms', 0)  # Delay between requests in milliseconds
         # Pricing (USD per million tokens). Optional; absent => no cost computed.
         # Expected keys: input_per_mtok, output_per_mtok, cached_input_per_mtok (optional).
@@ -689,8 +693,30 @@ class ModelEvaluator:
             return self._normalize_responses(raw)
         return raw
 
+    RETRYABLE_HTTP = {408, 409, 429, 500, 502, 503, 504, 529}
+
     async def _call_api(self, session: aiohttp.ClientSession, url: str, data: Dict[str, Any],
                         headers: Dict[str, str], timeout: int, label: str) -> tuple[int, Any]:
+        """POST l'appel API avec nouvelles tentatives sur les statuts transitoires.
+
+        Retourne (status, result_dict) ou (status, error_text)."""
+        attempt = 0
+        while True:
+            status, result = await self._call_api_once(session, url, data, headers, timeout, label)
+            if status == 200 or status not in self.RETRYABLE_HTTP or attempt >= self.http_retries:
+                return status, result
+            wait = min(self.http_retry_max_wait, 2.0 * (2 ** attempt))
+            retry_after = self._last_retry_after
+            if retry_after:
+                wait = min(self.http_retry_max_wait, max(wait, retry_after))
+            attempt += 1
+            logger.warning(f"HTTP {status} for {self.name} ({label}): retry {attempt}/{self.http_retries} in {wait:.0f}s")
+            await asyncio.sleep(wait)
+
+    _last_retry_after: Optional[float] = None
+
+    async def _call_api_once(self, session: aiohttp.ClientSession, url: str, data: Dict[str, Any],
+                             headers: Dict[str, str], timeout: int, label: str) -> tuple[int, Any]:
         """POST l'appel API. Retourne (status, result_dict) ou (status, error_text).
 
         En streaming, les événements SSE de chaque famille d'API (chat/completions,
@@ -701,6 +727,7 @@ class ModelEvaluator:
         if not self._uses_streaming():
             async with session.post(url, json=data, headers=headers, timeout=client_timeout) as response:
                 if response.status != 200:
+                    self._last_retry_after = self._parse_retry_after(response.headers.get("retry-after"))
                     return response.status, await response.text()
                 return 200, self._normalize_raw(await response.json())
 
@@ -718,6 +745,7 @@ class ModelEvaluator:
         stream_timeout = aiohttp.ClientTimeout(total=timeout, sock_read=self.idle_timeout)
         async with session.post(url, json=payload, headers=headers, timeout=stream_timeout) as response:
             if response.status != 200:
+                self._last_retry_after = self._parse_retry_after(response.headers.get("retry-after"))
                 return response.status, await response.text()
             if "json" in (response.headers.get("Content-Type") or "").lower():
                 # Le serveur a ignoré `stream` (proxy, serveur local minimal) : réponse classique
@@ -771,6 +799,15 @@ class ModelEvaluator:
             "".join(acc["content"]), "".join(acc["reasoning"]), acc["usage"], acc["finish_reason"],
             provider=acc["provider"] or ("anthropic" if self.api == "anthropic" else None), streamed=True,
         )
+
+    @staticmethod
+    def _parse_retry_after(value: Optional[str]) -> Optional[float]:
+        if not value:
+            return None
+        try:
+            return float(value)
+        except ValueError:
+            return None  # format date HTTP : on garde le backoff exponentiel
 
     def _consume_event(self, event: Dict[str, Any], acc: Dict[str, Any]) -> bool:
         """Intègre un événement SSE dans l'accumulateur. Retourne True si des tokens sont arrivés."""

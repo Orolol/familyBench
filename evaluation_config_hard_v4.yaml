@@ -1,5 +1,7 @@
-# Protocole "hard v4" : questions du tier hard uniquement, générateur 4.0,
-# API officielles de chaque vendeur, plafond de sortie PAR QUESTION.
+# Protocole "hard v4" : questions du tier hard uniquement (sans relational_path,
+# attributs composés, comparatives ni négations : recensements sur tout l'arbre),
+# générateur 4.0, API officielles (OpenRouter pour Muse Spark et Gemini 3.8 Flash),
+# plafond de sortie PAR QUESTION, batch 5.
 #
 # Chaque entrée du leaderboard est une paire modèle + niveau de thinking : les
 # niveaux ne sont pas équivalents d'un vendeur à l'autre et ne prétendent pas
@@ -12,90 +14,149 @@
 #                             pour DeepSeek qui l'attend dans thinking.reasoning_effort)
 #   thinking_level:          libellé affiché dans le leaderboard (défaut = effort)
 #   max_tokens_per_question: plafond de sortie (raisonnement + réponse) par question,
-#                            multiplié par la taille du batch
+#                            multiplié par la taille du batch ; budget_param pour Qwen
 #   extra_body:              paramètres propres au vendeur, fusionnés dans la requête
 #   stream: true par défaut ; pas de température (défaut du vendeur)
+#   http 429/5xx réessayés avec backoff ; flux figés et coupures réseau réessayés ;
+#   générations tronquées par le plafond non réessayées.
 #
-# Deux passes prévues : (1) plafond 16k / effort high sur toutes les entrées,
-# (2) effort max sans plafond (max_tokens_per_question: 0 => max_tokens) sur une sélection.
+# Les entrées sont identiques à evaluation_config_hard_v4_smoke.yaml, validées en
+# conditions réelles le 2026-09-03 (2 questions chacune). Tarifs en USD / Mtok
+# relevés le même jour sur les pages officielles.
+#
+# Lancement recommandé : un processus par vendeur, en parallèle, par exemple
+#   python evaluate.py --config evaluation_config_hard_v4.yaml --models claude-opus-5@high claude-fable-5.1@high
 
 models:
-  # --- DeepSeek (API officielle) : thinking: {type: enabled, reasoning_effort: low|high|max}
-  - name: "deepseek-v4-flash@high"
+  - name: "deepseek-v4-pro@high"
     api_base: "https://api.deepseek.com"
     api_key: "${DEEPSEEK_API_KEY}"
-    model: "deepseek-v4-flash"
-    effort: "high"              # low | high | max
-    effort_param: thinking      # DeepSeek attend thinking.reasoning_effort (référence API)
+    model: "deepseek-v4-pro"
+    effort: "high"
+    effort_param: thinking
     max_tokens_per_question: 16000
     extra_body:
       thinking: {type: "enabled"}
-    pricing: {input_per_mtok: 0.14, output_per_mtok: 0.28}
+    pricing: {input_per_mtok: 1.32, output_per_mtok: 3.96, cached_input_per_mtok: 0.044}   # heures pleines (api-docs.deepseek.com/quick_start/pricing)
 
-  # --- Anthropic : thinking adaptatif + output_config.effort low|medium|high|xhigh|max
-  # - name: "claude-opus-5@high"
-  #   api_base: "https://api.anthropic.com/v1"
-  #   api_key: "${ANTHROPIC_API_KEY}"
-  #   model: "claude-opus-5"
-  #   anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"   # requis avec une clé liée à une identité
-  #   effort: "high"
-  #   max_tokens_per_question: 16000
-  #   pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
+  - name: "claude-opus-5@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-opus-5"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"   # requis avec une clé liée à une identité
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
 
-  # --- OpenAI (API Responses) : reasoning.effort none|minimal|low|medium|high|xhigh|max selon modèle
-  # - name: "gpt-5.5@high"
-  #   api_base: "https://api.openai.com/v1"
-  #   api_key: "${OPENAI_API_KEY}"
-  #   model: "gpt-5.5"
-  #   api: "openai_responses"
-  #   effort: "high"
-  #   max_tokens_per_question: 16000
+  - name: "gpt-5.6@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6"          # alias de gpt-5.6-sol
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 4, output_per_mtok: 20, cached_input_per_mtok: 0.4}
 
-  # --- Gemini (endpoint OpenAI-compatible) : reasoning_effort low|medium|high
-  # - name: "gemini-3.1-pro@high"
-  #   api_base: "https://generativelanguage.googleapis.com/v1beta/openai"
-  #   api_key: "${GEMINI_API_KEY}"
-  #   model: "gemini-3.1-pro-preview"
-  #   effort: "high"
-  #   max_tokens_per_question: 16000
+  - name: "qwen3.8-max@budget16k"
+    api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"   # ou https://{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+    api_key: "${QWEN_API_KEY}"
+    model: "qwen3.8-max"
+    # Chez Qwen, max_tokens ne couvre pas la chaîne de pensée : on impose le budget
+    # de pensée (thinking_budget = 16k x taille du batch) au lieu d'un niveau d'effort
+    # (les deux sont exclusifs). Le niveau affiché est donc "budget16k".
+    effort_param: none
+    thinking_level: "budget16k"
+    budget_param: thinking_budget
+    max_tokens_per_question: 16000
+    extra_body:
+      enable_thinking: true
+    pricing: {input_per_mtok: 1.65, output_per_mtok: 4.951, cached_input_per_mtok: 0.206}
 
-  # --- Qwen (DashScope, mode OpenAI-compatible ; l'URL dépend de la région/workspace)
-  # - name: "qwen3.8-max@xhigh"
-  #   api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
-  #   api_key: "${QWEN_API_KEY}"
-  #   model: "qwen3.8-max"
-  #   effort: "xhigh"
-  #   max_tokens_per_question: 16000   # attention : chez Qwen, max_tokens ne couvre pas la chaîne de pensée
+  - name: "kimi-k3@high"
+    api_base: "https://api.moonshot.ai/v1"
+    api_key: "${MOONSHOT_API_KEY}"
+    model: "kimi-k3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 3, output_per_mtok: 15, cached_input_per_mtok: 0.3}
 
-  # --- Moonshot / Kimi : K3 = reasoning_effort low|high|max ; K2.6 = extra_body thinking.type
-  # - name: "kimi-k3@high"
-  #   api_base: "https://api.moonshot.ai/v1"
-  #   api_key: "${MOONSHOT_API_KEY}"
-  #   model: "kimi-k3"
-  #   effort: "high"
-  #   max_tokens_per_question: 16000
+  - name: "glm-5.3@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 1.4, output_per_mtok: 4.4, cached_input_per_mtok: 0.26}
 
-  # --- Z.ai / GLM : thinking.type + reasoning_effort (GLM-5.3 : low|high|max)
-  # - name: "glm-5.3@high"
-  #   api_base: "https://api.z.ai/api/paas/v4"
-  #   api_key: "${ZAI_API_KEY}"
-  #   model: "glm-5.3"
-  #   effort: "high"
-  #   max_tokens_per_question: 16000
-  #   extra_body:
-  #     thinking: {type: "enabled"}
+  - name: "glm-5.3-flash@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 0.15, output_per_mtok: 0.5, cached_input_per_mtok: 0.03}   # tarif catalogue (promo -50 % jusqu'au 9 sept. 2026)
+
+  - name: "gpt-5.6-terra@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-terra"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 2, output_per_mtok: 12, cached_input_per_mtok: 0.2}
+
+  - name: "gpt-5.6-luna@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-luna"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 0.2, output_per_mtok: 1.2, cached_input_per_mtok: 0.02}
+
+  # Fable 5.1 : thinking toujours actif (adaptatif), effort low..max, 30 jours de rétention requis
+  - name: "claude-fable-5.1@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-fable-5-1"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 10, output_per_mtok: 50, cached_input_per_mtok: 0.25}
+
+  # --- Via OpenRouter (pas d'API officielle exploitable) : reasoning: {effort}, fournisseur épinglé
+  - name: "muse-spark-1.3-contributor@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "meta/muse-spark-1.3-contributor"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["meta"], allow_fallbacks: false, data_collection: "allow"}
+    pricing: {input_per_mtok: 0.1, output_per_mtok: 0.2, cached_input_per_mtok: 0.002}   # tarif OpenRouter "contributor"
+
+  - name: "gemini-3.8-flash@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-3.8-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["google-ai-studio"], allow_fallbacks: false}
+    pricing: {input_per_mtok: 0.75, output_per_mtok: 3.75, cached_input_per_mtok: 0.075}
 
 benchmarks:
   - name: "hard_v4_en"
     people: 400
     depth: 8
-    questions: 60
+    questions: 100
     root_couples: 4
     seed: 4040
     language: "en"
     difficulty: hard            # tier hard uniquement, tirage équilibré entre types
-    # comme le mode expert : on écarte les deux types hard les plus faciles
-    exclude_types: [relational_path, relation_attribut_composee]
+    exclude_types: [relational_path, relation_attribut_composee, comparative, negation]
     # leviers 4.0 par défaut : max_children 2, second_union 20 %, relations mixed,
     # derived_links 30 %, shuffle, max_answer_names 10, drop 40, anonymize 50
 
