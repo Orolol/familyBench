@@ -37,6 +37,7 @@ models:
   #   api_base: "https://api.anthropic.com/v1"
   #   api_key: "${ANTHROPIC_API_KEY}"
   #   model: "claude-opus-5"
+  #   anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"   # requis avec une clé liée à une identité
   #   effort: "high"
   #   max_tokens_per_question: 16000
   #   pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
@@ -61,7 +62,7 @@ models:
   # --- Qwen (DashScope, mode OpenAI-compatible ; l'URL dépend de la région/workspace)
   # - name: "qwen3.8-max@xhigh"
   #   api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
-  #   api_key: "${DASHSCOPE_API_KEY}"
+  #   api_key: "${QWEN_API_KEY}"
   #   model: "qwen3.8-max"
   #   effort: "xhigh"
   #   max_tokens_per_question: 16000   # attention : chez Qwen, max_tokens ne couvre pas la chaîne de pensée

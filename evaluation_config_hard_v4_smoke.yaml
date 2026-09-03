@@ -5,53 +5,52 @@
 #
 # Les entrées dont la clé d'API est absente de .env sont ignorées avec un
 # avertissement (pas d'erreurs en cascade). Tarifs en USD / million de tokens,
-# à jour au moment de l'écriture pour Anthropic et DeepSeek ; à vérifier sur la
-# page de prix de chaque autre vendeur avant de lire la colonne coût.
+# relevés le 2026-09-03 sur les pages de prix officielles (DeepSeek en heures pleines).
 
 models:
-  - name: "deepseek-v4-flash@high"
+  - name: "deepseek-v4-pro@high"
     api_base: "https://api.deepseek.com"
     api_key: "${DEEPSEEK_API_KEY}"
-    model: "deepseek-v4-flash"
+    model: "deepseek-v4-pro"
     effort: "high"
     effort_param: thinking
     max_tokens_per_question: 16000
     extra_body:
       thinking: {type: "enabled"}
-    pricing: {input_per_mtok: 0.14, output_per_mtok: 0.28, cached_input_per_mtok: 0.014}
+    pricing: {input_per_mtok: 1.32, output_per_mtok: 3.96, cached_input_per_mtok: 0.044}   # heures pleines (api-docs.deepseek.com/quick_start/pricing)
 
   - name: "claude-opus-5@high"
     api_base: "https://api.anthropic.com/v1"
     api_key: "${ANTHROPIC_API_KEY}"
     model: "claude-opus-5"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"   # requis avec une clé liée à une identité
     effort: "high"
     max_tokens_per_question: 16000
     pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
 
-  - name: "gpt-5.5@high"
+  - name: "gpt-5.6@high"
     api_base: "https://api.openai.com/v1"
     api_key: "${OPENAI_API_KEY}"
-    model: "gpt-5.5"
+    model: "gpt-5.6"          # alias de gpt-5.6-sol
     api: "openai_responses"
     effort: "high"
     max_tokens_per_question: 16000
-    # pricing: {input_per_mtok: ?, output_per_mtok: ?, cached_input_per_mtok: ?}
+    pricing: {input_per_mtok: 4, output_per_mtok: 20, cached_input_per_mtok: 0.4}
 
-  - name: "gemini-3.1-pro@high"
-    api_base: "https://generativelanguage.googleapis.com/v1beta/openai"
-    api_key: "${GEMINI_API_KEY}"
-    model: "gemini-3.1-pro-preview"
-    effort: "high"
-    max_tokens_per_question: 16000
-    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
-
-  - name: "qwen3.8-max@xhigh"
+  - name: "qwen3.8-max@budget16k"
     api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"   # ou https://{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
-    api_key: "${DASHSCOPE_API_KEY}"
+    api_key: "${QWEN_API_KEY}"
     model: "qwen3.8-max"
-    effort: "xhigh"
-    max_tokens_per_question: 16000   # chez Qwen, max_tokens ne couvre pas la chaîne de pensée
-    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+    # Chez Qwen, max_tokens ne couvre pas la chaîne de pensée : on impose le budget
+    # de pensée (thinking_budget = 16k x taille du batch) au lieu d'un niveau d'effort
+    # (les deux sont exclusifs). Le niveau affiché est donc "budget16k".
+    effort_param: none
+    thinking_level: "budget16k"
+    budget_param: thinking_budget
+    max_tokens_per_question: 16000
+    extra_body:
+      enable_thinking: true
+    pricing: {input_per_mtok: 1.65, output_per_mtok: 4.951, cached_input_per_mtok: 0.206}
 
   - name: "kimi-k3@high"
     api_base: "https://api.moonshot.ai/v1"
@@ -59,7 +58,7 @@ models:
     model: "kimi-k3"
     effort: "high"
     max_tokens_per_question: 16000
-    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+    pricing: {input_per_mtok: 3, output_per_mtok: 15, cached_input_per_mtok: 0.3}
 
   - name: "glm-5.3@high"
     api_base: "https://api.z.ai/api/paas/v4"
@@ -69,7 +68,7 @@ models:
     max_tokens_per_question: 16000
     extra_body:
       thinking: {type: "enabled"}
-    # pricing: {input_per_mtok: ?, output_per_mtok: ?}
+    pricing: {input_per_mtok: 1.4, output_per_mtok: 4.4, cached_input_per_mtok: 0.26}
 
 benchmarks:
   - name: "hard_v4_smoke_en"
@@ -84,7 +83,7 @@ benchmarks:
 
 evaluation:
   runs_per_benchmark: 1
-  max_concurrent_requests: 2
+  max_concurrent_requests: 6
   timeout: 3600
   batch_size: 2
   output_dir: "evaluation_results/hard_v4_smoke"

@@ -59,6 +59,9 @@ class ModelEvaluator:
         #   "thinking"         (DeepSeek : thinking.reasoning_effort, vérifié dans la référence API)
         #   "none"             (ne rien envoyer, ex. modèle sans contrôle d'effort)
         self.effort_param = config.get('effort_param', 'reasoning_effort')
+        # Vendeurs dont max_tokens ne couvre pas la chaîne de pensée (Qwen) : nom du
+        # paramètre de budget de raisonnement, réglé à max_tokens_per_question x batch.
+        self.budget_param = config.get('budget_param')
         # Paramètres bruts fusionnés dans le corps de la requête (budgets de
         # thinking propres à un vendeur, etc.)
         self.extra_body: Dict[str, Any] = dict(config.get('extra_body') or {})
@@ -66,6 +69,8 @@ class ModelEvaluator:
         # (OpenAI-compatible : OpenAI chat, OpenRouter, DeepSeek, Qwen, Moonshot, Z.ai, Gemini compat, local)
         self.api = config.get('api') or self._detect_api()
         self.anthropic_version = config.get('anthropic_version', '2023-06-01')
+        # Clés liées à une identité : Anthropic exige l'en-tête anthropic-workspace-id
+        self.anthropic_workspace_id = self._resolve_api_key(str(config.get('anthropic_workspace_id') or ''))
         # Streaming SSE pour les API chat/completions (défaut: activé). Évite les
         # coupures des réponses longues non streamées et permet de suivre la
         # progression dans les logs. Désactivé automatiquement pour Anthropic et
@@ -152,6 +157,8 @@ class ModelEvaluator:
             if self.api_key != "none":
                 headers["x-api-key"] = self.api_key
             headers["anthropic-version"] = self.anthropic_version
+            if self.anthropic_workspace_id and self.anthropic_workspace_id != "none":
+                headers["anthropic-workspace-id"] = self.anthropic_workspace_id
         elif self.api_key != "none":
             headers["Authorization"] = f"Bearer {self.api_key}"
         return headers
@@ -173,6 +180,7 @@ class ModelEvaluator:
             "thinking_level": self.thinking_level,
             "effort": self.effort,
             "effort_param": self.effort_param,
+            "budget_param": self.budget_param,
             "reasoning": self.reasoning_config,
             "extra_body": self.extra_body or None,
             "max_tokens_per_question": self.max_tokens_per_question,
@@ -183,6 +191,8 @@ class ModelEvaluator:
 
     def _resolve_api_key(self, key: str) -> str:
         """Résout les variables d'environnement dans la clé API."""
+        if not key:
+            return ''
         if key.startswith('${') and key.endswith('}'):
             env_var = key[2:-1]
             return os.environ.get(env_var, 'none')
@@ -979,6 +989,8 @@ class ModelEvaluator:
             if self.reasoning_config:
                 data["reasoning"] = self.reasoning_config
         data.update(self.extra_body)
+        if self.budget_param and self.max_tokens_per_question:
+            data[self.budget_param] = int(self.max_tokens_per_question) * max(1, n_questions)
         if self.effort and self.effort_param == "thinking" and "openrouter" not in self.api_base:
             thinking = dict(data.get("thinking") or {"type": "enabled"})
             thinking["reasoning_effort"] = self.effort

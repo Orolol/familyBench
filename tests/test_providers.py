@@ -155,3 +155,12 @@ def test_openrouter_reasoning_details_streaming_fallback():
     assert m._consume_event({"choices": [{"delta": {"reasoning_details": [{"type": "reasoning.text", "text": "abc"}]}}]}, acc)
     assert m._consume_event({"choices": [{"delta": {"reasoning": "def", "reasoning_details": [{"type": "reasoning.text", "text": "def"}]}}]}, acc)
     assert "".join(acc["reasoning"]) == "abcdef", "no double counting when both fields are present"
+
+
+def test_budget_param_scales_with_batch_size():
+    m = ModelEvaluator({"name": "qwen@b16k", "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1", "api_key": "k",
+                        "model": "qwen3.8-max", "effort_param": "none", "thinking_level": "budget16k", "budget_param": "thinking_budget",
+                        "max_tokens_per_question": 16000, "extra_body": {"enable_thinking": True}})
+    d = m._build_api_request("p", "en", batch=True, n_questions=5)
+    assert d["thinking_budget"] == 80000 and d["max_tokens"] == 80000 and d["enable_thinking"] is True
+    assert "reasoning_effort" not in d
