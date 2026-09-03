@@ -6,11 +6,13 @@
 import argparse
 import json
 import datetime
+import logging
 from typing import Dict, List, Any
 
-from tree_evaluator.tree_generator import generate_tree
+from tree_evaluator.tree_generator import generate_tree, actual_depth
 from tree_evaluator.text_converter import convert_tree_to_text
 from tree_evaluator.question_generator import generate_questions, VALID_DIFFICULTIES
+from tree_evaluator.versioning import benchmark_fingerprint, GENERATOR_VERSION
 
 def generate_markdown_output(description: str, questions: List[Dict[str, Any]], language: str = "fr") -> str:
     """Génère le contenu du fichier Markdown pour le LLM."""
@@ -88,10 +90,26 @@ def main():
     parser.add_argument("--output", type=str, default="benchmark.json", help="Fichier de sortie pour le benchmark JSON.")
     parser.add_argument("--md-output", type=str, help="Fichier de sortie optionnel pour le prompt Markdown.")
     parser.add_argument("--seed", type=int, help="Graine pour la reproductibilité.")
-    parser.add_argument("--max-children", type=int, default=3, help="Nombre maximum d'enfants par personne.")
-    parser.add_argument("--shuffle", action="store_true", help="Mélanger l'ordre des personnes dans la description.")
+    parser.add_argument("--max-children", type=int, default=2, help="Nombre maximum d'enfants par union (défaut 2 : arbres plus profonds).")
+    parser.add_argument("--second-union-percentage", type=int, default=20,
+                        help="Part des personnes (0-100) ayant des enfants avec un second partenaire : demi-frères/sœurs, beaux-parents (défaut 20).")
+    parser.add_argument("--derived-links-percentage", type=int, default=30,
+                        help="Part des personnes (0-100) décrites par « X est la sœur de Y » au lieu de leurs liens parentaux (défaut 30).")
+    parser.add_argument("--no-shuffle", dest="shuffle", action="store_false",
+                        help="Ne pas mélanger la description (par défaut elle est mélangée, de façon seedée ; l'ordre trié révèle la génération).")
+    parser.add_argument("--relations", type=str, default="mixed", choices=["mixed", "parents", "children", "both"],
+                        help="Phrases de lien : mixed (défaut, chaque lien une fois dans une direction aléatoire), parents ('X est l'enfant de A et B'), children ('A a N enfants'), both (redondant, plus facile).")
+    parser.add_argument("--max-answer-names", type=int, default=10,
+                        help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
+    parser.add_argument("--drop-answer-names-above", type=int, default=40,
+                        help="Écarte les questions dont la réponse dépasse ce nombre de prénoms (recensements ; 0 = désactivé, défaut 40).")
+    parser.add_argument("--exclude-types", type=str, nargs="*", default=[],
+                        help="Types de questions à écarter (ex: relational_path relation_attribut_composee).")
+    parser.add_argument("--anonymize-percentage", type=int, default=50,
+                        help="Part des questions (0-100) dont les prénoms sont remplacés par une description par attributs (défaut 50).")
     parser.add_argument("--root-couples", type=int, default=1, help="Nombre de couples racines (plusieurs arbres).")
     parser.add_argument("--language", type=str, default="fr", choices=["fr", "en"], help="Langue du benchmark (fr ou en).")
+    parser.add_argument("--visualize", action="store_true", help="Générer une visualisation de l'arbre (PNG).")
     parser.add_argument("--enigma-percentage", type=int, default=10, help="Pourcentage de questions énigmes (défaut: 10%%). Ignoré si --difficulty est différent de 'all'.")
     parser.add_argument(
         "--difficulty",
@@ -102,6 +120,7 @@ def main():
     )
 
     args = parser.parse_args()
+    logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     print(f"Génération de l'arbre avec {args.people} personnes, profondeur {args.depth}, {args.root_couples} couple(s) racine(s), langue: {args.language}...")
     tree = generate_tree(
@@ -110,11 +129,19 @@ def main():
         max_children_per_person=args.max_children,
         seed=args.seed,
         num_root_couples=args.root_couples,
-        language=args.language
+        language=args.language,
+        second_union_percentage=args.second_union_percentage,
     )
 
+    depth_actual = actual_depth(tree)
+    if depth_actual < args.depth:
+        print(f"Attention : profondeur demandée {args.depth}, profondeur obtenue {depth_actual} "
+              f"(augmentez --people ou réduisez --max-children / --root-couples).")
+
     print("Conversion de l'arbre en texte...")
-    description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language)
+    description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language,
+                                       relations=args.relations, seed=args.seed,
+                                       derived_links_percentage=args.derived_links_percentage)
 
     if args.difficulty == "all":
         print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
@@ -126,6 +153,10 @@ def main():
         language=args.language,
         enigma_percentage=args.enigma_percentage,
         difficulty=args.difficulty,
+        max_answer_names=args.max_answer_names,
+        anonymize_percentage=args.anonymize_percentage,
+        drop_answer_names_above=args.drop_answer_names_above,
+        exclude_types=args.exclude_types,
     )
 
     if args.language == "en":
@@ -139,11 +170,44 @@ def main():
         "questions": questions,
         "metadata": {
             "total_people": args.people,
+            "people_in_tree": len(tree),
             "tree_depth": args.depth,
+            "tree_depth_actual": depth_actual,
             "max_children_per_person": args.max_children,
+            "root_couples": args.root_couples,
             "seed": args.seed,
             "language": args.language,
             "difficulty": args.difficulty,
+            "enigma_percentage": args.enigma_percentage,
+            "shuffle": args.shuffle,
+            "relations": args.relations,
+            "max_answer_names": args.max_answer_names,
+            "anonymize_percentage": args.anonymize_percentage,
+            "drop_answer_names_above": args.drop_answer_names_above,
+            "second_union_percentage": args.second_union_percentage,
+            "derived_links_percentage": args.derived_links_percentage,
+            "questions_requested": args.questions,
+            "questions_generated": len(questions),
+            "generator_version": GENERATOR_VERSION,
+            "benchmark_fingerprint": benchmark_fingerprint({
+                "people": args.people,
+                "depth": args.depth,
+                "questions": args.questions,
+                "seed": args.seed,
+                "language": args.language,
+                "max_children": args.max_children,
+                "root_couples": args.root_couples,
+                "enigma_percentage": args.enigma_percentage,
+                "difficulty": args.difficulty,
+                "shuffle": args.shuffle,
+                "relations": args.relations,
+                "max_answer_names": args.max_answer_names,
+                "anonymize_percentage": args.anonymize_percentage,
+                "drop_answer_names_above": args.drop_answer_names_above,
+                "second_union_percentage": args.second_union_percentage,
+                "derived_links_percentage": args.derived_links_percentage,
+                "exclude_types": sorted(args.exclude_types),
+            }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }
     }
@@ -157,6 +221,12 @@ def main():
         markdown_content = generate_markdown_output(description, questions, language=args.language)
         with open(args.md_output, "w", encoding="utf-8") as f:
             f.write(markdown_content)
+
+    if args.visualize:
+        from tree_evaluator.visualizer import visualize_tree  # import paresseux : graphviz optionnel
+        print("Génération de la visualisation...")
+        viz_output = args.output.rsplit('.', 1)[0]
+        visualize_tree(tree, viz_output)
 
     print("Terminé !")
 

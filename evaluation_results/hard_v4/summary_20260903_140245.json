@@ -1,0 +1,118 @@
+{
+  "timestamp": "20260903_140245",
+  "config": "evaluation_config_hard_v4.yaml",
+  "models_evaluated": [
+    "muse-spark-1.3-contributor@high"
+  ],
+  "benchmarks_run": [
+    "hard_v4_en"
+  ],
+  "benchmarks": {
+    "hard_v4_en": {
+      "fingerprint": "011e8ffbab7c6f76",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 100,
+      "batch_size": 5
+    }
+  },
+  "entries": {
+    "muse-spark-1.3-contributor@high": {
+      "model": "meta/muse-spark-1.3-contributor",
+      "api": "openai_chat",
+      "api_base": "https://openrouter.ai/api/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": {
+        "order": [
+          "meta"
+        ],
+        "allow_fallbacks": false,
+        "data_collection": "allow"
+      }
+    }
+  },
+  "summary_stats": {
+    "muse-spark-1.3-contributor@high": {
+      "total_questions": 100,
+      "correct_answers": 79,
+      "accuracy": 0.79,
+      "exact_matches": 79,
+      "exact_match_rate": 0.79,
+      "avg_partial_score": 0.8912698412698412,
+      "avg_response_time": 16.619843770503998,
+      "total_tokens": 245310,
+      "total_prompt_tokens": 310485,
+      "total_completion_tokens": 245310,
+      "avg_completion_tokens": 2453.1,
+      "total_cached_tokens": 30430,
+      "total_cost_usd": 0.07712836,
+      "avg_cost_usd": 0.0007712836000000001,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 240150,
+      "questions_with_reasoning": 100,
+      "avg_reasoning_tokens": 2401.5,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "beaux_parents": {
+          "total": 17,
+          "correct": 16,
+          "accuracy": 0.9411764705882353
+        },
+        "conditional": {
+          "total": 17,
+          "correct": 14,
+          "accuracy": 0.8235294117647058
+        },
+        "demi_fratrie": {
+          "total": 16,
+          "correct": 16,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 17,
+          "correct": 10,
+          "accuracy": 0.5882352941176471
+        },
+        "verticale_descendant_critere": {
+          "total": 17,
+          "correct": 15,
+          "accuracy": 0.8823529411764706
+        },
+        "verticale_racine_critere": {
+          "total": 16,
+          "correct": 8,
+          "accuracy": 0.5
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 100,
+          "correct": 79,
+          "accuracy": 0.79
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 100,
+        "correct": 79,
+        "accuracy": 0.79
+      }
+    }
+  }
+}

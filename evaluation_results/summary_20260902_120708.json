@@ -1,0 +1,111 @@
+{
+  "timestamp": "20260902_120708",
+  "config": "evaluation_config_deepseek_expert.yaml",
+  "models_evaluated": [
+    "deepseek/deepseek-v4-flash-0731"
+  ],
+  "benchmarks_run": [
+    "huge_tree_en_expert"
+  ],
+  "benchmarks": {
+    "huge_tree_en_expert": {
+      "fingerprint": "98bb88eb31bb79e2",
+      "generator_version": "3.0",
+      "difficulty": "expert",
+      "people": 1000,
+      "depth_requested": 20,
+      "depth_actual": 6,
+      "questions": 20,
+      "batch_size": 20
+    }
+  },
+  "summary_stats": {
+    "deepseek/deepseek-v4-flash-0731": {
+      "total_questions": 20,
+      "correct_answers": 0,
+      "accuracy": 0.0,
+      "exact_matches": 0,
+      "exact_match_rate": 0.0,
+      "avg_partial_score": 0.0,
+      "avg_response_time": 59.75880318582058,
+      "total_tokens": 64000,
+      "total_prompt_tokens": 36580,
+      "total_completion_tokens": 64000,
+      "avg_completion_tokens": 3200.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": 0.0230412,
+      "avg_cost_usd": 0.00115206,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 20,
+      "no_response_rate": 1.0,
+      "total_reasoning_tokens": 63980,
+      "questions_with_reasoning": 20,
+      "avg_reasoning_tokens": 3199.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "comparative": {
+          "total": 2,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "conditional": {
+          "total": 4,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "enigme": {
+          "total": 8,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "multihop": {
+          "total": 2,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "verticale_descendant_critere": {
+          "total": 4,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "enigma": {
+          "total": 8,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "hard": {
+          "total": 12,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "enigma_stats": {
+        "total": 8,
+        "correct": 0,
+        "accuracy": 0.0,
+        "by_complexity": {
+          "7": {
+            "total": 4,
+            "correct": 0,
+            "accuracy": 0.0
+          },
+          "8": {
+            "total": 4,
+            "correct": 0,
+            "accuracy": 0.0
+          }
+        }
+      },
+      "normal_stats": {
+        "total": 12,
+        "correct": 0,
+        "accuracy": 0.0
+      }
+    }
+  }
+}

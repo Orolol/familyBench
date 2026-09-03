@@ -12,7 +12,8 @@ def generate_attribute_search_questions(people: Dict[str, Person], language: str
     attributes = ["hair_color", "eye_color", "hat_color", "profession"]
 
     for attr in attributes:
-        all_values = {getattr(p, attr) for p in people.values()}
+        # Trié : l'ordre d'un set dépend du hash Python et casserait la reproductibilité par seed
+        all_values = sorted({getattr(p, attr) for p in people.values()})
         # Pour les professions, n'utiliser que les communes
         if attr == "profession":
             common_values = get_common_attributes(people, attr, min_count=3)

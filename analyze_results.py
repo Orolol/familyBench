@@ -18,29 +18,52 @@ except ImportError:
     HAS_PLOTTING = False
 
 
-def load_results(file_paths: List[Path]) -> pd.DataFrame:
-    """Load results from CSV or JSON files into a DataFrame."""
+def _is_failed_run(df: pd.DataFrame) -> bool:
+    """True si toutes les lignes du fichier sont en erreur (ex: serveur local éteint)."""
+    if "error" not in df.columns or df.empty:
+        return False
+    return bool(df["error"].notna().all() & (df["error"].astype(str).str.len() > 0).all())
+
+
+def load_results(file_paths: List[Path], exclude_failed_runs: bool = False) -> pd.DataFrame:
+    """Load results from CSV or JSON files into a DataFrame.
+
+    Args:
+        exclude_failed_runs: ignore les fichiers dont 100 % des lignes sont en
+            erreur, pour ne pas polluer les agrégats avec des runs ratés.
+    """
     frames = []
     for fp in file_paths:
         if fp.suffix.lower() == ".csv":
-            frames.append(pd.read_csv(fp))
+            frame = pd.read_csv(fp)
+        elif fp.suffix.lower() == ".jsonl":
+            frame = pd.read_json(fp, lines=True)
         elif fp.suffix.lower() == ".json":
             with open(fp, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if isinstance(data, list):
-                frames.append(pd.DataFrame(data))
+                frame = pd.DataFrame(data)
             elif isinstance(data, dict) and "questions_answers" in data:
-                frames.append(pd.DataFrame(data["questions_answers"]))
+                frame = pd.DataFrame(data["questions_answers"])
             else:
                 raise ValueError(f"Unsupported JSON structure in {fp}")
         else:
             raise ValueError(f"Unsupported file format: {fp.suffix}")
+        if exclude_failed_runs and _is_failed_run(frame):
+            print(f"Skipping {fp}: every row is an error")
+            continue
+        frame["source_file"] = fp.name
+        frames.append(frame)
+    if not frames:
+        raise ValueError("No usable result files")
     return pd.concat(frames, ignore_index=True)
 
 
 def compute_stats(df: pd.DataFrame) -> Dict[str, Any]:
     """Compute summary statistics per model."""
     stats = {}
+    if "batch_size" in df.columns and df["batch_size"].nunique() > 1:
+        df = df.assign(model_name=df["model_name"] + " [batch=" + df["batch_size"].astype(int).astype(str) + "]")
     for model, group in df.groupby("model_name"):
         total = len(group)
         correct = group["is_correct"].sum()
@@ -60,6 +83,21 @@ def compute_stats(df: pd.DataFrame) -> Dict[str, Any]:
                 "accuracy": float(sub["is_correct"].mean()),
             }
 
+        # Per difficulty tier (files produced before the field existed have no column)
+        by_difficulty = {}
+        if "difficulty" in group.columns:
+            for tier, sub in group.dropna(subset=["difficulty"]).groupby("difficulty"):
+                by_difficulty[tier] = {
+                    "total": len(sub),
+                    "correct": int(sub["is_correct"].sum()),
+                    "accuracy": float(sub["is_correct"].mean()),
+                }
+        # Hallucinations: answered questions containing at least one unknown name
+        hallucination_rate = None
+        if "hallucinated_names" in group.columns:
+            answered = group[(group["error"].isna()) & (group["no_response"] == False)]
+            if len(answered):
+                hallucination_rate = float((answered["hallucinated_names"].fillna(0) > 0).mean())
         # Enigma vs normal
         enigma = group[group["is_enigma"] == True]
         normal = group[group["is_enigma"] == False]
@@ -74,6 +112,8 @@ def compute_stats(df: pd.DataFrame) -> Dict[str, Any]:
             "total_tokens": int(tokens),
             "total_reasoning_tokens": int(reasoning),
             "by_question_type": by_type,
+            "by_difficulty": by_difficulty,
+            "hallucination_rate": hallucination_rate,
             "enigma": {
                 "total": len(enigma),
                 "correct": int(enigma["is_correct"].sum()),
@@ -109,6 +149,14 @@ def print_stats(stats: Dict[str, Any]):
             print(f"  Enigmas         : {s['enigma']['accuracy']:.1%} ({s['enigma']['correct']}/{s['enigma']['total']})")
         if s["normal"]["total"]:
             print(f"  Normal Qs       : {s['normal']['accuracy']:.1%} ({s['normal']['correct']}/{s['normal']['total']})")
+        if s.get("hallucination_rate") is not None:
+            print(f"  Hallucinations  : {s['hallucination_rate']:.1%} of answers contain an unknown name")
+        if s.get("by_difficulty"):
+            print(f"  By difficulty:")
+            for tier in ("easy", "medium", "hard", "enigma"):
+                if tier in s["by_difficulty"]:
+                    d = s["by_difficulty"][tier]
+                    print(f"    {tier:25s} {d['accuracy']:.1%} ({d['correct']}/{d['total']})")
         if s["by_question_type"]:
             print(f"  By type:")
             for qtype, qs in sorted(s["by_question_type"].items(), key=lambda x: -x[1]["accuracy"]):
@@ -234,10 +282,12 @@ def main():
     parser.add_argument("--plots", action="store_true", help="Generate comparative plots")
     parser.add_argument("--report", type=Path, help="Generate HTML report to given path")
     parser.add_argument("--output-dir", type=Path, default=Path("analysis_output"), help="Directory for plots")
+    parser.add_argument("--exclude-failed-runs", action="store_true",
+                        help="Skip files where every row is an error (e.g. API server down)")
     args = parser.parse_args()
 
     try:
-        df = load_results(args.files)
+        df = load_results(args.files, exclude_failed_runs=args.exclude_failed_runs)
     except Exception as e:
         print(f"Error loading results: {e}", file=sys.stderr)
         sys.exit(1)

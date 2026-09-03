@@ -1,0 +1,114 @@
+{
+  "timestamp": "20260903_140237",
+  "config": "evaluation_config_hard_v4.yaml",
+  "models_evaluated": [
+    "qwen3.8-max@budget16k"
+  ],
+  "benchmarks_run": [
+    "hard_v4_en"
+  ],
+  "benchmarks": {
+    "hard_v4_en": {
+      "fingerprint": "011e8ffbab7c6f76",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 100,
+      "batch_size": 5
+    }
+  },
+  "entries": {
+    "qwen3.8-max@budget16k": {
+      "model": "qwen3.8-max",
+      "api": "openai_chat",
+      "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "thinking_level": "budget16k",
+      "effort": null,
+      "effort_param": "none",
+      "budget_param": "thinking_budget",
+      "reasoning": null,
+      "extra_body": {
+        "enable_thinking": true
+      },
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    }
+  },
+  "summary_stats": {
+    "qwen3.8-max@budget16k": {
+      "total_questions": 100,
+      "correct_answers": 88,
+      "accuracy": 0.88,
+      "exact_matches": 88,
+      "exact_match_rate": 0.88,
+      "avg_partial_score": 0.91,
+      "avg_response_time": 89.18488702774047,
+      "total_tokens": 687295,
+      "total_prompt_tokens": 328565,
+      "total_completion_tokens": 687295,
+      "avg_completion_tokens": 6872.95,
+      "total_cached_tokens": 279680,
+      "total_cost_usd": 3.5410718749999996,
+      "avg_cost_usd": 0.03541071874999999,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 686420,
+      "questions_with_reasoning": 100,
+      "avg_reasoning_tokens": 6864.2,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "beaux_parents": {
+          "total": 17,
+          "correct": 17,
+          "accuracy": 1.0
+        },
+        "conditional": {
+          "total": 17,
+          "correct": 13,
+          "accuracy": 0.7647058823529411
+        },
+        "demi_fratrie": {
+          "total": 16,
+          "correct": 16,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 17,
+          "correct": 12,
+          "accuracy": 0.7058823529411765
+        },
+        "verticale_descendant_critere": {
+          "total": 17,
+          "correct": 16,
+          "accuracy": 0.9411764705882353
+        },
+        "verticale_racine_critere": {
+          "total": 16,
+          "correct": 14,
+          "accuracy": 0.875
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 100,
+          "correct": 88,
+          "accuracy": 0.88
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 100,
+        "correct": 88,
+        "accuracy": 0.88
+      }
+    }
+  }
+}

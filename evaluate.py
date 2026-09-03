@@ -7,6 +7,7 @@ import argparse
 import asyncio
 import json
 import logging
+from dataclasses import asdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List
@@ -22,13 +23,27 @@ from tree_evaluator.evaluation.display import EvalProgress, print_final_summary,
 
 load_dotenv()
 
-# Logging fichier uniquement (rich gère la console)
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.FileHandler('evaluation_debug.log')],
-)
 logger = logging.getLogger(__name__)
+
+
+def setup_logging(debug: bool, log_file: str = "evaluation_debug.log") -> None:
+    """Logging fichier uniquement (rich gère la console), avec rotation.
+
+    INFO par défaut ; --debug active DEBUG (requêtes et réponses complètes,
+    très volumineux : chaque requête contient l'arbre entier).
+    """
+    from logging.handlers import RotatingFileHandler
+
+    handler = RotatingFileHandler(
+        log_file, maxBytes=20 * 1024 * 1024, backupCount=3, encoding="utf-8"
+    )
+    handler.setFormatter(
+        logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    )
+    root = logging.getLogger()
+    root.handlers.clear()
+    root.addHandler(handler)
+    root.setLevel(logging.DEBUG if debug else logging.INFO)
 
 
 def _build_detailed_json(
@@ -70,6 +85,13 @@ def _build_detailed_json(
         "benchmark": benchmark_config["name"],
         "language": benchmark_config.get("language", "fr"),
         "timestamp": datetime.now().isoformat(),
+        "benchmark_fingerprint": benchmark_run.benchmark_fingerprint,
+        "generator_version": benchmark_run.generator_version,
+        "difficulty": benchmark_run.difficulty,
+        "tree_people": benchmark_run.tree_people,
+        "tree_depth_requested": benchmark_run.tree_depth_requested,
+        "tree_depth_actual": benchmark_run.tree_depth_actual,
+        "batch_size": benchmark_run.batch_size,
         "system_prompt": benchmark_run.system_prompt,
         "tree_description": benchmark_run.tree_description,
         "questions_answers": qa_list,
@@ -94,15 +116,26 @@ async def main():
         help="Liste des benchmarks à exécuter (override la config)",
     )
 
+    parser.add_argument("--batch-size", type=int, help="Override evaluation.batch_size (questions par requête)")
+    parser.add_argument("--runs", type=int, help="Override evaluation.runs_per_benchmark")
+    parser.add_argument("--max-concurrent", type=int, help="Override evaluation.max_concurrent_requests")
+    parser.add_argument("--output-dir", type=str, help="Override evaluation.output_dir")
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Active le logging DEBUG (requêtes/réponses complètes) dans evaluation_debug.log",
+    )
     args = parser.parse_args()
+    setup_logging(args.debug)
 
     # Charger la configuration
     with open(args.config, "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
     # Créer le dossier de sortie
+    if args.output_dir:
+        config["evaluation"]["output_dir"] = args.output_dir
     output_dir = Path(config["evaluation"]["output_dir"])
-    output_dir.mkdir(exist_ok=True)
+    output_dir.mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
@@ -117,8 +150,33 @@ async def main():
             b for b in config["benchmarks"] if b["name"] in args.benchmarks
         ]
 
+    if args.batch_size is not None:
+        config["evaluation"]["batch_size"] = args.batch_size
+    if args.runs is not None:
+        config["evaluation"]["runs_per_benchmark"] = args.runs
+    if args.max_concurrent is not None:
+        config["evaluation"]["max_concurrent_requests"] = args.max_concurrent
     runs_per_benchmark = config["evaluation"].get("runs_per_benchmark", 1)
     max_concurrent = config["evaluation"].get("max_concurrent_requests", 10)
+    batch_size = config["evaluation"].get("batch_size", 1)
+
+    # --- Résultats incrémentaux : une ligne JSON par question dès qu'elle est
+    # évaluée, pour ne rien perdre si le processus meurt avant la fin ---
+    partial_path = output_dir / f"partial_{timestamp}.jsonl"
+    partial_file = open(partial_path, "a", encoding="utf-8")
+
+    def _append_partial(result):
+        partial_file.write(json.dumps(asdict(result), ensure_ascii=False) + "\n")
+        partial_file.flush()
+
+    def _on_question_done(result):
+        _append_partial(result)
+        progress.update_question(result)
+
+    def _on_batch_done(results):
+        for r in results:
+            _append_partial(r)
+        progress.update_questions_batch(results)
 
     # --- Rich progress ---
     progress = EvalProgress(
@@ -131,10 +189,18 @@ async def main():
     all_results = []
     summary_stats = {}
     detailed_runs: List[Dict] = []
+    benchmark_meta: Dict[str, Dict] = {}
+    entries_meta: Dict[str, Dict] = {}
 
     try:
         for model_config in models_to_eval:
             model = ModelEvaluator(model_config)
+            if model.api_key == "none" and not any(h in model.api_base for h in ("127.0.0.1", "localhost")):
+                key_ref = model_config.get("api_key", "")
+                logger.warning(f"Skipping {model_config['name']}: API key {key_ref} is not set")
+                console.print(f"[yellow]⚠ {model_config['name']} ignoré : clé {key_ref} absente de l'environnement[/yellow]")
+                continue
+            entries_meta[model_config["name"]] = model.entry_metadata()
             model_results = []
             progress.begin_model(model_config["name"])
 
@@ -150,10 +216,10 @@ async def main():
                         model,
                         benchmark,
                         config["evaluation"].get("timeout", 60),
-                        config["evaluation"].get("batch_size", 1),
+                        batch_size,
                         max_concurrent=max_concurrent,
-                        on_question_done=progress.update_question,
-                        on_batch_done=progress.update_questions_batch,
+                        on_question_done=_on_question_done,
+                        on_batch_done=_on_batch_done,
                     )
 
                     results = benchmark_run.results
@@ -164,6 +230,16 @@ async def main():
                         stats["accuracy"], stats["avg_response_time"]
                     )
 
+                    benchmark_meta[benchmark["name"]] = {
+                        "fingerprint": benchmark_run.benchmark_fingerprint,
+                        "generator_version": benchmark_run.generator_version,
+                        "difficulty": benchmark_run.difficulty,
+                        "people": benchmark_run.tree_people,
+                        "depth_requested": benchmark_run.tree_depth_requested,
+                        "depth_actual": benchmark_run.tree_depth_actual,
+                        "questions": len(benchmark_run.questions),
+                        "batch_size": benchmark_run.batch_size,
+                    }
                     # Collecter le JSON détaillé
                     detailed_runs.append(
                         _build_detailed_json(
@@ -177,6 +253,7 @@ async def main():
 
     finally:
         progress.stop()
+        partial_file.close()
 
     # --- Sauvegarde des résultats ---
     output_paths: Dict[str, str] = {}
@@ -206,6 +283,8 @@ async def main():
                 "config": args.config,
                 "models_evaluated": [m["name"] for m in models_to_eval],
                 "benchmarks_run": [b["name"] for b in benchmarks_to_run],
+                "benchmarks": benchmark_meta,
+                "entries": entries_meta,
                 "summary_stats": summary_stats,
             },
             f,
@@ -213,6 +292,7 @@ async def main():
             indent=2,
         )
     output_paths["Résumé"] = str(summary_path)
+    output_paths["JSONL incrémental"] = str(partial_path)
 
     # Affichage final
     print_final_summary(summary_stats, output_paths)

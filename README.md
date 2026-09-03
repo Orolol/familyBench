@@ -1,232 +1,216 @@
 # FamilyBench 🌳
 
-FamilyBench is an evaluation tool for testing the relational reasoning capabilities of Large Language Models (LLMs). It generates random family trees, converts them to textual descriptions, and creates question-answer pairs to evaluate understanding of complex family relationships.
+FamilyBench is a dynamic benchmark for the relational reasoning of large language models. It generates a random family tree, writes it out as a long, deliberately inconvenient textual description, and asks questions whose answers are fully determined by that text: who is the half-sister of the person with auburn hair, amber eyes and a burgundy hat, which descendants of X work as a pilot, who has the most children among Y and their siblings. Every benchmark is regenerated from a seed, so nothing can leak into training data, and every answer is verified programmatically.
 
-## 🎯 Objective
+The current protocol, **hard-v4**, is described below with its leaderboard. Earlier protocols and their results are kept at the end for reference.
 
-FamilyBench enables systematic and reproducible evaluation of LLMs' ability to:
-- Understand direct family relationships (parents, children)
-- Infer complex relationships (grandparents, cousins, uncles/aunts)
-- Reason across multiple generations
-- Combine relationships with attributes (profession, physical appearance)
-- Perform cross-sectional and vertical queries in the family tree
+## 🏆 Leaderboard — protocol hard-v4 (2026-09-03)
 
-## 🌟 Features
+| # | Entry | Accuracy | Truncated questions | Output tokens / question | Output tokens / correct answer | Cached prompt | Cost (100 q) | Served by |
+|---|---|---|---|---|---|---|---|---|
+| 1 | `gpt-5.6@high` | **90%** | 0 | 1,217 | 1,352 | 0% | $3.66 | OpenAI Responses API |
+| 2 | `claude-opus-5@high` | **89%** | 0 | 1,756 | 1,973 | 79% | $5.07 | Anthropic Messages API |
+| 3 | `qwen3.8-max@budget16k` | **88%** | 0 | 6,873 | 7,810 | 85% | $3.54 | Alibaba DashScope |
+| 4 | `gemini-3.8-flash@high` | **87%** | 0 | 7,881 | 9,059 | 4% | $3.19 | OpenRouter (Google AI Studio) |
+| 5 | `deepseek-v4-pro@high` | **81%** | 0 | 7,190 | 8,877 | 88% | $2.91 | DeepSeek API |
+| 6 | `claude-fable-5.1@high` | **80%** | 0 | 951 | 1,189 | 79% | $5.85 | Anthropic Messages API |
+| 7 | `muse-spark-1.3-contributor@high` | **79%** | 0 | 2,453 | 3,105 | 10% | $0.08 | OpenRouter (Meta) |
+| 8 | `kimi-k3@high` | **75%** | 0 | 2,482 | 3,309 | 25% | $4.45 | Moonshot API |
+| 9 | `glm-5.3@high` | **64%** | 5 | 3,378 | 5,278 | 64% | $1.70 | Z.ai API |
+| 10 | `gpt-5.6-terra@high` | **62%** | 0 | 866 | 1,397 | 0% | $1.65 | OpenAI Responses API |
+| 11 | `gpt-5.6-luna@high` | **58%** | 0 | 2,763 | 4,764 | 0% | $0.39 | OpenAI Responses API |
+| 12 | `glm-5.3-flash@high` | **43%** | 10 | 3,302 | 7,680 | 0% | $0.21 | Z.ai API |
 
-- **Dynamic generation**: Creation of random family trees with configurable constraints
-- **Multi-language**: Support for French and English
-- **Varied question types**: 9 categories of questions with increasing difficulty
-- **Automatic evaluation**: Interface with OpenAI-compatible APIs to test multiple models
-- **Reproducibility**: Use of seeds to generate identical benchmarks
-- **Flexible export**: JSON and Markdown formats for direct LLM integration
+**How to read it.** An entry is a *(model, thinking level)* pair: thinking effort is not comparable across vendors and the benchmark does not pretend it is, so the level is part of the name and is reported as such. Each entry ran once on the same 100 questions (seed 4040), in 20 batches of 5, with a hard cap of **16,000 output tokens per question** (80k per request, reasoning included). Differences under about 7 points are within run-to-run noise (measured on two identical DeepSeek passes: 39 of 60 questions kept their verdict). *Output tokens / correct answer* is the efficiency ranking: the same accuracy costs GPT-5.6 six times fewer tokens than Qwen 3.8 Max or Gemini 3.8 Flash. Costs use the vendors' list prices of 2026-09-03; the whole pass cost $33.
 
-## 📋 Prerequisites
+Per question type (correct / total):
 
-- Python 3.8+
-- pip
+| Entry | step-parents | half-siblings | conditional | descendants + criterion | roots + criterion | multihop |
+|---|---|---|---|---|---|---|
+| `gpt-5.6@high` | 17/17 | 14/16 | 15/17 | 17/17 | 14/16 | 13/17 |
+| `claude-opus-5@high` | 17/17 | 16/16 | 17/17 | 14/17 | 16/16 | 9/17 |
+| `qwen3.8-max@budget16k` | 17/17 | 16/16 | 13/17 | 16/17 | 14/16 | 12/17 |
+| `gemini-3.8-flash@high` | 16/17 | 16/16 | 12/17 | 17/17 | 15/16 | 11/17 |
+| `deepseek-v4-pro@high` | 17/17 | 13/16 | 13/17 | 14/17 | 14/16 | 10/17 |
+| `claude-fable-5.1@high` | 17/17 | 16/16 | 11/17 | 16/17 | 10/16 | 10/17 |
+| `muse-spark-1.3-contributor@high` | 16/17 | 16/16 | 14/17 | 15/17 | 8/16 | 10/17 |
+| `kimi-k3@high` | 17/17 | 15/16 | 13/17 | 11/17 | 10/16 | 9/17 |
+| `glm-5.3@high` | 16/17 | 9/16 | 12/17 | 8/17 | 12/16 | 7/17 |
+| `gpt-5.6-terra@high` | 15/17 | 10/16 | 13/17 | 10/17 | 7/16 | 7/17 |
+| `gpt-5.6-luna@high` | 15/17 | 8/16 | 10/17 | 9/17 | 7/16 | 9/17 |
+| `glm-5.3-flash@high` | 10/17 | 8/16 | 8/17 | 8/17 | 4/16 | 5/17 |
 
-## 🚀 Installation
+**What the pass showed.**
+- The top four (GPT-5.6, Claude Opus 5, Qwen 3.8 Max, Gemini 3.8 Flash) sit within 3 points, below the noise floor; separating them needs a second seed. They reach that score with very different budgets: 1,200 to 1,800 output tokens per question for the OpenAI and Anthropic models, 7,000 to 8,000 for Qwen, Gemini and DeepSeek Pro.
+- The 16k cap only bit GLM-5.3 (5 truncated questions) and GLM-5.3-Flash (10). Nobody else came close, so the capped pass is the reference and an uncapped "max effort" pass would only change the GLM rows.
+- The discriminating question types are **multihop** ("the children of the siblings of the grandparents of X") and **roots with criterion** ("people without parents who work as X"), both of which require scanning the whole description. The relation types added by generator 4.0 (step-parents, half-siblings) are solved by every model above 75 %.
+- Muse Spark 1.3 at 79 % for $0.08 is by far the best score per dollar; Claude Fable 5.1 trails Claude Opus 5 by 9 points while using half the tokens, mostly on conditional questions ("who has the most children among X and their siblings").
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/familybench.git
-cd familybench
-```
+Files: `evaluation_results/hard_v4/` (`summary_*.json` per entry, `results_*.json/csv` per question, `detailed_*.json` with the exact prompt; `_orphan_partials/` holds incremental files of processes that were restarted, and the DeepSeek Pro entry was rebuilt from the response cache so its response times are zero there).
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## 🧬 What the benchmark is (generator 4.0)
 
-3. (Optional) For automatic evaluation, create a `.env` file:
-```bash
-OPENROUTER_API_KEY=your_api_key_here
-# Or any other required API key
-```
+### The tree
 
-## 📖 Usage
+- Random family trees with unique first names and unique (hair, eyes, hat) combinations; professions repeat on purpose so that "who works as a pilot" has several answers.
+- Each child has exactly two parents. A configurable share of people (`second_union_percentage`, default 20 %) also have children with a second partner, which creates **half-siblings and step-parents**. "Brother/sister" means both parents in common, "half-brother/half-sister" exactly one; uncles, cousins and nephews are defined through full siblings. This convention is written at the top of every description.
+- Two children per union by default (`max_children`), so 400 people give about 6 generations. The requested depth is an upper bound: the pool of people is usually exhausted before it is reached, and the actual depth is recorded in every output.
 
-### Benchmark Generation
+### The description
 
-#### Basic Usage
-```bash
-# Generate a simple benchmark in French
-python generate_benchmark.py --people 30 --depth 3 --questions 50 --output benchmark.json
+- Every parent-child link is stated **exactly once, in a random direction and place** (`relations: mixed`): "Ana is the mother of Leo" here, "Leo is the son of Marc" forty lines later. Knowing both parents of someone means joining two distant sentences.
+- A share of people (`derived_links_percentage`, default 30 %) are described only as "X is the sister of Y"; Y keeps explicit links and is never derived itself, so the tree stays fully reconstructible (a test rebuilds it from the sentences).
+- Sentences are shuffled with a generator seeded from the benchmark seed: the sorted order leaked everyone's generation, and the seeding keeps the description byte-identical across runs so provider prompt caches keep hitting.
+- About 13,000 tokens for 400 people.
 
-# Generate a benchmark in English
-python generate_benchmark.py --people 50 --depth 4 --questions 100 --language en --output benchmark_en.json
-```
+### The questions
 
-#### Generation for Direct Prompting
-```bash
-# Generate a ready-to-use Markdown file for an LLM
-python generate_benchmark.py --people 20 --depth 3 --questions 30 --md-output prompt.md
-```
+23 question types in four difficulty tiers (`easy`, `medium`, `hard`, `enigma`), sampled evenly across types. The `hard` tier used by the protocol: conditional, multihop, descendants with criterion, roots with criterion, half-siblings, step-parents (plus compound attributes, relational paths, comparatives and negations, which the protocol excludes, see below). Enigmas are relation chains with a unique discriminating attribute ("Which grandfather of the aunt of the grandfather of Lacey has blue eyes?"), in nine complexity levels; they turned out to be solved at 100 % by mid-tier models once the phrasing was made unambiguous, which is why the protocol focuses on the hard tier instead.
 
-#### Advanced Options
-```bash
-# With seed for reproducibility
-python generate_benchmark.py --people 100 --depth 5 --questions 200 --seed 12345 --output benchmark_large.json
+Two rewrites apply after sampling: in `anonymize_percentage` (default 50 %) of the questions every first name is replaced by the person's unique attribute description ("the person with red hair, blue eyes and a green hat"), so the model must locate the person before reasoning; and questions whose answer would list more than `max_answer_names` (10) names are asked as counts, while those above `drop_answer_names_above` (40) are dropped as whole-tree censuses. Answers are a single name, an alphabetically sorted comma-separated list, a number, or `None`.
 
-# With multiple families (root couples)
-python generate_benchmark.py --people 60 --depth 4 --questions 100 --root-couples 3 --output multi_family.json
+Every generated question records `type`, `difficulty`, `answer_format` (`names`, `count`, `label`, `none`), `anonymized` and `converted_to_count`.
 
-# Limit number of children per person
-python generate_benchmark.py --people 40 --depth 3 --questions 80 --max-children 2 --output limited_children.json
-```
+### Difficulty levers
 
-### Model Evaluation
+All levers are `generate_benchmark.py` flags and `benchmarks:` keys of the evaluation config, and all are part of the benchmark fingerprint. Defaults are the hard settings.
 
-#### Configuration
-Create or modify `evaluation_config.yaml`:
-
-```yaml
-models:
-  - name: "gpt-3.5-turbo"
-    api_base: "https://api.openai.com/v1"
-    api_key: "${OPENAI_API_KEY}"
-    model: "gpt-3.5-turbo"
-    temperature: 0.0
-    max_tokens: 1000
-
-benchmarks:
-  - name: "small_fr"
-    people: 30
-    depth: 3
-    questions: 50
-    language: "fr"
-    seed: 42
-    
-  - name: "small_en"
-    people: 30
-    depth: 3
-    questions: 50
-    language: "en"
-    seed: 42
-```
-
-#### Running Evaluation
-```bash
-# Evaluate all models on all benchmarks
-python evaluate.py
-
-# Evaluate specific models
-python evaluate.py --models gpt-3.5-turbo claude-3
-
-# Evaluate on specific benchmarks
-python evaluate.py --benchmarks small_fr large_en
-
-# With custom configuration
-python evaluate.py --config my_eval_config.yaml
-```
-
-### Results Analysis
+| Lever | Key | Default | Effect |
+|---|---|---|---|
+| Second unions | `second_union_percentage` | 20 | Half-siblings and step-parents; `0` restores the single-union tree |
+| Children per union | `max_children` | 2 | Fewer children per union means more generations for the same tree size |
+| Link phrasing | `relations` | `mixed` | `mixed` (each link once, random direction), `parents`, `children`, `both` (redundant, easiest) |
+| Derived links | `derived_links_percentage` | 30 | "X is the sister of Y" instead of X's parent links |
+| Shuffle | `shuffle` | true | Seeded shuffle of the sentences |
+| Attribute references | `anonymize_percentage` | 50 | Names replaced by attribute descriptions in the questions (never in enigmas) |
+| Long answers as counts | `max_answer_names` | 10 | Above N names the question becomes "how many people…" |
+| Census questions dropped | `drop_answer_names_above` | 40 | Above N names the question is removed before sampling |
+| Excluded types | `exclude_types` | none | e.g. `[relational_path, relation_attribut_composee, comparative, negation]` |
 
 ```bash
-# Analyze evaluation results
-python analyze_results.py evaluation_results/results_*.csv
-
-# Generate comparative plots
-python analyze_results.py evaluation_results/results_*.csv --plots
-
-# Export detailed report
-python analyze_results.py evaluation_results/results_*.csv --report report.html
+# Easier description, single unions, no rewrites (close to the 2025 protocol)
+python generate_benchmark.py --people 400 --depth 6 --questions 200 --seed 43 --language en \
+    --no-shuffle --relations both --max-children 3 --second-union-percentage 0 --derived-links-percentage 0 \
+    --max-answer-names 0 --anonymize-percentage 0 --output easy.json
 ```
 
-## 🧠 Question Types
+### Reproducibility
 
-FamilyBench generates 9 types of questions:
+Every benchmark carries a fingerprint (`benchmark_fingerprint`, in the generated JSON and in every summary) computed from the generator version, the data files (name lists) and all generation parameters. Two runs are comparable only if their fingerprints match. Question selection is reproducible across processes and machines for a given seed (the generator never iterates over sets).
 
-1. **Direct relations**: "Who are Marie's children?"
-2. **Inverse relations**: "Whose child is Jean?"
-3. **Attribute search**: "Who has blonde hair?"
-4. **Multi-criteria search**: "Who has brown hair and blue eyes?"
-5. **Counting**: "How many children does Pierre have?"
-6. **Complex relations**: "Who are Sophie's cousins?"
-7. **Cross-sectional questions**: "Who is in the same generation as Luc and works as a doctor?"
-8. **Vertical questions**: "Who are Claire's oldest ancestors?"
-9. **Compound relations**: "Which of Paul's children work as engineers?"
+## 📐 Protocol hard-v4
 
-## 📊 Data Structure
+`evaluation_config_hard_v4.yaml` is the reference configuration:
 
-### JSON Output Format
-```json
-{
-  "tree_description": "Textual description of the family tree...",
-  "prompt_template": "Template for LLM prompt",
-  "questions": [
-    {
-      "id": 1,
-      "question": "Who are Marie's parents?",
-      "answer": "Jean,Sophie",
-      "type": "relation_directe"
-    }
-  ],
-  "metadata": {
-    "total_people": 30,
-    "tree_depth": 3,
-    "language": "en",
-    "generation_timestamp": "2024-01-15T10:30:00"
-  }
-}
+| Parameter | Value | Why |
+|---|---|---|
+| Tree | 400 people, 4 root couples, seed 4040, generator 4.0 defaults | About 13k prompt tokens; 6 generations |
+| Questions | 100, `difficulty: hard`, evenly spread over 6 types | Enigmas and the easier tiers are saturated by current models |
+| Excluded types | relational paths, compound attributes, comparatives, negations | The first two are the easiest hard types; the last two are whole-tree censuses ("who has the same number of children as X") that no model answers within budget |
+| Batch | 5 questions per request | Halves the cost and is itself part of the difficulty: on generator 3.1, batch 5 cost DeepSeek V4 Flash 20 points |
+| Output cap | `max_tokens_per_question: 16000`, i.e. 80,000 per request | Reasoning and answer included; a truncated request loses its 5 questions ("cannot answer within budget") and is not retried |
+| Effort | `high` on every vendor (`budget16k` on Qwen, see below) | The common label; levels are not equivalent and are displayed as such |
+| Temperature | vendor default | Anthropic rejects it with thinking, reasoning models ignore it, Moonshot fixes it |
+| Robustness | streaming everywhere, idle timeout 300 s, retries on stalled streams, connection resets, HTTP 429/5xx (backoff, `retry-after`) | Truncated generations are never retried nor cached |
+
+Vendor notes learned on the first pass: Moonshot allows **one concurrent request per organisation** (run Kimi with `--max-concurrent 1`, patient retries are set in the config); Qwen's `max_tokens` does not cover the chain of thought, so the Qwen entry sets `thinking_budget` (16k × batch) instead of an effort level, hence `@budget16k`; DeepSeek expects the effort inside `thinking.reasoning_effort` (`effort_param: thinking`); identity-linked Anthropic keys need `anthropic_workspace_id`; OpenAI's prompt cache reported writes but no reads during the pass, so OpenAI costs are without cache discount.
+
+### Running the protocol
+
+```bash
+# 1. Cost check: same protocol on 2 questions per entry (entries without an API key are skipped)
+python evaluate.py --config evaluation_config_hard_v4_smoke.yaml
+python scripts/estimate_cost.py evaluation_results/hard_v4_smoke/summary_<ts>.json --questions 100
+
+# 2. The pass: one process per entry, in parallel (entries inside one process run sequentially)
+python evaluate.py --config evaluation_config_hard_v4.yaml --models claude-opus-5@high
+python evaluate.py --config evaluation_config_hard_v4.yaml --models kimi-k3@high --max-concurrent 1
+...
 ```
 
-### Generation Constraints
+Each run writes `partial_<ts>.jsonl` incrementally (nothing is lost if a process dies), then `results_<ts>.csv/json`, `detailed_<ts>.json` (prompts and every Q&A) and `summary_<ts>.json` (per-entry stats, per-type and per-tier accuracy, hallucination rate, fingerprint, entry metadata). Responses are cached on disk (`.cache/`, `diskcache`) keyed by the full request, so an interrupted entry can be relaunched and only pays for what it has not completed. Keys are read from `.env` (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `ANTHROPIC_WORKSPACE_ID`, `DEEPSEEK_API_KEY`, `QWEN_API_KEY`, `MOONSHOT_API_KEY`, `ZAI_API_KEY`, `OPENROUTER_API_KEY`).
 
-- **Name uniqueness**: Each person has a unique first name
-- **Profession uniqueness**: Professions are NOT unique — multiple people can share the same profession (intentional for attribute-search questions)
-- **Appearance uniqueness**: The combination (hair, eyes, hat) is unique
-- **Simple structure**: No remarriages, each child has exactly 2 parents
+## 📊 Scoring
 
-## 🌍 Multi-language Support
+The model answer is normalised (JSON objects or arrays, numbered lists, `<answer>` tags, "Final answer:" prefixes, spelled-out numbers, `None`/`Aucun` variants) and both sides are compared as sets, case-insensitively, after the same normalisation:
 
-FamilyBench currently supports:
-- 🇫🇷 French (fr)
-- 🇬🇧 English (en)
+| Metric | Definition |
+|---|---|
+| `is_exact_match` | Same set of names (order ignored) |
+| `partial_match_score` | Jaccard index between the two sets |
+| `is_correct` | Exact match **or** Jaccard ≥ 0.9; since long answers are asked as counts, this only ever tolerates one name on lists of 10 |
+| `no_response` | Empty answer, refusal, truncation, or a sentence instead of an answer |
+| `hallucinated_names` | Names in the answer that do not exist in the tree (only when the expected answer is a list of names) |
 
-Translations include:
-- Person descriptions
-- Question formulations
-- Prompt templates
-- Data (names, professions, colors)
+`accuracy` is the share of `is_correct` over all questions, errors and no-responses included. In batch mode the model answers with a JSON object keyed by question number, so a skipped question does not shift the others. `scripts/rescore_results.py` re-scores existing files after a scoring change.
 
-## 🔧 Architecture
+## ⚙️ Configuration reference
+
+Per-entry keys of `models:`:
+
+| Key | Meaning |
+|---|---|
+| `name` | Leaderboard entry, by convention `model@level` |
+| `api` | `anthropic` (Messages API), `openai_responses`, or `openai_chat` (any OpenAI-compatible endpoint: OpenAI chat, OpenRouter, DeepSeek, Qwen, Moonshot, Z.ai, Gemini compat, local servers). Auto-detected from `api_base` when omitted |
+| `effort` | Generic effort label, translated into `output_config.effort` (Anthropic, adaptive thinking), `reasoning.effort` (OpenAI Responses), `reasoning_effort` (OpenAI-compatible), `reasoning: {effort}` (OpenRouter) |
+| `effort_param` | For OpenAI-compatible vendors: `reasoning_effort` (default), `thinking` (DeepSeek), `none` |
+| `budget_param` | Name of a thinking-budget parameter set to `max_tokens_per_question` × batch size (Qwen: `thinking_budget`) |
+| `thinking_level` | Label shown in the leaderboard (defaults to `effort`) |
+| `max_tokens_per_question` | Output cap per question; the request cap is this times the batch size. `0` falls back to `max_tokens` |
+| `extra_body` | Vendor-specific parameters merged into the request (`thinking: {type: enabled}`, `enable_thinking`, Gemini's `google.thinking_config`…) |
+| `reasoning`, `provider` | OpenRouter-style reasoning object and provider routing (`order`, `allow_fallbacks`) — pin a provider: prompt caches are per provider |
+| `pricing` | `input_per_mtok`, `output_per_mtok`, `cached_input_per_mtok` to get `cost_usd` |
+| `anthropic_workspace_id` | Required with identity-linked Anthropic keys |
+| `stream`, `idle_timeout`, `http_retries`, `http_retry_max_wait`, `request_delay_ms` | Streaming (default on), stall cut-off, HTTP retry policy, pacing |
+
+Per-benchmark keys of `benchmarks:`: `people`, `depth`, `questions`, `root_couples`, `seed`, `language` (`fr`/`en`), `difficulty` (`all`, `easy`, `medium`, `hard`, `enigma`, `expert`), `enigma_percentage`, `exclude_types`, and the difficulty levers above. `evaluation:` keys: `runs_per_benchmark`, `max_concurrent_requests`, `timeout`, `batch_size`, `output_dir`, `output_formats`. Command-line overrides: `--models`, `--benchmarks`, `--batch-size`, `--runs`, `--max-concurrent`, `--output-dir`, `--debug`.
+
+## 🚀 Installation and other tools
+
+```bash
+pip install -r requirements.txt      # aiohttp, pyyaml, python-dotenv, rich, diskcache; pandas/matplotlib for the analysis
+pytest                               # 114 tests, no network needed (fake API servers)
+
+# Generate a benchmark file (JSON with answers, optional Markdown prompt)
+python generate_benchmark.py --people 400 --depth 8 --questions 100 --root-couples 4 --seed 4040 --language en --difficulty hard --output bench.json
+
+# Analyse results (per model, per type, per tier, plots, HTML report)
+python analyze_results.py evaluation_results/hard_v4/results_*.csv --plots
+python analyze_results.py evaluation_results/**/results_*.csv --exclude-failed-runs
+
+# Compare batch sizes on one model (accuracy vs cost)
+python scripts/batch_sweep.py --config evaluation_config_batch_sweep.yaml --batch-sizes 1 5 10 20
+```
+
+Repository layout:
 
 ```
-familybench/
-├── tree_evaluator/
-│   ├── __init__.py
-│   ├── models.py           # Data models (Person)
-│   ├── tree_generator.py   # Tree generation
-│   ├── text_converter.py   # Text conversion
-│   ├── question_generator.py # Question generation
-│   └── translations.py     # Translation system
-├── data/
-│   ├── fr/                # French data
-│   └── en/                # English data
-├── generate_benchmark.py   # CLI for generation
-├── evaluate.py            # Model evaluation
-└── analyze_results.py     # Results analysis
+tree_evaluator/
+├── tree_generator.py, text_converter.py      # tree and description (generator 4.0)
+├── question_generator.py, questions/         # 23 question types, tiers, enigma chain engine, rewrites
+├── versioning.py                             # generator version and benchmark fingerprint
+└── evaluation/                               # API adapters (Anthropic, OpenAI Responses, OpenAI-compatible),
+                                              # streaming, scoring, stats, rich display, I/O
+scripts/                                      # batch_sweep.py, estimate_cost.py, rescore_results.py
+evaluation_config_hard_v4*.yaml               # the protocol and its 2-question smoke variant
+evaluation_results/                           # every run, incremental and final files
+tests/                                        # pytest suite
 ```
 
-## 📈 Performance
+## 📜 History
 
-Typical generation times:
-- 50 people, 100 questions: ~1 second
-- 200 people, 500 questions: ~5 seconds
-- 1000 people, 2000 questions: ~30 seconds
+### 2026, generators 2.0 to 4.0 (not comparable with each other nor with the leaderboard)
 
-## 🏆 Benchmark Results
+- **Generator 2.0**, `large_tree_en` (500 people, seed 1), batch 1, unlimited reasoning: Kimi K2.6 81.7 %, DeepSeek V4 Flash 80.5 % (expert), Qwen 3.6 35B A3B (local) 79.3 %.
+- **Generator 3.1 batch-size sweep**, DeepSeek V4 Flash, 400 people, expert, 40 questions: batch 1 85.0 %, batch 5 65.0 %. Batching divides the cost by 2.7 and costs 20 points, mostly on enigmas. Batches of 20 on a 1,000-person tree never produced an answer within 160k reasoning tokens.
+- **Generator 4.0 versus 3.1**, same model, batch 1, expert, 40 questions: 85 % → 50 %; hard tier 74 % → 27 %; reasoning per question 5k → 24k tokens; 7 questions truncated at 160k output tokens. The failure profile is recall (one name missing, or "None" when a link is missed) and exhaustive comparisons that exceed the budget.
+- **Pre-protocol tests**, DeepSeek V4 Flash on the official API, hard tier, 60 questions, batch 5: `@high` with the 16k cap 48.3 %, `@max` uncapped 53.3 %; the two passes agreed on only 39 of 60 questions, which is the origin of the ±7 points noise estimate. Comparative questions scored 0/9 in both and were excluded from the protocol.
 
-Here are the evaluation results of several state-of-the-art models on FamilyBench:
+Files: `evaluation_results/batch_sweep_deepseek/`, `evaluation_results/v4_deepseek/`, `evaluation_results/hard_v4_deepseek_flash_tests/`, `evaluation_results/hard_v4_smoke*/`.
 
-### Evaluation Configuration
-- **Benchmark**: `huge_tree_en` - 400 people, depth 10, 200 questions, 10 root couples
-- **Temperature**: 0.3 for all models
-- **Evaluation Date**: August 14, 2025
-- **Total Questions**: 189 per model (after filtering)
+### 2025 leaderboard (generator 1.x, historical)
 
-### Results Summary
+Benchmark `huge_tree_en` (400 people, requested depth 10 with 5 generations actually reached, 189 questions, 10 root couples), temperature 0.3, reasoning capped at 8,000 tokens, batch 1, via OpenRouter. The name lists and the question sampling have changed since, so `seed 43` no longer regenerates this benchmark; the table is kept as a reference. The per-model commentary of that era is available in the git history.
 
 | Model | Accuracy | Exact Match | Avg Response Time | Total Tokens | Reasoning Tokens | No Response Rate |
 |-------|----------|-------------|-------------------|--------------|------------------|------------------|
@@ -253,180 +237,6 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 | **Gemma 3 27B** | 17.99% | 17.99% | 4.97s | 2,888 | 0 | 0.53% |
 | **Qwen 3 30B A3B** | 7.94% | 7.94% | 6.74s | 7,096 | 0 | 0.53% |
 
-### Detailed Performance Analysis
-
-#### Top Performers
-
-**Gemini 2.5 Pro** (Best Overall)
-- **Accuracy**: 81.48% (154/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 84.44% (152/180 correct)
-- **Efficiency**: Best accuracy with moderate token usage and fast responses
-- **Reliability**: Perfect 0% no-response rate
-- **Reasoning**: Efficient reasoning with only 504 tokens average
-
-**Claude Sonnet 4.5** (Strong Second)
-- **Accuracy**: 77.78% (147/189 correct)
-- **Enigma Performance**: 33.33% (3/9 correct)
-- **Normal Questions**: 80.00% (144/180 correct)
-- **Speed**: Fast responses (25.88s average)
-- **Efficiency**: Good balance with 682 avg reasoning tokens
-- **Reliability**: Perfect 0% no-response rate and 0% error rate
-- **Note**: Improved version of Sonnet 4, with better accuracy and enigma handling
-
-**DeepSeek R1** (Top Tier)
-- **Accuracy**: 75.66% (143/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 78.33% (141/180 correct)
-- **Reasoning**: Moderate reasoning usage (3,078 avg tokens)
-- **Reliability**: Excellent with 0% no-response rate
-- **Note**: 1.06% error rate but still highly reliable
-
-**GLM 4.6** (Impressive Improvement)
-- **Accuracy**: 74.60% (141/189 correct)
-- **Enigma Performance**: 44.44% (4/9 correct, **best enigma performance across all models**)
-- **Normal Questions**: 76.11% (137/180 correct)
-- **Response Time**: Moderate at 89.11s average
-- **Reasoning**: Moderate reasoning usage (1,667 avg tokens, 183 questions with reasoning)
-- **Reliability**: Perfect 0% no-response rate, 3.17% error rate
-- **Note**: With improved prompting, GLM 4.6 jumped from 47.62% to 74.60% (+27 points!), showing excellent prompt sensitivity and reasoning capabilities
-
-**Gemini 2.5 Flash**
-- **Accuracy**: 73.54% (139/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 76.11% (137/180 correct)
-- **Speed**: Fastest among top models (17.85s)
-- **Efficiency**: Excellent balance - 73.54% accuracy with minimal reasoning tokens (439 avg)
-- **Note**: Small 2.65% no-response rate but overall highly reliable
-
-**Qwen 3 Next 80B A3B Thinking**
-- **Accuracy**: 71.43% (135/189 correct)
-- **Enigma Performance**: 33.33% (3/9 correct, tied for best enigma performance)
-- **Normal Questions**: 73.33% (132/180 correct)
-- **Reasoning**: Extensive reasoning usage (5,818 avg tokens)
-- **Response Time**: Moderate at 68.02s average
-- **Reliability**: Good with 3.17% no-response rate
-- **Note**: Strong overall performance with particularly good enigma handling
-
-**Claude Sonnet 4**
-- **Accuracy**: 67.20% (127/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 69.44% (125/180 correct)
-- **Efficiency**: Good balance of speed (32.93s) and accuracy
-- **Reasoning**: Efficient with 797 avg reasoning tokens
-
-**DeepSeek V3.2 Exp**
-- **Accuracy**: 66.67% (126/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 68.89% (124/180 correct)
-- **Response Time**: Slower at 258.76s average
-- **Reasoning**: Moderate reasoning usage (2,559 avg tokens)
-- **Reliability**: Perfect 0% no-response rate but 11.64% error rate
-- **Note**: Experimental version with good accuracy but higher error rate
-
-**GLM 4.5**
-- **Accuracy**: 64.02% (121/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 66.11% (119/180 correct)
-- **Balance**: Good accuracy with reasonable resource usage
-- **Reliability**: Low 2.12% no-response rate
-
-#### Mid-Tier Models
-
-**GLM 4.5 Air**
-- **Accuracy**: 57.14% (108/189 correct)
-- **Enigma Performance**: 33.33% (3/9 correct, best enigma performance)
-- **Token Usage**: 4.2x more tokens than standard GLM 4.5
-- **Weakness**: Very high no-response rate (26.46%)
-
-**GPT-OSS 120B** (New)
-- **Accuracy**: 50.26% (95/189 correct)
-- **Enigma Performance**: 11.11% (1/9 correct)
-- **Normal Questions**: 52.22% (94/180 correct)
-- **Speed**: Fast for its size (14.46s)
-- **Reasoning**: Uses reasoning tokens extensively (1,200 avg)
-- **Note**: A solid mid-tier performer, outperforming many similarly sized models.
-
-**Qwen 3.2 Thinking**
-- **Accuracy**: 50.26% (95/189 correct)
-- **Enigma Performance**: 37.5% (3/8 correct, second best enigma)
-- **Reasoning**: Extensive reasoning (7,185 avg tokens)
-- **Weakness**: 20.63% no-response rate limits reliability
-
-**Kimi K2**
-- **Accuracy**: 34.92% (66/189 correct)
-- **Speed**: Fast responses (16.04s average)
-- **Enigma Performance**: 0% (failed all enigma questions)
-- **Reliability**: Perfect 0% no-response rate
-
-**Kimi K2 0905**
-- **Accuracy**: 28.04% (53/189 correct)
-- **Normal Questions**: 28.89% (52/180 correct)
-- **Enigma Performance**: 11.11% (1/9 correct)
-- **Speed**: Very fast responses (9.35s average)
-- **Token Efficiency**: Extremely minimal (7,684 total, no reasoning tokens)
-- **Reliability**: Perfect 0% no-response rate and 0% error rate
-- **Note**: Lower accuracy than original Kimi K2 (34.92%) but faster and more efficient
-
-**Hunyuan A13B**
-- **Accuracy**: 30.16% (57/189 correct)
-- **Enigma Performance**: 11.11% (1/9 correct)
-- **Reasoning**: Light reasoning usage (641 avg tokens)
-- **Response Time**: Slower at 91.52s average
-
-**GPT-OSS 20B** (New)
-- **Accuracy**: 30.16% (57/189 correct)
-- **Enigma Performance**: 0% (0/9 correct)
-- **Normal Questions**: 31.67% (57/180 correct)
-- **Reliability**: Perfect 0% no-response rate
-- **Reasoning**: High reasoning token usage for its performance level (2,211 avg)
-- **Note**: Performance is in line with other models in its tier, but with higher token consumption.
-
-**Mistral Medium 3.1** (New)
-- **Accuracy**: 29.63% (56/189 correct)
-- **Enigma Performance**: 22.22% (2/9 correct)
-- **Normal Questions**: 30.00% (54/180 correct)
-- **Speed**: Fast (6.64s average)
-- **Token Efficiency**: Very low token usage (6,062 total)
-- **Reliability**: 0.53% no-response rate
-- **Reasoning**: No reasoning tokens used
-
-#### Lower Performers
-
-**Qwen 3.2** (Base Model)
-- **Accuracy**: 28.04% (53/189 correct)
-- **Speed**: Fastest model (5.06s average)
-- **Token Efficiency**: Minimal token usage (3,098 total)
-- **Enigma Performance**: 0% (failed all enigma questions)
-
-**Mistral Small 3.2**
-- **Accuracy**: 22.22% (42/189 correct)
-- **Enigma Performance**: 11.11% (1/9 correct)
-- **Speed**: Moderate (13.03s average)
-- **Reliability**: Perfect 0% no-response rate
-
-**Qwen 3 Coder**
-- **Accuracy**: 21.16% (40/189 correct)
-- **Enigma Performance**: 11.11% (1/9 correct)
-- **Speed**: Moderate (18.01s average)
-- **Token Usage**: Higher than similar performers (40,031 total)
-- **Note**: Despite being a coding model, struggles with relational reasoning
-
-**Gemma 3 27B**
-- **Accuracy**: 17.99% (34/189 correct)
-- **Speed**: Very fast (4.97s average)
-- **Token Efficiency**: Extremely minimal (2,888 total)
-- **Enigma Performance**: 0% (failed all enigma questions)
-
-**Qwen 3 30B A3B** (Lowest Performer)
-- **Accuracy**: 7.94% (15/189 correct)
-- **Enigma Performance**: 0% (failed all enigma questions)
-- **Speed**: Fast (6.74s average)
-- **Token Efficiency**: Very minimal (7,096 total)
-- **Note**: Waiting to test the thinking model !
-
-### Key Insights
-
 1. **Clear Top Tier**: Gemini 2.5 Pro (81.48%), Claude Sonnet 4.5 (77.78%), DeepSeek R1 (75.66%), GLM 4.6 (74.60%), Gemini 2.5 Flash (73.54%), and Qwen 3 Next 80B A3B Thinking (71.43%) form the elite group, all exceeding 70% accuracy
 2. **Prompt Engineering Matters**: GLM 4.6 demonstrated a massive +27 point improvement (47.62% → 74.60%) with enhanced prompting, showing that prompt quality can dramatically impact model performance
 3. **Claude Family Evolution**: Claude Sonnet 4.5 (77.78%) shows significant improvement over Sonnet 4 (67.20%), climbing to second place with better enigma handling (33.33% vs 22.22%)
@@ -437,47 +247,10 @@ Here are the evaluation results of several state-of-the-art models on FamilyBenc
 8. **DeepSeek Evolution**: DeepSeek V3.2 Exp (66.67%) shows competitive accuracy but with higher error rate (11.64%) compared to R1's perfect reliability
 9. **Token Efficiency**: Gemini 2.5 Flash achieves 73.54% accuracy with only 439 reasoning tokens average, making it the most efficient top performer
 
-### Benchmark Difficulty
-
-The `huge_tree_en` benchmark represents an extreme challenge:
-- **400 people** across 10 generations
-- **10 root couples** creating multiple interconnected family trees
-- **200 questions** testing various relationship types
-- Models must maintain consistency across extremely long contexts
-- **Enigma questions** require complex multi-step reasoning
-
 ## 🤝 Contributing
 
-Contributions are welcome! To contribute:
-
-1. Fork the project
-2. Create a branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Contribution Ideas
-
-- Add new languages
-- Create new question types
-- Improve generation algorithm
-- Add tree visualizations
-- Optimize performance
+Contributions are welcome: new languages, new question families (bounded aggregation over a branch is the next difficulty lever we would add), vendor adapters, analysis. Open an issue or a pull request.
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Inspired by relational reasoning benchmarks
-- Uses public domain name and profession data
-- Designed for AI research and LLM evaluation
-
-## 📧 Contact
-
-For any questions or suggestions, feel free to open an issue on GitHub.
-
----
-
-🤖 Made with ❤️ for LLM evaluation
+MIT — see [LICENSE](LICENSE).

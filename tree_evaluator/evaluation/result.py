@@ -26,5 +26,17 @@ class EvaluationResult:
     cost_usd: Optional[float] = None
     reasoning_text: Optional[str] = None
     question_type: Optional[str] = None
+    # Tier de difficulté de la question (easy / medium / hard / enigma)
+    difficulty: Optional[str] = None
+    # Nombre de prénoms de la réponse qui n'existent pas dans l'arbre
+    hallucinated_names: int = 0
     is_enigma: bool = False
     enigma_complexity: Optional[int] = None
+    # Taille du batch dans lequel la question a été posée (1 = une requête par question)
+    batch_size: int = 1
+    # finish_reason renvoyé par l'API ("stop", "length" = coupé par max_tokens...)
+    finish_reason: Optional[str] = None
+    # Fournisseur réel (OpenRouter renvoie `provider`) : utile pour le cache de prompt
+    provider: Optional[str] = None
+    # Niveau de thinking de l'entrée du leaderboard (paire modèle + niveau)
+    thinking_level: Optional[str] = None

@@ -46,7 +46,7 @@ models:
 
   - name: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
     api_base: "http://127.0.0.1:8080/v1"
-    api_key: "${OPENROUTER_API_KEY}"
+    api_key: "none"   # serveur local sans authentification ("none" = pas d'en-tête Authorization)
     model: "sakamakismile/Qwen3.6-27B-Text-NVFP4-MTP"
     # Local vLLM => no pricing; cost_usd will be None.
 

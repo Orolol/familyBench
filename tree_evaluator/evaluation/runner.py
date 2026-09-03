@@ -7,9 +7,10 @@ from typing import Dict, List, Any, Optional, Callable
 
 import aiohttp
 
-from tree_evaluator.tree_generator import generate_tree
+from tree_evaluator.tree_generator import generate_tree, actual_depth
 from tree_evaluator.text_converter import convert_tree_to_text
 from tree_evaluator.question_generator import generate_questions
+from tree_evaluator.versioning import benchmark_fingerprint, benchmark_params_from_config, GENERATOR_VERSION
 from .model_evaluator import ModelEvaluator
 from .result import EvaluationResult
 
@@ -23,6 +24,14 @@ class BenchmarkRun:
     tree_description: str
     system_prompt: str
     questions: List[Dict[str, Any]]
+    # Métadonnées de reproductibilité
+    benchmark_fingerprint: str = ""
+    generator_version: str = GENERATOR_VERSION
+    tree_people: int = 0
+    tree_depth_requested: int = 0
+    tree_depth_actual: int = 0
+    difficulty: str = "all"
+    batch_size: int = 1
 
 
 async def run_benchmark_evaluation(
@@ -47,22 +56,45 @@ async def run_benchmark_evaluation(
     tree = generate_tree(
         total_people=benchmark_config['people'],
         max_depth=benchmark_config['depth'],
-        max_children_per_person=benchmark_config.get('max_children', 3),
+        max_children_per_person=benchmark_config.get('max_children', 2),
         seed=benchmark_config.get('seed'),
         num_root_couples=benchmark_config.get('root_couples', 1),
-        language=language
+        language=language,
+        second_union_percentage=benchmark_config.get('second_union_percentage', 20),
     )
 
-    tree_description = convert_tree_to_text(tree, shuffle=False, language=language)
+    # Description : mélangée par défaut (l'ordre trié révèle la génération),
+    # un seul sens de lien par défaut ("X est l'enfant de A et B"). Le mélange
+    # est seedé pour que la description soit identique d'un run à l'autre.
+    tree_description = convert_tree_to_text(
+        tree,
+        shuffle=benchmark_config.get('shuffle', True),
+        language=language,
+        relations=benchmark_config.get('relations', 'mixed'),
+        seed=benchmark_config.get('seed'),
+        derived_links_percentage=benchmark_config.get('derived_links_percentage', 30),
+    )
     enigma_percentage = benchmark_config.get('enigma_percentage', 10)
     difficulty = benchmark_config.get('difficulty', 'all')
     questions = generate_questions(
         tree, benchmark_config['questions'],
         language=language, enigma_percentage=enigma_percentage,
         difficulty=difficulty,
+        max_answer_names=benchmark_config.get('max_answer_names', 10),
+        anonymize_percentage=benchmark_config.get('anonymize_percentage', 50),
+        drop_answer_names_above=benchmark_config.get('drop_answer_names_above', 40),
+        exclude_types=benchmark_config.get('exclude_types'),
     )
 
     system_prompt = model.prompt_builder.get_system_prompt(language, batch_size > 1)
+    model.set_known_names(p.first_name for p in tree.values())
+    fingerprint = benchmark_fingerprint(benchmark_params_from_config(benchmark_config))
+    depth_actual = actual_depth(tree)
+    if depth_actual < benchmark_config['depth']:
+        logger.warning(
+            "Benchmark %s: requested depth %d, actual depth %d",
+            benchmark_config['name'], benchmark_config['depth'], depth_actual,
+        )
 
     semaphore = asyncio.Semaphore(max_concurrent)
 
@@ -142,10 +174,17 @@ async def run_benchmark_evaluation(
     # Ajouter le nom du benchmark
     for result in results:
         result.benchmark_name = benchmark_config['name']
+        result.batch_size = batch_size
 
     return BenchmarkRun(
         results=list(results),
         tree_description=tree_description,
         system_prompt=system_prompt,
         questions=questions,
+        benchmark_fingerprint=fingerprint,
+        tree_people=len(tree),
+        tree_depth_requested=benchmark_config['depth'],
+        tree_depth_actual=depth_actual,
+        difficulty=difficulty,
+        batch_size=batch_size,
     )

@@ -10,3 +10,9 @@ __pycache__/
 *.pyzw
 *.pyzwz
 *.log
+
+# Local artefacts
+.cache/
+analysis_output/
+.pytest_cache/
+*.log.*

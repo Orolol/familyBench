@@ -1,0 +1,170 @@
+{
+  "timestamp": "20260903_122113",
+  "config": "evaluation_config_hard_v4_smoke.yaml",
+  "models_evaluated": [
+    "muse-spark-1.3-contributor@high",
+    "gemini-3.8-flash@high"
+  ],
+  "benchmarks_run": [
+    "hard_v4_smoke_en"
+  ],
+  "benchmarks": {
+    "hard_v4_smoke_en": {
+      "fingerprint": "e05e5ff54bc3cc22",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 2,
+      "batch_size": 2
+    }
+  },
+  "entries": {
+    "muse-spark-1.3-contributor@high": {
+      "model": "meta/muse-spark-1.3-contributor",
+      "api": "openai_chat",
+      "api_base": "https://openrouter.ai/api/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": {
+        "order": [
+          "meta"
+        ],
+        "allow_fallbacks": false,
+        "data_collection": "allow"
+      }
+    },
+    "gemini-3.8-flash@high": {
+      "model": "google/gemini-3.8-flash",
+      "api": "openai_chat",
+      "api_base": "https://openrouter.ai/api/v1",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "reasoning_effort",
+      "budget_param": null,
+      "reasoning": null,
+      "extra_body": null,
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": {
+        "order": [
+          "google-ai-studio"
+        ],
+        "allow_fallbacks": false
+      }
+    }
+  },
+  "summary_stats": {
+    "muse-spark-1.3-contributor@high": {
+      "total_questions": 2,
+      "correct_answers": 1,
+      "accuracy": 0.5,
+      "exact_matches": 1,
+      "exact_match_rate": 0.5,
+      "avg_partial_score": 0.75,
+      "avg_response_time": 20.222326517105103,
+      "total_tokens": 4566,
+      "total_prompt_tokens": 15462,
+      "total_completion_tokens": 4566,
+      "avg_completion_tokens": 2283.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": 0.0024594,
+      "avg_cost_usd": 0.0012297,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 4396,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 2198.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 1,
+          "accuracy": 0.5
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      }
+    },
+    "gemini-3.8-flash@high": {
+      "total_questions": 2,
+      "correct_answers": 2,
+      "accuracy": 1.0,
+      "exact_matches": 2,
+      "exact_match_rate": 1.0,
+      "avg_partial_score": 1.0,
+      "avg_response_time": 22.044176936149597,
+      "total_tokens": 18064,
+      "total_prompt_tokens": 15804,
+      "total_completion_tokens": 18064,
+      "avg_completion_tokens": 9032.0,
+      "total_cached_tokens": 0,
+      "total_cost_usd": 0.079593,
+      "avg_cost_usd": 0.0397965,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 18036,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 9018.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 2,
+          "accuracy": 1.0
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    }
+  }
+}

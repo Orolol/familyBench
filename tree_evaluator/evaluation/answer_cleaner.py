@@ -30,7 +30,7 @@ class AnswerCleaner:
         # Chercher d'autres formats courants comme **Answer:** ou Answer:
         if not glm_match and not answer_match:
             # Format **Answer:** ou Answer:
-            answer_pattern = re.search(r'(?:\*\*)?Answer\s*:\s*(.+?)(?:\n|$)', answer, re.IGNORECASE)
+            answer_pattern = re.search(r'(?:\*\*)?Answer\s*:\**\s*(.+?)(?:\n|$)', answer, re.IGNORECASE)
             if answer_pattern:
                 answer = answer_pattern.group(1).strip()
             
@@ -59,10 +59,12 @@ class AnswerCleaner:
             if final_answer_pattern:
                 answer = final_answer_pattern.group(1).strip()
         
-        # Enlever les guillemets, points, espaces superflus
-        answer = answer.strip()
-        answer = answer.strip('"\'')
-        answer = answer.rstrip('.')
+        # Enlever les guillemets, points, astérisques, espaces superflus
+        # (en boucle : `"Alice,Bob".` -> `Alice,Bob`)
+        previous = None
+        while previous != answer:
+            previous = answer
+            answer = answer.strip().strip('"\'`*').rstrip('.').strip()
         
         # Si la réponse contient une explication après deux-points, essayer d'extraire juste les noms
         if ':' in answer and not any(char in answer.split(':')[0] for char in [',', ' ']):
@@ -196,13 +198,18 @@ class AnswerCleaner:
         return False
     
     @staticmethod
-    def check_exact_match(model_answer: str, expected_answer: str) -> bool:
-        """Vérifie si la réponse correspond exactement."""
-        # Normaliser les deux réponses
-        model_normalized = {x.strip() for x in model_answer.split(',')} if ',' in model_answer else {model_answer.strip()}
-        expected_normalized = {x.strip() for x in expected_answer.split(',')} if ',' in expected_answer else {expected_answer.strip()}
-        
-        return model_normalized == expected_normalized
+    def _normalize_list(answer: str) -> set:
+        """Ensemble d'éléments comparables : mêmes transformations que le nettoyage
+        du modèle (" and " -> virgule, espaces, casse), appliquées AUSSI à la
+        réponse attendue. Sans cela, "salt and pepper" attendu ne pouvait jamais
+        égaler la réponse nettoyée "salt,pepper"."""
+        answer = re.sub(r'\s+(?:and|et)\s+', ',', answer, flags=re.IGNORECASE)
+        return {x.strip().lower() for x in answer.split(',') if x.strip()}
+
+    @classmethod
+    def check_exact_match(cls, model_answer: str, expected_answer: str) -> bool:
+        """Vérifie si la réponse correspond exactement (ensemble, ordre ignoré)."""
+        return cls._normalize_list(model_answer) == cls._normalize_list(expected_answer)
     
     @staticmethod
     def calculate_partial_match(model_answer: str, expected_answer: str) -> float:
@@ -211,9 +218,9 @@ class AnswerCleaner:
             return 1.0
         
         # Pour les listes
-        if ',' in expected_answer or ',' in model_answer:
-            model_set = {x.strip() for x in model_answer.split(',') if x.strip()} if model_answer else set()
-            expected_set = {x.strip() for x in expected_answer.split(',') if x.strip()} if expected_answer else set()
+        if ',' in expected_answer or ',' in model_answer or ' and ' in expected_answer or ' et ' in expected_answer:
+            model_set = AnswerCleaner._normalize_list(model_answer)
+            expected_set = AnswerCleaner._normalize_list(expected_answer)
             
             if not expected_set:
                 return 0.0

@@ -1,0 +1,38 @@
+# DeepSeek V4 Flash (0731) via OpenRouter, plus gros arbre, mode expert, batch de 20.
+models:
+  - name: "deepseek/deepseek-v4-flash-0731"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "deepseek/deepseek-v4-flash-0731"
+    temperature: 0.3
+    idle_timeout: 300         # flux figé > 5 min => coupé et réessayé
+    max_tokens: 160000         # OpenRouter autorise jusqu'à 943k ; 64k a été insuffisant pour 20 questions
+    provider:
+      # Un seul fournisseur : le cache de prompt est par fournisseur, et OpenRouter
+      # en propose 12 pour ce modèle ; sans pin, le préfixe commun (arbre) ne
+      # sert presque jamais (4 % de tokens cachés observés).
+      order: ["baidu/fp8", "coreweave/fp8"]
+      allow_fallbacks: false
+      data_collection: "allow"
+    pricing:                   # USD / Mtok, indicatif
+      input_per_mtok: 0.14
+      output_per_mtok: 0.28
+
+benchmarks:
+  - name: "huge_tree_en_expert"
+    people: 1000
+    depth: 20
+    questions: 20
+    root_couples: 8
+    seed: 667
+    language: "en"
+    difficulty: expert
+    # leviers 3.1 par défaut : shuffle, relations parents, max_answer_names 10, drop_answer_names_above 40, anonymize 50
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 1
+  timeout: 5400
+  batch_size: 20
+  output_dir: "evaluation_results"
+  output_formats: [csv, json]

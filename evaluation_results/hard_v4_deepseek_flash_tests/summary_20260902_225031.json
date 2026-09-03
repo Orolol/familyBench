@@ -1,0 +1,125 @@
+{
+  "timestamp": "20260902_225031",
+  "config": "evaluation_config_hard_v4.yaml",
+  "models_evaluated": [
+    "deepseek-v4-flash@high"
+  ],
+  "benchmarks_run": [
+    "hard_v4_en"
+  ],
+  "benchmarks": {
+    "hard_v4_en": {
+      "fingerprint": "bca6f096067e3d3d",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 60,
+      "batch_size": 5
+    }
+  },
+  "entries": {
+    "deepseek-v4-flash@high": {
+      "model": "deepseek-v4-flash",
+      "api": "openai_chat",
+      "api_base": "https://api.deepseek.com",
+      "thinking_level": "high",
+      "effort": "high",
+      "effort_param": "thinking",
+      "reasoning": null,
+      "extra_body": {
+        "thinking": {
+          "type": "enabled"
+        }
+      },
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    }
+  },
+  "summary_stats": {
+    "deepseek-v4-flash@high": {
+      "total_questions": 60,
+      "correct_answers": 29,
+      "accuracy": 0.48333333333333334,
+      "exact_matches": 29,
+      "exact_match_rate": 0.48333333333333334,
+      "avg_partial_score": 0.5949537037037037,
+      "avg_response_time": 94.82378870328267,
+      "total_tokens": 786835,
+      "total_prompt_tokens": 188060,
+      "total_completion_tokens": 786835,
+      "avg_completion_tokens": 13113.916666666666,
+      "total_cached_tokens": 117375,
+      "total_cost_usd": 0.2466422,
+      "avg_cost_usd": 0.004110703333333333,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 5,
+      "no_response_rate": 0.08333333333333333,
+      "total_reasoning_tokens": 786300,
+      "questions_with_reasoning": 60,
+      "avg_reasoning_tokens": 13105.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "beaux_parents": {
+          "total": 8,
+          "correct": 6,
+          "accuracy": 0.75
+        },
+        "comparative": {
+          "total": 9,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "conditional": {
+          "total": 9,
+          "correct": 7,
+          "accuracy": 0.7777777777777778
+        },
+        "demi_fratrie": {
+          "total": 8,
+          "correct": 6,
+          "accuracy": 0.75
+        },
+        "multihop": {
+          "total": 9,
+          "correct": 2,
+          "accuracy": 0.2222222222222222
+        },
+        "negation": {
+          "total": 1,
+          "correct": 0,
+          "accuracy": 0.0
+        },
+        "verticale_descendant_critere": {
+          "total": 8,
+          "correct": 4,
+          "accuracy": 0.5
+        },
+        "verticale_racine_critere": {
+          "total": 8,
+          "correct": 4,
+          "accuracy": 0.5
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 60,
+          "correct": 29,
+          "accuracy": 0.48333333333333334
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 60,
+        "correct": 29,
+        "accuracy": 0.48333333333333334
+      }
+    }
+  }
+}

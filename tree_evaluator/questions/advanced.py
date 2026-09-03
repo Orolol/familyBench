@@ -3,7 +3,7 @@
 from typing import Dict, List, Any
 from tree_evaluator.models import Person
 from tree_evaluator.translations import get_translation
-from .base import format_answer, get_common_attributes, get_father, get_mother
+from .base import get_siblings, get_uncles_aunts, get_cousins, get_nephews_nieces, get_co_parents, format_answer, get_common_attributes, get_father, get_mother
 
 
 def generate_compound_relation_questions(people: Dict[str, Person], language: str = "fr") -> List[Dict[str, Any]]:
@@ -47,7 +47,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
         
         # Frères/sœurs avec attributs
         if person.parent_ids:
-            siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
+            siblings = get_siblings(person, people)
             
             # Frères/sœurs par profession (seulement les professions communes)
             common_professions = get_common_attributes(people, 'profession', min_count=3)
@@ -85,7 +85,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
         
         # Enfants des frères/sœurs (neveux/nièces) avec attributs
         if person.parent_ids:
-            siblings = [people[cid] for pid in person.parent_ids for cid in people[pid].children_ids if cid != person.id]
+            siblings = get_siblings(person, people)
             nephews_by_hair = {}
             for sibling in siblings:
                 for child_id in sibling.children_ids:
@@ -103,13 +103,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
                     })
         
         # Parents des cousins (oncles/tantes)
-        cousins = []
-        for pid in person.parent_ids:
-            parent = people[pid]
-            if parent.parent_ids:
-                parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                for sibling in parent_siblings:
-                    cousins.extend([(people[cid], sibling) for cid in sibling.children_ids])
+        cousins = [(people[cid], ua) for ua in get_uncles_aunts(person, people) for cid in ua.children_ids]
         
         if cousins:
             # Oncles/tantes par attributs physiques plutôt que professions
@@ -176,13 +170,7 @@ def generate_compound_relation_questions(people: Dict[str, Person], language: st
                 })
         
         # Nombre de cousins
-        cousins = []
-        for pid in person.parent_ids:
-            parent = people[pid]
-            if parent.parent_ids:
-                parent_siblings = [people[cid] for gpid in parent.parent_ids for cid in people[gpid].children_ids if cid != pid]
-                for sibling in parent_siblings:
-                    cousins.extend([people[cid].first_name for cid in sibling.children_ids])
+        cousins = [c.first_name for c in get_cousins(person, people)]
         
         if cousins:
             questions.append({
@@ -235,15 +223,9 @@ def generate_multihop_questions(people: Dict[str, Person], language: str = "fr")
         # 1. Enfants des frères et sœurs des grands-parents
         great_uncles_children = []
         for pid in person.parent_ids:
-            parent = people[pid]
-            for gpid in parent.parent_ids:
-                grandparent = people[gpid]
-                # Frères et sœurs du grand-parent
-                for ggpid in grandparent.parent_ids:
-                    for sibling_id in people[ggpid].children_ids:
-                        if sibling_id != gpid:  # Pas le grand-parent lui-même
-                            sibling = people[sibling_id]
-                            great_uncles_children.extend([people[cid].first_name for cid in sibling.children_ids])
+            for gpid in people[pid].parent_ids:
+                for sibling in get_siblings(people[gpid], people):
+                    great_uncles_children.extend([people[cid].first_name for cid in sibling.children_ids])
         
         if great_uncles_children:
             questions.append({
@@ -253,18 +235,9 @@ def generate_multihop_questions(people: Dict[str, Person], language: str = "fr")
             })
         
         # 2. Couleurs de cheveux des beaux-parents des enfants
-        in_laws_hair = []
-        for cid in person.children_ids:
-            child = people[cid]
-            # Si l'enfant a des enfants, trouver l'autre parent
-            if child.children_ids:
-                for gcid in child.children_ids:
-                    grandchild = people[gcid]
-                    # Trouver l'autre parent du petit-enfant
-                    for other_parent_id in grandchild.parent_ids:
-                        if other_parent_id != cid:
-                            in_law = people[other_parent_id]
-                            in_laws_hair.append(in_law.hair_color)
+        in_laws_hair = [
+            in_law.hair_color for cid in person.children_ids for in_law in get_co_parents(people[cid], people)
+        ]
         
         if in_laws_hair and len(set(in_laws_hair)) > 1:  # Au moins 2 couleurs différentes
             questions.append({
@@ -290,8 +263,7 @@ def generate_multihop_questions(people: Dict[str, Person], language: str = "fr")
         # 4. Petits-enfants des frères et sœurs
         if person.parent_ids:
             siblings_grandchildren = []
-            siblings = [people[cid] for pid in person.parent_ids 
-                       for cid in people[pid].children_ids if cid != person.id]
+            siblings = get_siblings(person, people)
             for sibling in siblings:
                 for cid in sibling.children_ids:
                     child = people[cid]
@@ -314,13 +286,7 @@ def generate_conditional_questions(people: Dict[str, Person], language: str = "f
     for person in people.values():
         # 1. Si a des frères, qui sont leurs filles
         if person.parent_ids:
-            seen_brothers = set()
-            brothers = []
-            for pid in person.parent_ids:
-                for sibling_id in people[pid].children_ids:
-                    if sibling_id != person.id and sibling_id not in seen_brothers and people[sibling_id].gender == 'M':
-                        seen_brothers.add(sibling_id)
-                        brothers.append(people[sibling_id])
+            brothers = [b for b in get_siblings(person, people) if b.gender == 'M']
 
             if brothers:
                 daughters = list(set(
@@ -356,13 +322,7 @@ def generate_conditional_questions(people: Dict[str, Person], language: str = "f
         
         # 3. Qui a le plus d'enfants parmi X et ses frères/sœurs
         if person.parent_ids:
-            seen = set()
-            siblings = []
-            for pid in person.parent_ids:
-                for cid in people[pid].children_ids:
-                    if cid != person.id and cid not in seen:
-                        seen.add(cid)
-                        siblings.append(people[cid])
+            siblings = get_siblings(person, people)
 
             if siblings:
                 all_candidates = [person] + siblings
@@ -415,9 +375,7 @@ def generate_negation_questions(people: Dict[str, Person], language: str = "fr")
     people_no_siblings = []
     for person in people.values():
         if person.parent_ids:
-            siblings_count = sum(1 for pid in person.parent_ids 
-                               for cid in people[pid].children_ids if cid != person.id)
-            if siblings_count == 0:
+            if not get_siblings(person, people):
                 people_no_siblings.append(person.first_name)
     
     if people_no_siblings:
@@ -588,14 +546,8 @@ def generate_relational_path_questions(people: Dict[str, Person], language: str 
                 return "petit-enfant"
         
         # Oncle-tante/neveu-nièce
-        if p1.parent_ids:
-            for pid in p1.parent_ids:
-                parent = people[pid]
-                if parent.parent_ids:
-                    for gpid in parent.parent_ids:
-                        for uncle_id in people[gpid].children_ids:
-                            if uncle_id != pid and uncle_id == p2_id:
-                                return "neveu/nièce-oncle/tante"
+        if any(ua.id == p2_id for ua in get_uncles_aunts(p1, people)):
+            return "neveu/nièce-oncle/tante"
         
         # Cousins
         p1_grandparents = []
@@ -626,23 +578,14 @@ def generate_relational_path_questions(people: Dict[str, Person], language: str 
                     questions.append({
                         "question": get_translation("q_relationship_between", language).format(
                             name1=person.first_name, name2=child.first_name),
-                        "answer": "parent-enfant",
+                        "answer": get_translation("rel_parent_child", language),
                         "type": "relational_path"
                     })
         
         # 2. Quelques paires de cousins si possible
         for person in people.values():
             # Trouver les cousins
-            cousins = []
-            if person.parent_ids:
-                for pid in person.parent_ids:
-                    parent = people[pid]
-                    if parent.parent_ids:
-                        for gpid in parent.parent_ids:
-                            for aunt_uncle_id in people[gpid].children_ids:
-                                if aunt_uncle_id != pid:
-                                    for cousin_id in people[aunt_uncle_id].children_ids:
-                                        cousins.append(people[cousin_id])
+            cousins = get_cousins(person, people)
             
             if cousins and len(questions) < 10:
                 cousin = cousins[0]
@@ -652,7 +595,7 @@ def generate_relational_path_questions(people: Dict[str, Person], language: str 
                     questions.append({
                         "question": get_translation("q_relationship_between", language).format(
                             name1=person.first_name, name2=cousin.first_name),
-                        "answer": "cousins",
+                        "answer": get_translation("rel_cousins", language),
                         "type": "relational_path"
                     })
                     

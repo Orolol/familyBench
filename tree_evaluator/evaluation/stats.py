@@ -1,7 +1,28 @@
 """Fonctions pour calculer les statistiques d'évaluation."""
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from .result import EvaluationResult
+
+
+def _accuracy_block(results: List[EvaluationResult]) -> Dict[str, Any]:
+    total = len(results)
+    correct = sum(1 for r in results if r.is_correct)
+    return {
+        'total': total,
+        'correct': correct,
+        'accuracy': correct / total if total else 0.0,
+    }
+
+
+def _group_stats(results: List[EvaluationResult], key) -> Dict[str, Dict[str, Any]]:
+    """Statistiques d'accuracy groupées par une clé (type, difficulté, ...)."""
+    groups: Dict[str, List[EvaluationResult]] = {}
+    for r in results:
+        k = key(r)
+        if k is None:
+            continue
+        groups.setdefault(str(k), []).append(r)
+    return {k: _accuracy_block(v) for k, v in sorted(groups.items())}
 
 
 def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
@@ -25,6 +46,12 @@ def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
     no_responses = sum(1 for r in results if r.no_response)
     total_reasoning_tokens = sum(r.reasoning_tokens for r in results)
     questions_with_reasoning = sum(1 for r in results if r.reasoning_tokens > 0)
+
+    # Hallucinations : réponses (non vides, sans erreur) contenant au moins un
+    # prénom absent de l'arbre.
+    answered = [r for r in results if not r.error and not r.no_response and r.model_answer]
+    answers_with_hallucination = sum(1 for r in answered if r.hallucinated_names > 0)
+    total_hallucinated_names = sum(r.hallucinated_names for r in results)
     
     # Statistiques pour les énigmes
     enigma_results = [r for r in results if r.is_enigma]
@@ -32,35 +59,14 @@ def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
     
     enigma_stats = {}
     if enigma_results:
-        enigma_total = len(enigma_results)
-        enigma_correct = sum(1 for r in enigma_results if r.is_correct)
-        enigma_stats = {
-            'total': enigma_total,
-            'correct': enigma_correct,
-            'accuracy': enigma_correct / enigma_total,
-            'by_complexity': {}
-        }
-        
-        # Statistiques par niveau de complexité
-        for complexity in [1, 2, 3]:
+        enigma_stats = _accuracy_block(enigma_results)
+        enigma_stats['by_complexity'] = {}
+        complexities = sorted({r.enigma_complexity for r in enigma_results if r.enigma_complexity is not None})
+        for complexity in complexities:
             complex_results = [r for r in enigma_results if r.enigma_complexity == complexity]
-            if complex_results:
-                complex_correct = sum(1 for r in complex_results if r.is_correct)
-                enigma_stats['by_complexity'][complexity] = {
-                    'total': len(complex_results),
-                    'correct': complex_correct,
-                    'accuracy': complex_correct / len(complex_results)
-                }
+            enigma_stats['by_complexity'][complexity] = _accuracy_block(complex_results)
     
-    normal_stats = {}
-    if normal_results:
-        normal_total = len(normal_results)
-        normal_correct = sum(1 for r in normal_results if r.is_correct)
-        normal_stats = {
-            'total': normal_total,
-            'correct': normal_correct,
-            'accuracy': normal_correct / normal_total
-        }
+    normal_stats = _accuracy_block(normal_results) if normal_results else {}
     
     return {
         'total_questions': total,
@@ -84,6 +90,11 @@ def calculate_summary_stats(results: List[EvaluationResult]) -> Dict[str, Any]:
         'total_reasoning_tokens': total_reasoning_tokens,
         'questions_with_reasoning': questions_with_reasoning,
         'avg_reasoning_tokens': total_reasoning_tokens / questions_with_reasoning if questions_with_reasoning > 0 else 0,
+        'hallucination_rate': answers_with_hallucination / len(answered) if answered else 0.0,
+        'answers_with_hallucination': answers_with_hallucination,
+        'total_hallucinated_names': total_hallucinated_names,
+        'by_question_type': _group_stats(results, lambda r: r.question_type),
+        'by_difficulty': _group_stats(results, lambda r: r.difficulty),
         'enigma_stats': enigma_stats,
         'normal_stats': normal_stats
     }

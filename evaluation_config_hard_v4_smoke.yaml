@@ -1,0 +1,147 @@
+# Test de coût du protocole hard-v4 : mêmes réglages (arbre, tier hard, plafond
+# 16k par question, API officielles), mais 2 questions en une requête de 2.
+# Le résumé donne les tokens par question ; scripts/estimate_cost.py extrapole
+# le coût des 60 questions du protocole complet pour chaque entrée.
+#
+# Les entrées dont la clé d'API est absente de .env sont ignorées avec un
+# avertissement (pas d'erreurs en cascade). Tarifs en USD / million de tokens,
+# relevés le 2026-09-03 sur les pages de prix officielles (DeepSeek en heures pleines).
+
+models:
+  - name: "deepseek-v4-pro@high"
+    api_base: "https://api.deepseek.com"
+    api_key: "${DEEPSEEK_API_KEY}"
+    model: "deepseek-v4-pro"
+    effort: "high"
+    effort_param: thinking
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 1.32, output_per_mtok: 3.96, cached_input_per_mtok: 0.044}   # heures pleines (api-docs.deepseek.com/quick_start/pricing)
+
+  - name: "claude-opus-5@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-opus-5"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"   # requis avec une clé liée à une identité
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
+
+  - name: "gpt-5.6@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6"          # alias de gpt-5.6-sol
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 4, output_per_mtok: 20, cached_input_per_mtok: 0.4}
+
+  - name: "qwen3.8-max@budget16k"
+    api_base: "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"   # ou https://{WorkspaceId}.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1
+    api_key: "${QWEN_API_KEY}"
+    model: "qwen3.8-max"
+    # Chez Qwen, max_tokens ne couvre pas la chaîne de pensée : on impose le budget
+    # de pensée (thinking_budget = 16k x taille du batch) au lieu d'un niveau d'effort
+    # (les deux sont exclusifs). Le niveau affiché est donc "budget16k".
+    effort_param: none
+    thinking_level: "budget16k"
+    budget_param: thinking_budget
+    max_tokens_per_question: 16000
+    extra_body:
+      enable_thinking: true
+    pricing: {input_per_mtok: 1.65, output_per_mtok: 4.951, cached_input_per_mtok: 0.206}
+
+  - name: "kimi-k3@high"
+    api_base: "https://api.moonshot.ai/v1"
+    api_key: "${MOONSHOT_API_KEY}"
+    model: "kimi-k3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 3, output_per_mtok: 15, cached_input_per_mtok: 0.3}
+
+  - name: "glm-5.3@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 1.4, output_per_mtok: 4.4, cached_input_per_mtok: 0.26}
+
+  - name: "glm-5.3-flash@high"
+    api_base: "https://api.z.ai/api/paas/v4"
+    api_key: "${ZAI_API_KEY}"
+    model: "glm-5.3-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    extra_body:
+      thinking: {type: "enabled"}
+    pricing: {input_per_mtok: 0.15, output_per_mtok: 0.5, cached_input_per_mtok: 0.03}   # tarif catalogue (promo -50 % jusqu'au 9 sept. 2026)
+
+  - name: "gpt-5.6-terra@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-terra"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 2, output_per_mtok: 12, cached_input_per_mtok: 0.2}
+
+  - name: "gpt-5.6-luna@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6-luna"
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 0.2, output_per_mtok: 1.2, cached_input_per_mtok: 0.02}
+
+  # Fable 5.1 : thinking toujours actif (adaptatif), effort low..max, 30 jours de rétention requis
+  - name: "claude-fable-5.1@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-fable-5-1"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 10, output_per_mtok: 50, cached_input_per_mtok: 0.25}
+
+  # --- Via OpenRouter (pas d'API officielle exploitable) : reasoning: {effort}, fournisseur épinglé
+  - name: "muse-spark-1.3-contributor@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "meta/muse-spark-1.3-contributor"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["meta"], allow_fallbacks: false, data_collection: "allow"}
+    pricing: {input_per_mtok: 0.1, output_per_mtok: 0.2, cached_input_per_mtok: 0.002}   # tarif OpenRouter "contributor"
+
+  - name: "gemini-3.8-flash@high"
+    api_base: "https://openrouter.ai/api/v1"
+    api_key: "${OPENROUTER_API_KEY}"
+    model: "google/gemini-3.8-flash"
+    effort: "high"
+    max_tokens_per_question: 16000
+    provider: {order: ["google-ai-studio"], allow_fallbacks: false}
+    pricing: {input_per_mtok: 0.75, output_per_mtok: 3.75, cached_input_per_mtok: 0.075}
+
+benchmarks:
+  - name: "hard_v4_smoke_en"
+    people: 400
+    depth: 8
+    questions: 2
+    root_couples: 4
+    seed: 4040
+    language: "en"
+    difficulty: hard
+    exclude_types: [relational_path, relation_attribut_composee, comparative, negation]
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 6
+  timeout: 3600
+  batch_size: 2
+  output_dir: "evaluation_results/hard_v4_smoke"
+  output_formats: [csv, json]

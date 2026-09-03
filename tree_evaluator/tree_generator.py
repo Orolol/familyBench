@@ -1,9 +1,23 @@
+import logging
 import random
 import uuid
 from itertools import product
+from pathlib import Path
 from typing import Dict, List, Tuple
 
 from tree_evaluator.models import Person
+
+logger = logging.getLogger(__name__)
+
+# Dossier des données, indépendant du répertoire courant
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
+
+
+def actual_depth(people: Dict[str, Person]) -> int:
+    """Nombre de générations réellement présentes dans l'arbre."""
+    if not people:
+        return 0
+    return max(p.generation for p in people.values()) + 1
 
 def _load_data(file_path: str) -> List[Tuple[str, str]]:
     """Charge les lignes d'un fichier texte (prénom,sexe)."""
@@ -41,14 +55,27 @@ def _get_unique_attributes(
     
     return unique_names_genders, selected_professions, unique_color_combos
 
+DEFAULT_SECOND_UNION_PERCENTAGE = 20
+
+
 def generate_tree(
     total_people: int,
     max_depth: int,
-    max_children_per_person: int,
+    max_children_per_person: int = 2,
     seed: int | None = None,
     num_root_couples: int = 1,
     language: str = "fr",
+    second_union_percentage: int = DEFAULT_SECOND_UNION_PERCENTAGE,
 ) -> Dict[str, Person]:
+    """Génère un arbre généalogique aléatoire.
+
+    Args:
+        max_children_per_person: nombre max d'enfants PAR UNION (par couple).
+        second_union_percentage: part (0-100) des personnes qui, après une
+            première union, ont aussi des enfants avec un second partenaire.
+            Cela crée des demi-frères/sœurs et des beaux-parents. Chaque
+            enfant a toujours exactement deux parents.
+    """
     
     if total_people < 1:
         raise ValueError("total_people must be at least 1")
@@ -60,12 +87,14 @@ def generate_tree(
         raise ValueError("num_root_couples must be at least 1")
     if language not in ("fr", "en"):
         raise ValueError(f"language must be 'fr' or 'en', got {language!r}")
+    if not 0 <= second_union_percentage <= 100:
+        raise ValueError("second_union_percentage must be between 0 and 100")
     
     if seed is not None:
         random.seed(seed)
 
     # Charger les données selon la langue
-    data_dir = f"data/{language}"
+    data_dir = DATA_DIR / language
     first_names_genders = _load_data(f"{data_dir}/first_names.txt")
     professions = _load_professions(f"{data_dir}/professions.txt")
     hair_colors = _load_professions(f"{data_dir}/hair_colors.txt")
@@ -133,53 +162,92 @@ def generate_tree(
         people_to_marry = list(current_generation)
         random.shuffle(people_to_marry)
         
-        for person in people_to_marry:
-            if not person_pool:
-                break
-                
-            # Chercher un partenaire de sexe opposé dans le pool
+        def make_union(person: Person) -> bool:
+            """Marie `person` avec un partenaire du pool et leur donne 1..max enfants."""
             potential_partners = [p for p in person_pool if p.gender != person.gender]
-            
-            if not potential_partners:
-                continue
-                
-            # Choisir un partenaire au hasard
+            if not potential_partners or len(person_pool) < 2:
+                return False
             partner = random.choice(potential_partners)
             person_pool.remove(partner)
             partner.generation = person.generation  # Le partenaire rejoint la même génération
             people_in_tree_ids.add(partner.id)
-            
-            # Décider qui est parent1 et parent2 selon le genre
             if person.gender == 'M':
                 parent1, parent2 = person, partner
             else:
                 parent1, parent2 = partner, person
-            
-            # Avoir des enfants
-            max_possible_children = min(max_children_per_person, len(person_pool)) if person_pool else 0
+            max_possible_children = min(max_children_per_person, len(person_pool))
             if max_possible_children == 0:
-                continue
+                return False
             num_children = random.randint(1, max_possible_children)
-            
             for _ in range(num_children):
                 if not person_pool:
                     break
-                
                 child = person_pool.pop(0)
                 child.generation = gen + 1
                 child.parent_ids = [parent1.id, parent2.id]
                 parent1.children_ids.append(child.id)
                 parent2.children_ids.append(child.id)
-                
                 next_generation.append(child)
                 people_in_tree_ids.add(child.id)
-        
+            return True
+
+        for person in people_to_marry:
+            # Il faut au moins un conjoint ET un enfant, sinon le conjoint
+            # entrerait dans l'arbre sans aucun lien de parenté.
+            if len(person_pool) < 2:
+                break
+            if not make_union(person):
+                continue
+            # Seconde union : demi-frères/sœurs et beaux-parents
+            if random.random() * 100 < second_union_percentage and len(person_pool) >= 2:
+                make_union(person)
+
         if not next_generation:
             break
         
         current_generation = next_generation
         gen += 1
 
+    # Rattacher les personnes restantes (pool non vide à cause de la limite de
+    # profondeur ou d'un reste impair) comme enfants de couples existants qui
+    # ont encore de la place, pour que l'arbre contienne bien total_people.
+    if person_pool:
+        random.shuffle(person_pool)
+        for leftover in list(person_pool):
+            candidates = [
+                p for p in people.values()
+                if p.id in people_in_tree_ids
+                and p.children_ids
+                and len(p.children_ids) < max_children_per_person
+                and p.generation <= max_depth - 2
+            ]
+            if not candidates:
+                break
+            parent = random.choice(candidates)
+            first_child = people[parent.children_ids[0]]
+            co_parent_id = next(pid for pid in first_child.parent_ids if pid != parent.id)
+            co_parent = people[co_parent_id]
+            leftover.generation = parent.generation + 1
+            leftover.parent_ids = [parent.id, co_parent_id] if parent.gender == 'M' else [co_parent_id, parent.id]
+            parent.children_ids.append(leftover.id)
+            co_parent.children_ids.append(leftover.id)
+            people_in_tree_ids.add(leftover.id)
+            person_pool.remove(leftover)
+        if person_pool:
+            logger.warning(
+                "%d of %d people could not be placed in the tree (depth %d, max %d children per couple) "
+                "and were dropped.", len(person_pool), total_people, max_depth, max_children_per_person,
+            )
+
     final_tree = {pid: p for pid, p in people.items() if pid in people_in_tree_ids}
-    
+
+    depth_reached = actual_depth(final_tree)
+    if depth_reached < max_depth:
+        logger.warning(
+            "Requested depth %d but the tree only has %d generation(s): the pool of %d people "
+            "is exhausted before reaching it (each couple has 1-%d children). Increase "
+            "total_people or lower max_children_per_person / num_root_couples to go deeper.",
+            max_depth, depth_reached, total_people, max_children_per_person,
+        )
+
     return final_tree
