@@ -164,3 +164,12 @@ def test_budget_param_scales_with_batch_size():
     d = m._build_api_request("p", "en", batch=True, n_questions=5)
     assert d["thinking_budget"] == 80000 and d["max_tokens"] == 80000 and d["enable_thinking"] is True
     assert "reasoning_effort" not in d
+
+
+def test_openai_requests_carry_a_stable_prompt_cache_key():
+    m = ModelEvaluator({"name": "o", "api_base": "https://api.openai.com/v1", "api_key": "k", "model": "gpt-5.6", "api": "openai_responses", "effort": "high"})
+    a = m._build_api_request("TREE\n\nQ1", "en", parts=("TREE", "Q1"))
+    b = m._build_api_request("TREE\n\nQ2", "en", parts=("TREE", "Q2"))
+    assert a["prompt_cache_key"] == b["prompt_cache_key"] and a["prompt_cache_key"].startswith("familybench-")
+    r = ModelEvaluator({"name": "r", "api_base": "https://openrouter.ai/api/v1", "api_key": "k", "model": "m"})
+    assert "prompt_cache_key" not in r._build_api_request("p", "en")

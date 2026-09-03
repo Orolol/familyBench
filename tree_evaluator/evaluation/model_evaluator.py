@@ -989,6 +989,10 @@ class ModelEvaluator:
                     {"role": "user", "content": prompt},
                 ],
                 "max_output_tokens": max_tokens,
+                # Clé de routage du cache : sans elle, des requêtes concurrentes au même
+                # préfixe partent sur des machines différentes et le cache n'est jamais lu
+                # (observé : cache_write_tokens à chaque requête, cached_tokens = 0).
+                "prompt_cache_key": self._prompt_cache_key(prefix or prompt),
             }
             reasoning = dict(self.reasoning_config or {})
             if self.effort and "effort" not in reasoning:
@@ -1006,6 +1010,8 @@ class ModelEvaluator:
                 {"role": "user", "content": prompt},
             ],
         }
+        if "api.openai.com" in self.api_base:
+            data["prompt_cache_key"] = self._prompt_cache_key(prefix or prompt)
         if self.temperature is not None:
             data["temperature"] = self.temperature
         if self.max_completion_tokens and not self.max_tokens_per_question:
@@ -1033,6 +1039,11 @@ class ModelEvaluator:
             thinking["reasoning_effort"] = self.effort
             data["thinking"] = thinking
         return data
+
+    @staticmethod
+    def _prompt_cache_key(prefix: str) -> str:
+        import hashlib
+        return "familybench-" + hashlib.sha256(prefix.encode("utf-8")).hexdigest()[:24]
 
     def _get_api_url(self) -> str:
         """Retourne l'URL de l'API selon la famille."""
