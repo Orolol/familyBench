@@ -1,0 +1,94 @@
+{
+  "timestamp": "20260903_114828",
+  "config": "evaluation_config_hard_v4_smoke.yaml",
+  "models_evaluated": [
+    "qwen3.8-max@budget16k"
+  ],
+  "benchmarks_run": [
+    "hard_v4_smoke_en"
+  ],
+  "benchmarks": {
+    "hard_v4_smoke_en": {
+      "fingerprint": "e05e5ff54bc3cc22",
+      "generator_version": "4.0",
+      "difficulty": "hard",
+      "people": 400,
+      "depth_requested": 8,
+      "depth_actual": 6,
+      "questions": 2,
+      "batch_size": 2
+    }
+  },
+  "entries": {
+    "qwen3.8-max@budget16k": {
+      "model": "qwen3.8-max",
+      "api": "openai_chat",
+      "api_base": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+      "thinking_level": "budget16k",
+      "effort": null,
+      "effort_param": "none",
+      "budget_param": "thinking_budget",
+      "reasoning": null,
+      "extra_body": {
+        "enable_thinking": true
+      },
+      "max_tokens_per_question": 16000,
+      "max_tokens": 16000,
+      "temperature": null,
+      "provider_routing": null
+    }
+  },
+  "summary_stats": {
+    "qwen3.8-max@budget16k": {
+      "total_questions": 2,
+      "correct_answers": 2,
+      "accuracy": 1.0,
+      "exact_matches": 2,
+      "exact_match_rate": 1.0,
+      "avg_partial_score": 1.0,
+      "avg_response_time": 182.00344574451447,
+      "total_tokens": 14668,
+      "total_prompt_tokens": 16362,
+      "total_completion_tokens": 14668,
+      "avg_completion_tokens": 7334.0,
+      "total_cached_tokens": 14720,
+      "total_cost_usd": 0.07836288799999999,
+      "avg_cost_usd": 0.039181443999999996,
+      "errors": 0,
+      "error_rate": 0.0,
+      "no_responses": 0,
+      "no_response_rate": 0.0,
+      "total_reasoning_tokens": 14652,
+      "questions_with_reasoning": 2,
+      "avg_reasoning_tokens": 7326.0,
+      "hallucination_rate": 0.0,
+      "answers_with_hallucination": 0,
+      "total_hallucinated_names": 0,
+      "by_question_type": {
+        "conditional": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        },
+        "multihop": {
+          "total": 1,
+          "correct": 1,
+          "accuracy": 1.0
+        }
+      },
+      "by_difficulty": {
+        "hard": {
+          "total": 2,
+          "correct": 2,
+          "accuracy": 1.0
+        }
+      },
+      "enigma_stats": {},
+      "normal_stats": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    }
+  }
+}
