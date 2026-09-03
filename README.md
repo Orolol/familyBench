@@ -384,6 +384,9 @@ Protocol `hard-v4` (`evaluation_config_hard_v4.yaml`): hard tier only, 60 questi
 | Entry | Accuracy | Truncated batches | Reasoning tokens / question | Cached prompt tokens | Cost | Wall time |
 |---|---|---|---|---|---|---|
 | deepseek-v4-flash@high | 48.3 % (29/60) | 1 of 12 | 13,100 | 62 % | $0.25 | 30 min |
+| deepseek-v4-flash@max (no cap, 380k per request) | 53.3 % (32/60) | 0 of 12 | 13,700 | 100 % | $0.26 | 21 min |
+
+`max` versus `high` on DeepSeek V4 Flash changes almost nothing in reasoning volume (+4 %) and the 5-point gap is within run-to-run noise: only 39 of the 60 questions got the same verdict in both passes (12 gained, 9 lost). Treat single 60-question runs as ±7 points; the max pass also shows that the DeepSeek prompt cache survives across runs (100 % hit).
 
 Per type: conditional 78 %, half-siblings 75 %, step-parents 75 %, roots-with-criterion 50 %, descendants-with-criterion 50 %, multihop 22 %, comparative 0 %. The comparative questions ("who has the same number of children as X") are whole-tree censuses even when the answer is short, and no answer in 16k tokens is realistic; they are candidates for exclusion from the protocol. Files in `evaluation_results/hard_v4/`.
 
