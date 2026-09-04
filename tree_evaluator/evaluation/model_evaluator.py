@@ -851,6 +851,8 @@ class ModelEvaluator:
             return progressed
         if self.api == "openai_responses":
             etype = event.get("type") or ""
+            if etype.startswith("response.") and etype not in ("response.created", "response.in_progress"):
+                progressed = True  # tout événement de sortie (item ajouté, partie de résumé...) est une progression
             if etype in ("error", "response.failed"):
                 acc["error"] = event.get("error") or (event.get("response") or {}).get("error") or {"message": "response failed"}
             elif etype == "response.output_text.delta" and event.get("delta"):
@@ -1010,8 +1012,10 @@ class ModelEvaluator:
             reasoning = dict(self.reasoning_config or {})
             if self.effort and "effort" not in reasoning:
                 reasoning["effort"] = self.effort
-            if reasoning:
-                data["reasoning"] = reasoning
+            # Sans résumé, l'API Responses n'émet rien pendant le raisonnement : un long
+            # raisonnement était coupé comme flux figé. Le résumé donne une progression.
+            reasoning.setdefault("summary", "auto")
+            data["reasoning"] = reasoning
             data.update(self.extra_body)
             return data
 

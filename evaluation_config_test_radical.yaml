@@ -10,6 +10,7 @@ models:
     effort: "high"
     max_tokens_per_question: 2500
     partial_threshold: 1.0          # exact match uniquement
+    idle_timeout: 900               # 50 questions : le raisonnement peut rester silencieux longtemps
     pricing: {input_per_mtok: 4, output_per_mtok: 20, cached_input_per_mtok: 0.4}
 
 benchmarks:

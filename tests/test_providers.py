@@ -97,7 +97,7 @@ async def test_openai_responses_streaming():
                             "api_key": "k", "model": "gpt-5.5", "effort": "xhigh", "max_tokens_per_question": 2000})
         r = await m.evaluate_question("TREE", Q, session, timeout=10, language="en")
     b = seen["body"]
-    assert b["reasoning"] == {"effort": "xhigh"} and b["max_output_tokens"] == 2000 and "temperature" not in b
+    assert b["reasoning"] == {"effort": "xhigh", "summary": "auto"} and b["max_output_tokens"] == 2000 and "temperature" not in b
     assert r.model_answer == "Bob" and r.is_correct and r.reasoning_tokens == 6 and r.cached_tokens == 24
     assert r.reasoning_text == "thinking " and r.finish_reason == "stop" and r.thinking_level == "xhigh"
 
