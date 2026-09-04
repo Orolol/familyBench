@@ -1,0 +1,30 @@
+# Test : mode expert (tier hard + énigmes de niveau 4 à 9), arbre de 1000 personnes,
+# 50 questions, gpt-5.6 (sol) en effort high, mêmes réglages de requête que hard-v4.
+models:
+  - name: "gpt-5.6@high"
+    api_base: "https://api.openai.com/v1"
+    api_key: "${OPENAI_API_KEY}"
+    model: "gpt-5.6"          # alias de gpt-5.6-sol
+    api: "openai_responses"
+    effort: "high"
+    max_tokens_per_question: 16000
+    pricing: {input_per_mtok: 4, output_per_mtok: 20, cached_input_per_mtok: 0.4}
+
+benchmarks:
+  - name: "expert_1000_en"
+    people: 1000
+    depth: 12
+    questions: 50
+    root_couples: 8
+    seed: 5050
+    language: "en"
+    difficulty: expert
+    exclude_types: [comparative, negation]   # recensements sur tout l'arbre, comme dans hard-v4
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 4
+  timeout: 3600
+  batch_size: 5
+  output_dir: "evaluation_results/tests_expert_1000"
+  output_formats: [csv, json]
