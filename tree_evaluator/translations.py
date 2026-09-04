@@ -186,6 +186,16 @@ TRANSLATIONS = {
         "q_co_parents_of": "Avec qui {name} a-t-il ou a-t-elle eu des enfants ?",
         "q_how_many_half_siblings": "Combien de demi-frères et demi-sœurs a {name} ?",
 
+        # Errata et énumération complète
+        "erratum_parent": "Correction : {wrong} n'est pas {role} de {child} ; {role_cap} de {child} est {right}.",
+        "role_father": "le père", "role_mother": "la mère",
+        "description_errata_note": "Certaines phrases sont fausses et corrigées ailleurs par une phrase commençant par « Correction : » ; la correction fait foi, où qu'elle se trouve.",
+        "q_enum_descendants": "Donne la liste complète des descendants de {name}, toutes générations confondues.",
+        "q_enum_grandchildren": "Donne la liste complète des petits-enfants de {name}.",
+        "q_enum_nephews": "Donne la liste complète des neveux et nièces de {name}.",
+        "q_enum_cousins": "Donne la liste complète des cousins et cousines de {name}.",
+        "q_enum_roots_children": "Donne la liste complète des enfants des personnes sans parents qui travaillent comme {profession}.",
+
         # Pronoms
         "pronoun_m": "il",
         "pronoun_f": "elle",
@@ -378,6 +388,16 @@ TRANSLATIONS = {
         "q_step_parents_of": "Who are {name}'s step-parents (partners of one of {name}'s parents who are not {name}'s parents)?",
         "q_co_parents_of": "With whom did {name} have children?",
         "q_how_many_half_siblings": "How many half-siblings does {name} have?",
+
+        # Errata and full enumeration
+        "erratum_parent": "Correction: {wrong} is not {role} of {child}; {role} of {child} is {right}.",
+        "role_father": "the father", "role_mother": "the mother",
+        "description_errata_note": "Some statements are wrong and are corrected elsewhere by a sentence starting with \"Correction:\"; the correction prevails wherever it appears.",
+        "q_enum_descendants": "Give the complete list of {name}'s descendants, across all generations.",
+        "q_enum_grandchildren": "Give the complete list of {name}'s grandchildren.",
+        "q_enum_nephews": "Give the complete list of {name}'s nephews and nieces.",
+        "q_enum_cousins": "Give the complete list of {name}'s cousins.",
+        "q_enum_roots_children": "Give the complete list of the children of the people without parents who work as a {profession}.",
 
         # Pronouns
         "pronoun_m": "he",

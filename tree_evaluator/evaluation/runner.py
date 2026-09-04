@@ -8,7 +8,7 @@ from typing import Dict, List, Any, Optional, Callable
 import aiohttp
 
 from tree_evaluator.tree_generator import generate_tree, actual_depth
-from tree_evaluator.text_converter import convert_tree_to_text
+from tree_evaluator.text_converter import convert_tree_to_text_with_facts
 from tree_evaluator.question_generator import generate_questions
 from tree_evaluator.versioning import benchmark_fingerprint, benchmark_params_from_config, GENERATOR_VERSION
 from .model_evaluator import ModelEvaluator
@@ -66,14 +66,19 @@ async def run_benchmark_evaluation(
     # Description : mélangée par défaut (l'ordre trié révèle la génération),
     # un seul sens de lien par défaut ("X est l'enfant de A et B"). Le mélange
     # est seedé pour que la description soit identique d'un run à l'autre.
-    tree_description = convert_tree_to_text(
+    tree_description, facts = convert_tree_to_text_with_facts(
         tree,
         shuffle=benchmark_config.get('shuffle', True),
         language=language,
         relations=benchmark_config.get('relations', 'mixed'),
         seed=benchmark_config.get('seed'),
         derived_links_percentage=benchmark_config.get('derived_links_percentage', 30),
+        errata_percentage=benchmark_config.get('errata_percentage', 0),
     )
+    # Personnes dont un lien est corrigé par un erratum (pour l'analyse)
+    erratum_names = {tree[f["person_id"]].first_name for f in facts if f["kind"] == "erratum"}
+    erratum_names |= {tree[f["decoy_id"]].first_name for f in facts if f["kind"] == "erratum"}
+    erratum_names |= {tree[f["true_parent_id"]].first_name for f in facts if f["kind"] == "erratum"}
     enigma_percentage = benchmark_config.get('enigma_percentage', 10)
     difficulty = benchmark_config.get('difficulty', 'all')
     questions = generate_questions(
@@ -84,7 +89,13 @@ async def run_benchmark_evaluation(
         anonymize_percentage=benchmark_config.get('anonymize_percentage', 50),
         drop_answer_names_above=benchmark_config.get('drop_answer_names_above', 40),
         exclude_types=benchmark_config.get('exclude_types'),
+        include_types=benchmark_config.get('include_types'),
     )
+    if erratum_names:
+        import re as _re
+        for q in questions:
+            names = set(_re.findall(r"[A-Z][\w'-]+", q["question"])) | set(q["answer"].split(","))
+            q["touches_erratum"] = bool(names & erratum_names)
 
     system_prompt = model.prompt_builder.get_system_prompt(language, batch_size > 1)
     model.set_known_names(p.first_name for p in tree.values())

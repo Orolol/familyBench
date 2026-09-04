@@ -103,6 +103,9 @@ def main():
                         help="Au-delà de ce nombre de prénoms, la question devient un dénombrement (0 = désactivé, défaut 10).")
     parser.add_argument("--drop-answer-names-above", type=int, default=40,
                         help="Écarte les questions dont la réponse dépasse ce nombre de prénoms (recensements ; 0 = désactivé, défaut 40).")
+    parser.add_argument("--errata-percentage", type=int, default=0,
+                        help="Part des personnes (0-100) dont un lien parental est énoncé faux puis corrigé par un « Correction : » placé ailleurs (mode mixed).")
+    parser.add_argument("--include-types", type=str, nargs="*", default=[], help="Liste blanche de types de questions.")
     parser.add_argument("--exclude-types", type=str, nargs="*", default=[],
                         help="Types de questions à écarter (ex: relational_path relation_attribut_composee).")
     parser.add_argument("--anonymize-percentage", type=int, default=50,
@@ -141,7 +144,8 @@ def main():
     print("Conversion de l'arbre en texte...")
     description = convert_tree_to_text(tree, shuffle=args.shuffle, language=args.language,
                                        relations=args.relations, seed=args.seed,
-                                       derived_links_percentage=args.derived_links_percentage)
+                                       derived_links_percentage=args.derived_links_percentage,
+                                       errata_percentage=args.errata_percentage)
 
     if args.difficulty == "all":
         print(f"Génération de {args.questions} questions (dont {args.enigma_percentage}% d'énigmes)...")
@@ -157,6 +161,7 @@ def main():
         anonymize_percentage=args.anonymize_percentage,
         drop_answer_names_above=args.drop_answer_names_above,
         exclude_types=args.exclude_types,
+        include_types=args.include_types,
     )
 
     if args.language == "en":
@@ -207,6 +212,8 @@ def main():
                 "second_union_percentage": args.second_union_percentage,
                 "derived_links_percentage": args.derived_links_percentage,
                 "exclude_types": sorted(args.exclude_types),
+                "include_types": sorted(args.include_types),
+                "errata_percentage": args.errata_percentage,
             }),
             "generation_timestamp": datetime.datetime.now().isoformat(),
         }

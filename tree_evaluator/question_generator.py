@@ -36,6 +36,7 @@ DIFFICULTY_TIERS: Dict[str, set[str]] = {
         "verticale_racine_critere",
         "demi_fratrie",
         "beaux_parents",
+        "enumeration",
     },
     "enigma": {"enigme"},
 }
@@ -78,6 +79,7 @@ from tree_evaluator.questions.advanced import (
     generate_relational_path_questions
 )
 from tree_evaluator.questions.enigma import generate_enigma_questions
+from tree_evaluator.questions.enumeration import generate_enumeration_questions
 from tree_evaluator.questions.rewrite import (
     anonymize_names, convert_long_answers_to_counts, answer_format, fix_english_articles,
     drop_census_questions,
@@ -147,6 +149,7 @@ def generate_questions(
     anonymize_percentage: int = DEFAULT_ANONYMIZE_PERCENTAGE,
     drop_answer_names_above: int = DEFAULT_DROP_ANSWER_NAMES_ABOVE,
     exclude_types: Optional[Iterable[str]] = None,
+    include_types: Optional[Iterable[str]] = None,
 ) -> List[Dict[str, Any]]:
     """Génère une liste de questions de différents types.
 
@@ -162,8 +165,10 @@ def generate_questions(
         drop_answer_names_above: les questions dont la réponse dépasse ce nombre
             de prénoms sont écartées avant tirage (recensements). 0 = désactivé.
         exclude_types: types de questions à écarter (ex. relational_path).
+        include_types: liste blanche de types (appliquée avant exclude_types).
     """
     excluded = set(exclude_types or ())
+    included = set(include_types or ())
     if difficulty not in VALID_DIFFICULTIES:
         raise ValueError(
             f"difficulty must be one of {sorted(VALID_DIFFICULTIES)}, got {difficulty!r}"
@@ -177,6 +182,7 @@ def generate_questions(
     normal_questions.extend(generate_counting_questions(people, language))
     normal_questions.extend(generate_complex_relation_questions(people, language))
     normal_questions.extend(generate_half_family_questions(people, language))
+    normal_questions.extend(generate_enumeration_questions(people, language))
     normal_questions.extend(generate_transversal_questions(people, language))
     normal_questions.extend(generate_vertical_questions(people, language))
     normal_questions.extend(generate_compound_relation_questions(people, language))
@@ -189,6 +195,8 @@ def generate_questions(
     unique_normal_questions = drop_census_questions(
         _dedupe(normal_questions), people, language, drop_answer_names_above
     )
+    if included:
+        unique_normal_questions = [q for q in unique_normal_questions if q["type"] in included]
     unique_normal_questions = [q for q in unique_normal_questions if q["type"] not in excluded]
     unique_enigma_questions = _dedupe(generate_enigma_questions(people, language))
     if "enigme" in excluded:

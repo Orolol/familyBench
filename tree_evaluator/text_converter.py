@@ -38,6 +38,7 @@ def build_description_facts(
     relations: str = "mixed",
     derived_links_percentage: int = 0,
     rng=random,
+    errata_percentage: int = 0,
 ) -> List[dict]:
     """Construit la liste des faits à écrire, sans les ordonner.
 
@@ -55,6 +56,12 @@ def build_description_facts(
       complet dont les liens sont explicites) dont les liens parentaux sont
       remplacés par "X est la sœur de Y". L'arbre reste reconstituable : Y
       (l'ancre) garde ses liens explicites et n'est jamais lui-même dérivé.
+    errata_percentage: part des personnes (mode "mixed" uniquement) dont UN lien
+      parental est énoncé faux (un parent leurre du même sexe) puis corrigé par
+      une phrase "Correction : D n'est pas le père de X ; le père de X est A",
+      placée n'importe où. Les questions sont calculées sur l'arbre vrai : il
+      faut appliquer la correction pour répondre. Faits produits : le lien
+      faux porte "corrupted": True, la correction est de kind "erratum".
     """
     if relations not in RELATION_MODES:
         raise ValueError(f"relations must be one of {RELATION_MODES}, got {relations!r}")
@@ -80,6 +87,24 @@ def build_description_facts(
             anchors.add(anchor.id)
             derived[person.id] = anchor
 
+    # Errata : choisir les personnes dont un lien sera énoncé faux puis corrigé
+    errata: Dict[str, dict] = {}  # person_id -> {"parent_id", "decoy_id"}
+    if errata_percentage > 0 and relations == "mixed":
+        candidates = [p for p in people.values() if p.parent_ids and p.id not in derived]
+        rng.shuffle(candidates)
+        by_gender_gen: Dict[tuple, List[Person]] = {}
+        for p_ in people.values():
+            by_gender_gen.setdefault((p_.gender, p_.generation), []).append(p_)
+        for person in candidates:
+            if rng.random() * 100 >= errata_percentage:
+                continue
+            true_parent = people[rng.choice(person.parent_ids)]
+            pool = [d for d in by_gender_gen.get((true_parent.gender, true_parent.generation), [])
+                    if d.id not in person.parent_ids and d.id != person.id]
+            if not pool:
+                continue
+            errata[person.id] = {"parent_id": true_parent.id, "decoy_id": rng.choice(pool).id}
+
     for person in people.values():
         if person.id in derived:
             anchor = derived[person.id]
@@ -97,8 +122,25 @@ def build_description_facts(
                     name=_tag(person), parent1=parent_names[0], parent2=parent_names[1]) + ".",
             })
         if person.parent_ids and relations == "mixed":
+            err = errata.get(person.id)
             for pid in person.parent_ids:
                 direction = rng.choice(("parent", "child"))
+                if err and pid == err["parent_id"]:
+                    decoy = people[err["decoy_id"]]
+                    facts.append({
+                        "kind": "link", "person_id": person.id, "parent_id": decoy.id, "direction": direction,
+                        "corrupted": True, "true_parent_id": pid,
+                        "text": _link_sentence(decoy, person, direction, language),
+                    })
+                    role_key = "role_father" if decoy.gender == "M" else "role_mother"
+                    role = get_translation(role_key, language)
+                    facts.append({
+                        "kind": "erratum", "person_id": person.id, "decoy_id": decoy.id, "true_parent_id": pid,
+                        "text": get_translation("erratum_parent", language).format(
+                            wrong=_tag(decoy), child=_tag(person), right=_tag(people[pid]),
+                            role=role, role_cap=role[0].upper() + role[1:]),
+                    })
+                    continue
                 facts.append({
                     "kind": "link", "person_id": person.id, "parent_id": pid, "direction": direction,
                     "text": _link_sentence(people[pid], person, direction, language),
@@ -123,7 +165,22 @@ def convert_tree_to_text(
     seed: Optional[int] = None,
     derived_links_percentage: int = 0,
     conventions: bool = True,
+    errata_percentage: int = 0,
 ) -> str:
+    return convert_tree_to_text_with_facts(people, shuffle, language, relations, seed,
+                                           derived_links_percentage, conventions, errata_percentage)[0]
+
+
+def convert_tree_to_text_with_facts(
+    people: Dict[str, Person],
+    shuffle: bool = False,
+    language: str = "fr",
+    relations: str = "mixed",
+    seed: Optional[int] = None,
+    derived_links_percentage: int = 0,
+    conventions: bool = True,
+    errata_percentage: int = 0,
+) -> tuple:
     """Convertit le dictionnaire de personnes en une description textuelle.
 
     Args:
@@ -139,9 +196,9 @@ def convert_tree_to_text(
             oncle, cousin... (nécessaire dès qu'il y a des secondes unions).
     """
     if not people:
-        return ""
+        return "", []
     rng = random.Random(f"description-{seed}") if seed is not None else random
-    facts = build_description_facts(people, language, relations, derived_links_percentage, rng)
+    facts = build_description_facts(people, language, relations, derived_links_percentage, rng, errata_percentage)
 
     order = {p.id: i for i, p in enumerate(sorted(people.values(), key=lambda p: (p.generation, p.first_name)))}
     lines: List[str] = []
@@ -165,6 +222,9 @@ def convert_tree_to_text(
             lines.extend(f["text"] for f in [head] + rest)
 
     if conventions:
-        lines.insert(0, get_translation("description_conventions", language))
+        header = get_translation("description_conventions", language)
+        if errata_percentage > 0 and relations == "mixed":
+            header += " " + get_translation("description_errata_note", language)
+        lines.insert(0, header)
     text = "\n".join(lines)
-    return fix_english_articles(text) if language == "en" else text
+    return (fix_english_articles(text) if language == "en" else text), facts

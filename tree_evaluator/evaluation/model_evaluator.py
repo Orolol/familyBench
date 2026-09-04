@@ -62,6 +62,8 @@ class ModelEvaluator:
         # Vendeurs dont max_tokens ne couvre pas la chaîne de pensée (Qwen) : nom du
         # paramètre de budget de raisonnement, réglé à max_tokens_per_question x batch.
         self.budget_param = config.get('budget_param')
+        # Seuil de Jaccard pour is_correct (1.0 = exact match uniquement)
+        self.partial_threshold = float(config.get('partial_threshold', self.CORRECT_PARTIAL_THRESHOLD))
         # Paramètres bruts fusionnés dans le corps de la requête (budgets de
         # thinking propres à un vendeur, etc.)
         self.extra_body: Dict[str, Any] = dict(config.get('extra_body') or {})
@@ -188,6 +190,7 @@ class ModelEvaluator:
             "reasoning": self.reasoning_config,
             "extra_body": self.extra_body or None,
             "max_tokens_per_question": self.max_tokens_per_question,
+            "partial_threshold": self.partial_threshold,
             "max_tokens": self._effective_max_tokens(1),
             "temperature": self.temperature,
             "provider_routing": self.provider_config,
@@ -350,7 +353,7 @@ class ModelEvaluator:
             else:
                 is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
                 partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
-                is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
+                is_correct = is_exact_match or partial_score >= self.partial_threshold
 
             # Calculer le temps total depuis le début (incluant les retries)
             total_response_time = time.time() - total_start_time
@@ -551,7 +554,7 @@ class ModelEvaluator:
                 else:
                     is_exact_match = self.cleaner.check_exact_match(model_answer, question['answer'])
                     partial_score = self.cleaner.calculate_partial_match(model_answer, question['answer'])
-                    is_correct = is_exact_match or partial_score >= self.CORRECT_PARTIAL_THRESHOLD
+                    is_correct = is_exact_match or partial_score >= self.partial_threshold
 
                 per_q_prompt = prompt_tokens // len(questions)
                 per_q_completion = tokens_used // len(questions)
