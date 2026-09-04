@@ -184,3 +184,18 @@ async def test_http_4xx_other_than_retryable_is_not_retried():
         m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m", "stream": False})
         r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
     assert calls["n"] == 1 and r.error and "400" in r.error
+
+
+@pytest.mark.asyncio
+async def test_quota_exhausted_is_not_retried():
+    calls = {"n": 0}
+
+    async def chat(request):
+        calls["n"] += 1
+        return web.Response(status=500, text='{"type": "insufficient_quota", "code": "credit_balance_exhausted"}')
+
+    app = web.Application(); app.router.add_post("/v1/chat/completions", chat)
+    async with TestServer(app) as server, __import__("aiohttp").ClientSession() as session:
+        m = ModelEvaluator({"name": "s", "api_base": f"http://127.0.0.1:{server.port}/v1", "api_key": "none", "model": "m", "stream": False})
+        r = await m.evaluate_question("tree", Q, session, timeout=10, language="en")
+    assert calls["n"] == 1 and r.error and "credit_balance_exhausted" in r.error

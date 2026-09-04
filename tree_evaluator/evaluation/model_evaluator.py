@@ -708,6 +708,10 @@ class ModelEvaluator:
             status, result = await self._call_api_once(session, url, data, headers, timeout, label)
             if status == 200 or status not in self.RETRYABLE_HTTP or attempt >= self.http_retries:
                 return status, result
+            # Quota / crédit épuisé : définitif, quel que soit le statut HTTP renvoyé
+            if isinstance(result, str) and any(k in result for k in ("insufficient_quota", "credit_balance_exhausted", "Insufficient balance")):
+                logger.error(f"{self.name} ({label}): account quota exhausted, not retrying: {result[:160]}")
+                return status, result
             wait = min(self.http_retry_max_wait, 2.0 * (2 ** attempt))
             retry_after = self._last_retry_after
             if retry_after:
