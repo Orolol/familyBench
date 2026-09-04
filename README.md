@@ -208,6 +208,11 @@ tests/                                        # pytest suite
 
 Files: `evaluation_results/batch_sweep_deepseek/`, `evaluation_results/v4_deepseek/`, `evaluation_results/hard_v4_deepseek_flash_tests/`, `evaluation_results/hard_v4_smoke*/`.
 
+### Experiments after the leaderboard (generator 4.1)
+
+- **Expert mode, 1,000 people, 50 questions, batch 5**, `gpt-5.6@high`: 88 %, enigmas 20/20, all six misses are incomplete lists. Tree size alone does not hurt frontier models (`evaluation_results/tests_expert_1000/`).
+- **"Radical" test** (`evaluation_config_test_radical.yaml`): 1,000 people, **scattered errata** (20 % of people have one parent link stated wrong and corrected elsewhere by a "Correction:" sentence; questions are computed on the corrected tree), 50 **full enumerations** with 5-12 name answers and 50 multihop questions, **exact scoring**, **batch 50** (2 requests, 2,500 output tokens per question). `gpt-5.6@high`: **70 %** (enumeration 36/50, multihop 34/50), $1.01. Errors are 18 "None" and 12 incomplete lists; questions touching an erratum 38/58 versus 32/42 without; anonymised questions 28/47 versus 42/53 named. With 50 questions per request the model spent only 490 output tokens per question. Files in `evaluation_results/tests_radical/`. Generator 4.1 adds `errata_percentage`, the `enumeration` type, `include_types` and a per-entry `partial_threshold` (1.0 = exact match).
+
 ### 2025 leaderboard (generator 1.x, historical)
 
 Benchmark `huge_tree_en` (400 people, requested depth 10 with 5 generations actually reached, 189 questions, 10 root couples), temperature 0.3, reasoning capped at 8,000 tokens, batch 1, via OpenRouter. The name lists and the question sampling have changed since, so `seed 43` no longer regenerates this benchmark; the table is kept as a reference. The per-model commentary of that era is available in the git history.
