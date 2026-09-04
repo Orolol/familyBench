@@ -36,7 +36,7 @@ def test_errata_are_wrong_then_corrected_and_tree_is_recoverable(tree):
     for p in tree.values():
         assert parents.get(p.id, set()) == set(p.parent_ids), p.first_name
     text, facts2 = convert_tree_to_text_with_facts(tree, shuffle=True, language="en", seed=5, derived_links_percentage=30, errata_percentage=25)
-    assert text.count("Correction:") == len([f for f in facts2 if f["kind"] == "erratum"]) > 0
+    assert sum(1 for l in text.splitlines() if l.startswith("Correction:")) == len([f for f in facts2 if f["kind"] == "erratum"]) > 0
     assert "the correction prevails" in text.splitlines()[0]
     assert "Correction:" not in convert_tree_to_text_with_facts(tree, language="en", errata_percentage=0)[0]
 
