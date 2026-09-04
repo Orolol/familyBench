@@ -825,12 +825,15 @@ class ModelEvaluator:
                 acc["error"] = event.get("error") or {"message": "unknown error"}
             elif etype == "message_start":
                 acc["usage"] = self._anthropic_usage((event.get("message") or {}).get("usage") or {})
+            elif etype in ("content_block_start", "content_block_stop"):
+                progressed = True  # un bloc (thinking ou texte) commence/finit : le modèle avance
             elif etype == "content_block_delta":
                 delta = event.get("delta") or {}
+                progressed = True  # tout delta (texte, thinking, signature) est une progression
                 if delta.get("type") == "text_delta" and delta.get("text"):
-                    acc["content"].append(delta["text"]); progressed = True
+                    acc["content"].append(delta["text"])
                 elif delta.get("type") == "thinking_delta" and delta.get("thinking"):
-                    acc["reasoning"].append(delta["thinking"]); progressed = True
+                    acc["reasoning"].append(delta["thinking"])
             elif etype == "message_delta":
                 delta = event.get("delta") or {}
                 if delta.get("stop_reason"):
@@ -981,7 +984,10 @@ class ModelEvaluator:
                 "max_tokens": max_tokens,
                 "system": system_blocks,
                 "messages": [{"role": "user", "content": suffix if prefix else prompt}],
-                "thinking": {"type": "adaptive"},
+                # display "summarized" : des deltas de résumé de raisonnement arrivent pendant le
+                # thinking. Avec le défaut "omitted", un long thinking n'envoie que des pings et
+                # le détecteur de flux figé coupait la requête (observé sur un batch de 50).
+                "thinking": {"type": "adaptive", "display": "summarized"},
             }
             if self.effort:
                 data["output_config"] = {"effort": self.effort}

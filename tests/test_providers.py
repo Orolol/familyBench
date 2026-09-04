@@ -44,7 +44,7 @@ async def test_anthropic_messages_streaming():
     h = seen["headers"]; b = seen["body"]
     assert h["x-api-key"] == "sk-test" and h["anthropic-version"] == "2023-06-01" and "Authorization" not in h
     assert b["model"] == "claude-opus-5" and b["max_tokens"] == 1000 and b["stream"] is True
-    assert b["thinking"] == {"type": "adaptive"} and b["output_config"] == {"effort": "high"}
+    assert b["thinking"] == {"type": "adaptive", "display": "summarized"} and b["output_config"] == {"effort": "high"}
     assert "temperature" not in b
     # arbre dans un bloc système avec cache_control, question dans le message utilisateur
     assert b["system"][1]["cache_control"] == {"type": "ephemeral"} and "TREE" in b["system"][1]["text"]

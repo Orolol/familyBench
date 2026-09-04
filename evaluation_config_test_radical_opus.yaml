@@ -1,0 +1,35 @@
+# Test "radical" : énumérations complètes + multihop, errata dispersés (20 %),
+# 1000 personnes, 100 questions en 2 batchs de 50, scoring exact, Claude Opus 5 high.
+# Plafond par question ramené à 2 500 tokens : 50 x 2 500 = 125 000, sous les 128k de sortie d'Opus 5.
+models:
+  - name: "claude-opus-5@high"
+    api_base: "https://api.anthropic.com/v1"
+    api_key: "${ANTHROPIC_API_KEY}"
+    model: "claude-opus-5"
+    anthropic_workspace_id: "${ANTHROPIC_WORKSPACE_ID}"
+    effort: "high"
+    max_tokens_per_question: 2500   # 50 x 2 500 = 125 000, sous les 128k de sortie d'Opus 5
+    partial_threshold: 1.0          # exact match uniquement
+    idle_timeout: 900               # 50 questions : le thinking peut rester silencieux longtemps
+    pricing: {input_per_mtok: 5, output_per_mtok: 25, cached_input_per_mtok: 0.5}
+
+benchmarks:
+  - name: "radical_1000_en"
+    people: 1000
+    depth: 12
+    questions: 100
+    root_couples: 8
+    seed: 6060
+    language: "en"
+    difficulty: hard
+    include_types: [enumeration, multihop]
+    errata_percentage: 20
+    max_answer_names: 12            # les énumérations font 5 à 12 noms : pas de conversion en comptage
+
+evaluation:
+  runs_per_benchmark: 1
+  max_concurrent_requests: 2
+  timeout: 3600
+  batch_size: 50
+  output_dir: "evaluation_results/tests_radical"
+  output_formats: [csv, json]
